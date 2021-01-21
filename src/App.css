@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+.grid-container {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  grid-template-rows: 100px 1fr;
+  gap: 0px 0px;
+  grid-template-areas:
+    'header header'
+    'sidebar content';
+}
+.header {
+  grid-area: header;
+  background-color: black;
+}
+.sidebar {
+  grid-area: sidebar;
+  background-color: black;
+}
+.content {
+  grid-area: content;
+  border: 1px solid green;
+  position: relative;
+}
+

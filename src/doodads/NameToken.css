@@ -1,0 +1,20 @@
+.token__circle {
+  background: black;
+  border: 3px solid green;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.token__label {
+  color: white;
+  font-size: 20px;
+}
+.token.token--ally .token__circle {
+    border-color: rgb(20, 152, 196);    
+}
+.token.token--enemy .token__circle {
+    border-color: rgb(177, 65, 65);
+}

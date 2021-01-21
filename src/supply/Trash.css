@@ -1,0 +1,13 @@
+.trash {
+    display: flex;
+    border: 1px solid black;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.trash:hover {
+    filter: brightness(1.5)
+}
