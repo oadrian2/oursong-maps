@@ -32,18 +32,18 @@ const tokenSlice = createSlice({
 export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert } = tokenSlice.actions;
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
-  invoke('events', token)
-}
+  invoke('events', 123, token);
+};
 
 export const tokenUpsertRequested = (token) => (dispatch, getState, invoke) => {
-  invoke('events', token)
-}
+  invoke('events', 123, token);
+};
 
 export const tokenStashRequested = (id) => (dispatch, getState, invoke) => {
   const token = selectTokenById(getState(), id);
 
-  invoke('events', { ...token, position: null });
-}
+  invoke('events', 123, { ...token, position: null });
+};
 
 export default tokenSlice.reducer;
 
