@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd';
 import Draggable from 'react-draggable';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import Token from '../doodads/Token';
-import { selectActiveTokens, tokenCreated, tokenMoved, tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
+import { selectActiveTokens, tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
 import { Measurement } from '../measurement/Measurement';
 import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectPathAsVectors } from '../measurement/measurementSlice';
