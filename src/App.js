@@ -5,6 +5,7 @@ import './App.css';
 import { selectConnected } from './connection/connectionSlice';
 import MapLayer from './map/MapLayer';
 import Supply from './supply/Supply';
+import { Header } from './header/Header';
 
 function App() {
   const connected = useSelector(selectConnected);
@@ -14,7 +15,9 @@ function App() {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="grid-container">
-        <div className="header"></div>
+        <div className="header">
+          <Header />
+        </div>
         <div className="sidebar">
           <Supply />
         </div>

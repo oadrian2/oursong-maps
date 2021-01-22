@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import Token from '../doodads/Token';
@@ -6,7 +5,7 @@ import { selectStashedTokens, tokenStashRequested } from '../doodads/tokenSlice'
 import { ItemTypes } from '../ItemTypes';
 import './Supply.css';
 import TokenGroup from './TokenGroup';
-import { selectTokenGroupIds, standardPartyAdded } from './tokenGroupSlice';
+import { selectTokenGroupIds } from './tokenGroupSlice';
 import Trash from './Trash';
 
 export default function Supply() {
@@ -14,10 +13,6 @@ export default function Supply() {
 
   const tokenGroups = useSelector(selectTokenGroupIds);
   const tokens = useSelector(selectStashedTokens);
-
-  useEffect(() => {
-    dispatch(standardPartyAdded());
-  }, [dispatch]);
 
   const [, drop] = useDrop({
     accept: ItemTypes.TOKEN,

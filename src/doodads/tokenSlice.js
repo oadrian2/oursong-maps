@@ -1,4 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { selectEncounter } from '../map/mapSlice';
 
 const tokensAdapter = createEntityAdapter();
 
@@ -10,6 +11,7 @@ const tokenSlice = createSlice({
   reducers: {
     tokenCreated: tokensAdapter.addOne,
     tokenTrashed: tokensAdapter.removeOne,
+    tokensUpdated: tokensAdapter.upsertMany,
     tokenMoved: (state, action) => {
       const { id, position } = action.payload;
 
@@ -29,20 +31,33 @@ const tokenSlice = createSlice({
   },
 });
 
-export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert } = tokenSlice.actions;
+export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = tokenSlice.actions;
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
-  invoke('events', 123, token);
+  const state = getState();
+  const encounter = selectEncounter(state);
+
+  invoke('events', encounter, token);
 };
 
 export const tokenUpsertRequested = (token) => (dispatch, getState, invoke) => {
-  invoke('events', 123, token);
+  const encounter = selectEncounter(getState());
+
+  invoke('events', encounter, token);
 };
 
 export const tokenStashRequested = (id) => (dispatch, getState, invoke) => {
+  const encounter = selectEncounter(getState());
   const token = selectTokenById(getState(), id);
 
-  invoke('events', 123, { ...token, position: null });
+  invoke('events', encounter, { ...token, position: null });
+};
+
+export const tokenTrashRequested = (id) => (dispatch, getState, invoke) => {
+  const encounter = selectEncounter(getState());
+  const token = selectTokenById(getState(), id);
+
+  invoke('events', encounter, { ...token, deleted: true });
 };
 
 export default tokenSlice.reducer;
@@ -51,5 +66,5 @@ export const { selectAll: selectAllTokens, selectById: selectTokenById, selectId
   (state) => state.tokens
 );
 
-export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !t.position));
-export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position));
+export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !t.position && !t.deleted));
+export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position && !t.deleted));

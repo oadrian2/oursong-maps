@@ -16,6 +16,9 @@
 .header {
   grid-area: header;
   background-color: black;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
 }
 .sidebar {
   grid-area: sidebar;

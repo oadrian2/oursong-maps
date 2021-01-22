@@ -1,9 +1,9 @@
 import { Delete } from '@material-ui/icons';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { tokenTrashed } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import { tokenGroupTrashed } from './tokenGroupSlice';
+import { tokenGroupUpdateRequested } from './tokenGroupSlice';
+import { tokenTrashRequested } from '../doodads/tokenSlice';
 import './Trash.css';
 
 export default function Trash() {
@@ -16,10 +16,10 @@ export default function Trash() {
 
       switch (item.type) {
         case ItemTypes.TOKEN:
-          dispatch(tokenTrashed(id));
+          dispatch(tokenTrashRequested(id));
           break;
         case ItemTypes.TOKEN_GROUP:
-          dispatch(tokenGroupTrashed(id));
+          dispatch(tokenGroupUpdateRequested({ id, deleted: true }));
           break;
         default:
       }
