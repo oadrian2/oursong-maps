@@ -6,6 +6,7 @@ import { selectConnected } from './connection/connectionSlice';
 import MapLayer from './map/MapLayer';
 import Supply from './supply/Supply';
 import { Header } from './header/Header';
+import { CustomDragLayer } from './app/CustomDragLayer';
 
 function App() {
   const connected = useSelector(selectConnected);
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <CustomDragLayer />
       <div className="grid-container">
         <div className="header">
           <Header />
