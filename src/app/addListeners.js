@@ -48,3 +48,22 @@ export async function addListeners(connection, { dispatch, getState }) {
 
   dispatch(connected());
 }
+
+export const signalRMiddleware = (connection) => {
+  return store => {
+    connection.on('broadcastReceived', (action) => {
+      store.dispatch(action);
+    });
+
+    return next => action => {
+      if (action.type ==='broadcast') {
+        console.log('broadcasting', action.payload );
+        connection.invoke('broadcast', 123, action.payload);
+
+        return;
+      }
+
+      return next(action);
+    }
+  }
+}

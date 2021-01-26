@@ -5,11 +5,11 @@ import tokenReducer from '../doodads/tokenSlice';
 import connectionReducer from '../connection/connectionSlice';
 import mapReducer from '../map/mapSlice';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { addListeners } from './addListeners';
+import { addListeners, signalRMiddleware } from './addListeners';
 
 const connection = new HubConnectionBuilder()
   .configureLogging(LogLevel.Debug)
-  .withUrl('https://mapofwonders.azurewebsites.net/api')
+  .withUrl(process.env.REACT_APP_HUB_URL)
   .build();
 
 const store = configureStore({
@@ -25,7 +25,7 @@ const store = configureStore({
       thunk: {
         extraArgument: connection.invoke.bind(connection),
       },
-    }),
+    }).concat(signalRMiddleware(connection)),
 });
 
 addListeners(connection, store);
