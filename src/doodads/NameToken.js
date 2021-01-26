@@ -1,7 +1,7 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import './NameToken.css';
 
-export const NameToken = React.forwardRef(({ label, title, allegiance }, ref) => {
+export const NameToken = forwardRef(({ label, title, allegiance }, ref) => {
   const className =
     {
       [TokenAllegiance.ALLY]: 'token--ally',

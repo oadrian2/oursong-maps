@@ -4,12 +4,12 @@ import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import { tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import MeasurementOverlay from '../measurement/MeasurementOverlay';
-import MapImage from './MapImage';
+import { MeasurementOverlay } from '../measurement/MeasurementOverlay';
+import { MapImage } from './MapImage';
 import './MapLayer.css';
-import TokenLayer from './TokenLayer';
+import { TokenLayer } from './TokenLayer';
 
-export default function MapLayer() {
+export function MapLayer() {
   const dispatch = useDispatch();
 
   const ref = useRef();

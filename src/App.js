@@ -2,11 +2,11 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import './App.css';
-import { selectConnected } from './connection/connectionSlice';
-import MapLayer from './map/MapLayer';
-import Supply from './supply/Supply';
-import { Header } from './header/Header';
 import { CustomDragLayer } from './app/CustomDragLayer';
+import { selectConnected } from './connection/connectionSlice';
+import { Header } from './header/Header';
+import { MapLayer } from './map/MapLayer';
+import { Supply } from './supply/Supply';
 
 function App() {
   const connected = useSelector(selectConnected);

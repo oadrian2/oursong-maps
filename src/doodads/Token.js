@@ -4,15 +4,15 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import { ItemTypes } from '../ItemTypes';
 import { NameToken } from './NameToken';
-import { selectTokenById, selectIndexWithinGroup } from './tokenSlice';
+import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
 
-export default function Token({ id }) {
+export function Token({ id }) {
   const {
     group,
     shape: { prefix, label, allegiance, radius = 30 },
   } = useSelector((state) => selectTokenById(state, id));
 
-  const params = useMemo(() => ({ id, group }), [id, group])
+  const params = useMemo(() => ({ id, group }), [id, group]);
 
   const index = useSelector((state) => selectIndexWithinGroup(state, params));
 

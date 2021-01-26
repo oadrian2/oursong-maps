@@ -2,13 +2,13 @@ import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import { tokenStashRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import Stash from './Stash';
+import { Stash } from './Stash';
 import './Supply.css';
-import TokenGroup from './TokenGroup';
+import { TokenGroup } from './TokenGroup';
 import { selectTokenGroupIds } from './tokenGroupSlice';
-import Trash from './Trash';
+import { Trash } from './Trash';
 
-export default function Supply() {
+export function Supply() {
   const dispatch = useDispatch();
 
   const tokenGroups = useSelector(selectTokenGroupIds);

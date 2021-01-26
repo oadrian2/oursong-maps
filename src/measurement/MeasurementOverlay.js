@@ -12,7 +12,7 @@ function clientCoordinatesToMapCoordinates(element, position, scale) {
   return { x: (clientX - containerLeft + scrollLeft) / scale, y: (clientY - containerTop + scrollTop) / scale };
 }
 
-const MeasurementOverlay = forwardRef(({ children }, ref) => {
+export const MeasurementOverlay = forwardRef(({ children }, ref) => {
   const dispatch = useDispatch();
 
   const vectors = useSelector(selectPathAsVectors);
@@ -69,5 +69,3 @@ const MeasurementOverlay = forwardRef(({ children }, ref) => {
 });
 
 MeasurementOverlay.displayName = 'MeasurementOverlay';
-
-export default MeasurementOverlay;
