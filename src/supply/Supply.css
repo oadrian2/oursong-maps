@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 0.25rem;
 }
 
 .supply-groups {
@@ -12,7 +12,7 @@
     min-height: var(--tokenSize);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.25rem;
 }
 
 .supply-stashed {
@@ -20,7 +20,7 @@
     min-height: var(--tokenSize);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.25rem;
 }
 
 .supply-fill {
