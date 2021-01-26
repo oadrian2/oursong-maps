@@ -26,8 +26,11 @@ export function Measurement({ start, end, showRadius }) {
           <polygon points="0 0, 10 1.75, 0 3.5"></polygon>
         </marker>
       </defs>
+      
       <line className="measure-arrow" x1="0" y1="0" x2="1" y2="0"></line>
+
       {showRadius && <circle className="measure-radius" cx="0" cy="0" r="1" />}
+
       <text className="measure-label" fontSize="0.15" x="0.4" y="0.15">
         {unitLength.toLocaleString(undefined, { maximumFractionDigits: 1 })} yd.
       </text>

@@ -1,9 +1,8 @@
-import './MeasurementOverlay.css';
-import { useRef, useState } from 'react';
+import { forwardRef, useState, useRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectPathAsVectors } from '../measurement/measurementSlice';
 import { Measurement } from './Measurement';
-import { movedTo, pathAsVectorsSelector, pathStarted, pathStopped, pointPopped, pointPushed } from '../measurement/measurementSlice';
-import './MapLayer.css';
+import './MeasurementOverlay.css';
 
 function clientCoordinatesToMapCoordinates(element, position, scale) {
   const { x: clientX, y: clientY } = position;
@@ -13,19 +12,23 @@ function clientCoordinatesToMapCoordinates(element, position, scale) {
   return { x: (clientX - containerLeft + scrollLeft) / scale, y: (clientY - containerTop + scrollTop) / scale };
 }
 
-export function MeasurementOverlay({ children }) {
+export const MeasurementOverlay = forwardRef(({ children }, ref) => {
   const dispatch = useDispatch();
 
-  const vectors = useSelector(pathAsVectorsSelector);
-
-  const ref = useRef();
+  const vectors = useSelector(selectPathAsVectors);
 
   const [scale] = useState(1);
+
+  const containerRef = useRef();
+
+  useImperativeHandle(ref, () => ({
+    clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, ({ x, y }), scale)
+  }));
 
   function onMouseDown(event) {
     if (event.buttons !== 1 || !event.shiftKey) return; // only left-click
 
-    const position = clientCoordinatesToMapCoordinates(ref.current, { x: event.pageX, y: event.pageY }, scale);
+    const position = clientCoordinatesToMapCoordinates(containerRef.current, { x: event.pageX, y: event.pageY }, scale);
 
     dispatch(pathStarted(position));
   }
@@ -37,7 +40,7 @@ export function MeasurementOverlay({ children }) {
   function onMouseMove(event) {
     if (!vectors.length) return;
 
-    const position = clientCoordinatesToMapCoordinates(ref.current, { x: event.pageX, y: event.pageY }, scale);
+    const position = clientCoordinatesToMapCoordinates(containerRef.current, { x: event.pageX, y: event.pageY }, scale);
 
     dispatch(movedTo(position));
   }
@@ -49,7 +52,7 @@ export function MeasurementOverlay({ children }) {
 
   return (
     <div
-      ref={ref}
+      ref={containerRef}
       className="map-layer-wrapper"
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
@@ -63,4 +66,4 @@ export function MeasurementOverlay({ children }) {
       ))}
     </div>
   );
-}
+});

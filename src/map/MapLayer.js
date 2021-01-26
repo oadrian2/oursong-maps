@@ -1,70 +1,32 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
-import Draggable from 'react-draggable';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import Token from '../doodads/Token';
-import { selectActiveTokens, tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
+import { useDispatch } from 'react-redux';
+import { tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import { Measurement } from '../measurement/Measurement';
-import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectPathAsVectors } from '../measurement/measurementSlice';
+import { MeasurementOverlay } from '../measurement/MeasurementOverlay';
 import MapImage from './MapImage';
 import './MapLayer.css';
-import { PlacedDoodad } from './PlacedDoodad';
-
-function clientCoordinatesToMapCoordinates(element, position, scale) {
-  const { x: clientX, y: clientY } = position;
-  const { scrollLeft, scrollTop } = element;
-  const { left: containerLeft, top: containerTop } = element.getBoundingClientRect();
-
-  return { x: (clientX - containerLeft + scrollLeft) / scale, y: (clientY - containerTop + scrollTop) / scale };
-}
+import TokenLayer from './TokenLayer';
 
 export default function MapLayer() {
   const dispatch = useDispatch();
 
-  const vectors = useSelector(selectPathAsVectors);
-  const tokens = useSelector(selectActiveTokens, shallowEqual);
-
-  console.log(tokens);
-
   const ref = useRef();
+  const mouseLocation = useRef();
 
   const [scale] = useState(1);
 
-  function onMouseDown(event) {
-    if (event.buttons !== 1 || !event.shiftKey) return; // only shift + left-click
-
-    const position = clientCoordinatesToMapCoordinates(ref.current, { x: event.pageX, y: event.pageY }, scale);
-
-    dispatch(pathStarted(position));
-  }
-
-  function onMouseUp() {
-    if (!vectors.length) return;
-
-    dispatch(pathStopped());
-  }
-
-  function onMouseMove(event) {
-    if (!vectors.length) return;
-
-    const position = clientCoordinatesToMapCoordinates(ref.current, { x: event.pageX, y: event.pageY }, scale);
-
-    dispatch(movedTo(position));
-  }
-
-  function onKeyPress(event) {
-    if (event.code === 'KeyW') dispatch(pointPushed());
-    if (event.code === 'KeyQ') dispatch(pointPopped());
-  }
-
   const [, drop] = useDrop({
     accept: [ItemTypes.TOKEN, ItemTypes.TOKEN_GROUP],
+    hover: (item, monitor) => {
+      mouseLocation.current = monitor.getSourceClientOffset();
+      console.info(`loc`, monitor.getInitialSourceClientOffset(), mouseLocation.current);
+    },
     drop: (item, monitor) => {
       const { id, type, shape } = item;
 
-      const position = clientCoordinatesToMapCoordinates(ref.current, monitor.getSourceClientOffset(), scale);
+      const position = ref.current.clientCoordinatesToMapCoordinates(monitor.getSourceClientOffset());
 
       switch (type) {
         case ItemTypes.TOKEN:
@@ -79,38 +41,11 @@ export default function MapLayer() {
   });
 
   return (
-    <div
-      ref={ref}
-      className="map-layer-wrapper"
-      onMouseUp={onMouseUp}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onKeyPress={onKeyPress}
-      tabIndex="0"
-    >
+    <MeasurementOverlay ref={ref}>
       <div ref={drop} className="map-layer" style={{ transform: `scale(${scale})` }}>
         <MapImage />
-        {tokens.map(({ id, position }) => (
-          <PlacedDoodad key={id} position={position}>
-            <Token id={id} />
-          </PlacedDoodad>
-        ))}
-        {vectors.map(({ start, end }, index) => (
-          <Measurement key={index} start={start} end={end} showRadius={vectors.length === 1} />
-        ))}
+        <TokenLayer />
       </div>
-    </div>
-  );
-}
-
-export function Drag({ position }) {
-  const ref = useRef();
-
-  return (
-    <Draggable onDrag={(event, data) => console.log(data)} defaultPosition={position} nodeRef={ref}>
-      <div ref={ref} style={{ width: 60, height: 60, background: 'black', color: 'white', position: 'absolute', left: 0, top: 0 }}>
-        Hi there
-      </div>
-    </Draggable>
+    </MeasurementOverlay>
   );
 }

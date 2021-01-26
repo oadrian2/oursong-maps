@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { useDragLayer } from 'react-dnd';
-import { ItemTypes } from '../ItemTypes';
 import Token from '../doodads/Token';
+import { ItemTypes } from '../ItemTypes';
 import TokenGroup from '../supply/TokenGroup';
 
 const layerStyles = {
@@ -24,6 +25,7 @@ function getItemStyles(initialOffset, currentOffset) {
 
   return { transform: `translate(${x}px, ${y}px)` };
 }
+
 export const CustomDragLayer = (props) => {
   const { itemType, isDragging, item, initialOffset, currentOffset } = useDragLayer((monitor) => ({
     item: monitor.getItem(),
@@ -33,7 +35,7 @@ export const CustomDragLayer = (props) => {
     isDragging: monitor.isDragging(),
   }));
 
-  function renderItem() {
+  const renderedItem = useMemo(() => {
     switch (itemType) {
       case ItemTypes.TOKEN:
         return <Token id={item.id} />;
@@ -42,7 +44,7 @@ export const CustomDragLayer = (props) => {
       default:
         return null;
     }
-  }
+  }, [itemType, item]);
 
   if (!isDragging) {
     return null;
@@ -50,7 +52,7 @@ export const CustomDragLayer = (props) => {
 
   return (
     <div style={layerStyles}>
-      <div style={getItemStyles(initialOffset, currentOffset, props.snapToGrid)}>{renderItem()}</div>
+      <div style={getItemStyles(initialOffset, currentOffset, props.snapToGrid)}>{renderedItem}</div>
     </div>
   );
 };
