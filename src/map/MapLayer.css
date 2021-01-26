@@ -10,7 +10,3 @@
   width: 100%;
   transform-origin: top left;
 }
-
-.map-layer__token {
-  position: absolute;
-}

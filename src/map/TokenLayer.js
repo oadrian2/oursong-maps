@@ -1,6 +1,6 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import { Token } from '../doodads/Token';
-import { selectActiveTokens } from '../doodads/tokenSlice';
+import { Token } from './Token';
+import { selectActiveTokens } from './tokenSlice';
 import './MapLayer.css';
 import { PlacedDoodad } from './PlacedDoodad';
 

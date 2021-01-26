@@ -1,6 +1,6 @@
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { tokenStashRequested } from '../doodads/tokenSlice';
+import { tokenStashRequested } from '../map/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
 import { Stash } from './Stash';
 import './Supply.css';

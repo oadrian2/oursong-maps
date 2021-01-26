@@ -1,5 +1,5 @@
 import { connected, connecting } from '../connection/connectionSlice';
-import { tokensUpdated, tokenUpsert } from '../doodads/tokenSlice';
+import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { mapUpdated } from '../map/mapSlice';
 import { tokenGroupsUpdated } from '../supply/tokenGroupSlice';
 

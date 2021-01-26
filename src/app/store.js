@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import tokenGroupsReducer from '../supply/tokenGroupSlice';
 import measurementReducer from '../measurement/measurementSlice';
-import tokenReducer from '../doodads/tokenSlice';
+import tokenReducer from '../map/tokenSlice';
 import connectionReducer from '../connection/connectionSlice';
 import mapReducer from '../map/mapSlice';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';

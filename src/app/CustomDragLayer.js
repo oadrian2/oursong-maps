@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useDragLayer } from 'react-dnd';
-import { Token } from '../doodads/Token';
+import { Token } from '../map/Token';
 import { ItemTypes } from '../ItemTypes';
 import { TokenGroup } from '../supply/TokenGroup';
 

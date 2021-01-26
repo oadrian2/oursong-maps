@@ -2,7 +2,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import { useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
+import { tokenPlacementRequested, tokenUpsertRequested } from './tokenSlice';
 import { ItemTypes } from '../ItemTypes';
 import { MeasurementOverlay } from '../measurement/MeasurementOverlay';
 import { MapImage } from './MapImage';

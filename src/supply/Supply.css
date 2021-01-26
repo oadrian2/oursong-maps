@@ -9,7 +9,7 @@
 
 .supply-groups {
     flex: none;
-    min-height: 60px;
+    min-height: var(--tokenSize);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -17,7 +17,7 @@
 
 .supply-stashed {
     flex: none;
-    min-height: 60px;
+    min-height: var(--tokenSize);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -29,5 +29,5 @@
 
 .supply-trash {
     flex: none;
-    min-height: 60px;
+    min-height: var(--tokenSize);
 }

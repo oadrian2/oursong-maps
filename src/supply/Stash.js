@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
-import { Token } from '../doodads/Token';
-import { selectStashedTokens } from '../doodads/tokenSlice';
+import { Token } from '../map/Token';
+import { selectStashedTokens } from '../map/tokenSlice';
 import './Supply.css';
 
 export function Stash() {

@@ -1,5 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { selectEncounter } from '../map/mapSlice';
+import { selectEncounter } from './mapSlice';
 
 const tokensAdapter = createEntityAdapter();
 
@@ -69,9 +69,7 @@ export const { selectAll: selectAllTokens, selectById: selectTokenById, selectId
 export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !t.position && !t.deleted));
 export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position && !t.deleted));
 
-export const selectAllTokenIdGroupPairs = createSelector(selectAllTokens, (tokens) => tokens.map(({ id, group }) => ({ id, group })));
-
 export const selectIndexWithinGroup = createSelector(
-  [selectAllTokenIdGroupPairs, (state, { id, group }) => ({ id, group })],
+  [selectAllTokens, (state, { id, group }) => ({ id, group })],
   (tokens, { id, group }) => tokens.filter((t) => t.group === group).findIndex((t) => t.id === id)
 );

@@ -6,7 +6,7 @@ function calculateCoordinates(start, end) {
   const height = end.y - start.y;
   const length = Math.hypot(height, width);
   const angle = Math.atan2(height, width);
-  const unitLength = length / 60;
+  const unitLength = length / 48; // token size
 
   return { x, y, length, unitLength, angle };
 }

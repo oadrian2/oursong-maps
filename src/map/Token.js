@@ -3,7 +3,7 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import { ItemTypes } from '../ItemTypes';
-import { NameToken } from './NameToken';
+import { NameToken } from '../doodads/NameToken';
 import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
 
 export function Token({ id }) {
