@@ -11,6 +11,7 @@ const tokenSlice = createSlice({
   reducers: {
     tokenCreated: tokensAdapter.addOne,
     tokenTrashed: tokensAdapter.removeOne,
+    tokenUpsert: tokensAdapter.upsertOne,
     tokensUpdated: tokensAdapter.upsertMany,
     tokenMoved: (state, action) => {
       const { id, position } = action.payload;
@@ -27,7 +28,6 @@ const tokenSlice = createSlice({
 
       state.entities[id] = position;
     },
-    tokenUpsert: tokensAdapter.upsertOne,
   },
 });
 
@@ -68,3 +68,10 @@ export const { selectAll: selectAllTokens, selectById: selectTokenById, selectId
 
 export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !t.position && !t.deleted));
 export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position && !t.deleted));
+
+export const selectAllTokenIdGroupPairs = createSelector(selectAllTokens, (tokens) => tokens.map(({ id, group }) => ({ id, group })));
+
+export const selectIndexWithinGroup = createSelector(
+  [selectAllTokenIdGroupPairs, (state, { id, group }) => ({ id, group })],
+  (tokens, { id, group }) => tokens.filter((t) => t.group === group).findIndex((t) => t.id === id)
+);

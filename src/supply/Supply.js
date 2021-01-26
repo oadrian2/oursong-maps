@@ -1,8 +1,8 @@
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import Token from '../doodads/Token';
-import { selectStashedTokens, tokenStashRequested } from '../doodads/tokenSlice';
+import { tokenStashRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
+import Stash from './Stash';
 import './Supply.css';
 import TokenGroup from './TokenGroup';
 import { selectTokenGroupIds } from './tokenGroupSlice';
@@ -12,7 +12,6 @@ export default function Supply() {
   const dispatch = useDispatch();
 
   const tokenGroups = useSelector(selectTokenGroupIds);
-  const tokens = useSelector(selectStashedTokens);
 
   const [, drop] = useDrop({
     accept: ItemTypes.TOKEN,
@@ -33,9 +32,7 @@ export default function Supply() {
       </div>
       <hr style={{ width: '100%' }} />
       <div className="supply-stashed">
-        {tokens.map(({ id }) => (
-          <Token key={id} id={id} />
-        ))}
+        <Stash />
       </div>
       <hr style={{ width: '100%' }} />
       <div className="supply-fill" />
