@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import { tokenPlacementRequested, tokenUpsertRequested } from '../doodads/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import { MeasurementOverlay } from '../measurement/MeasurementOverlay';
+import MeasurementOverlay from '../measurement/MeasurementOverlay';
 import MapImage from './MapImage';
 import './MapLayer.css';
 import TokenLayer from './TokenLayer';

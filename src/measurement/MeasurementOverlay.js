@@ -1,4 +1,4 @@
-import { forwardRef, useState, useRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectPathAsVectors } from '../measurement/measurementSlice';
 import { Measurement } from './Measurement';
@@ -12,7 +12,7 @@ function clientCoordinatesToMapCoordinates(element, position, scale) {
   return { x: (clientX - containerLeft + scrollLeft) / scale, y: (clientY - containerTop + scrollTop) / scale };
 }
 
-export const MeasurementOverlay = forwardRef(({ children }, ref) => {
+const MeasurementOverlay = forwardRef(({ children }, ref) => {
   const dispatch = useDispatch();
 
   const vectors = useSelector(selectPathAsVectors);
@@ -22,7 +22,7 @@ export const MeasurementOverlay = forwardRef(({ children }, ref) => {
   const containerRef = useRef();
 
   useImperativeHandle(ref, () => ({
-    clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, ({ x, y }), scale)
+    clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, { x, y }, scale),
   }));
 
   function onMouseDown(event) {
@@ -67,3 +67,7 @@ export const MeasurementOverlay = forwardRef(({ children }, ref) => {
     </div>
   );
 });
+
+MeasurementOverlay.displayName = 'MeasurementOverlay';
+
+export default MeasurementOverlay;

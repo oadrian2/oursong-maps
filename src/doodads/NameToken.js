@@ -17,6 +17,8 @@ export const NameToken = React.forwardRef(({ label, title, allegiance }, ref) =>
   );
 });
 
+NameToken.displayName = 'NameToken';
+
 export const TokenAllegiance = {
   UNKNOWN: 'unknown',
   ALLY: 'ally',
