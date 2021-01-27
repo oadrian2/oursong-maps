@@ -1,3 +1,7 @@
 export function MapImage({ scale }) {
-  return <img draggable="false" style={{ transformOrigin: 'top left', transform: 'scale(2.2)' }} src="map.webp" alt="the map" />;
+  return (
+    <span style={{ display: 'inline-block' }}>
+      <img draggable="false" style={{ width: '220%' }} src="map.webp" alt="the map" />
+    </span>
+  );
 }

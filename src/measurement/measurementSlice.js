@@ -36,15 +36,40 @@ export default measurementSlice.reducer;
 
 export const selectPoints = (state) => state.measurements.origin && [state.measurements.origin, ...state.measurements.points];
 
-export const selectPathAsString = (state) =>
-  state.measurements.origin &&
-  `M ${state.measurements.origin.x},${state.measurements.origin.y} ${state.measurements.points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
+export const selectPathAsString = createSelector(
+  [(state) => state.measurements.origin, (state) => state.measurements.points],
+  (origin, points) => origin && `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`
+);
 
 export const selectPathAsVectors = createSelector(
   [(state) => state.measurements],
   (measurements) =>
-    measurements.points.reduce(({ vectors, start }, end) => ({ vectors: [...vectors, { start, end }], start: end }), {
-      vectors: [],
-      start: measurements.origin,
-    }).vectors
+    measurements.points.reduce(
+      ({ vectors, start }, end) => ({
+        vectors: [...vectors, { start, end, length: Math.hypot(end.y - start.y, end.x - start.x) }],
+        start: end,
+      }),
+      {
+        vectors: [],
+        start: measurements.origin,
+      }
+    ).vectors
 );
+
+export const selectMeasurement = createSelector([selectPathAsVectors, selectPathAsString], (vectors, path) => {
+  if (!path) return null;
+
+  const isSingle = vectors.length === 1;
+
+  const [{ start: origin, length: radius }] = vectors;
+
+  const { lastLength, totalLength } = vectors.reduce(
+    (result, { length }) => ({
+      lastLength: length,
+      totalLength: length + result.totalLength,
+    }),
+    { lastLength: 0.0, totalLength: 0.0 }
+  );
+
+  return { path, origin, radius, isSingle, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0 };
+});

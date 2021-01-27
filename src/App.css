@@ -36,5 +36,5 @@
 .content {
   grid-area: content;
   border: 1px solid green;
-  position: relative;
+  overflow: scroll;
 }
