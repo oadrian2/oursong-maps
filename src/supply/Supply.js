@@ -1,17 +1,17 @@
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { tokenStashRequested } from '../map/tokenSlice';
 import { ItemTypes } from '../ItemTypes';
+import { tokenStashRequested } from '../map/tokenSlice';
 import { Stash } from './Stash';
 import './Supply.css';
 import { TokenGroup } from './TokenGroup';
-import { selectTokenGroupIds } from './tokenGroupSlice';
+import { selectClaimedGeneratorIds } from './tokenGroupSlice';
 import { Trash } from './Trash';
 
 export function Supply() {
   const dispatch = useDispatch();
 
-  const tokenGroups = useSelector(selectTokenGroupIds);
+  const tokenGroups = useSelector(selectClaimedGeneratorIds);
 
   const [, drop] = useDrop({
     accept: ItemTypes.TOKEN,

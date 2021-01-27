@@ -1,0 +1,44 @@
+.session-dialog {
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.session-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.session-dialog__submit {
+    padding: 0.25rem 0.5rem;
+    font-family: 'Roboto';
+    border-radius: 2px;
+    border: 1px solid black;
+    font-size: 1rem;
+}
+
+.session-dialog__generators {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.generators__group {
+    display: flex;
+    gap: 4px;
+}
+
+.generators__select-all {
+    margin-right: 8px;
+}
+
+.generators__select-all,
+.generators__select-one {
+    border: 4px solid transparent;
+    border-radius: 50%;
+    user-select: none;
+}
+
+.selected {
+    border-color: lightgreen;
+}

@@ -7,8 +7,6 @@ import { PlacedDoodad } from './PlacedDoodad';
 export function TokenLayer() {
   const tokens = useSelector(selectActiveTokens, shallowEqual);
 
-  console.log(tokens);
-
   return tokens.map(({ id, position }) => (
     <PlacedDoodad key={id} position={position}>
       <Token id={id} />

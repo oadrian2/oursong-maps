@@ -21,7 +21,7 @@ export function MapLayer() {
     accept: [ItemTypes.TOKEN, ItemTypes.TOKEN_GROUP],
     hover: (item, monitor) => {
       mouseLocation.current = monitor.getSourceClientOffset();
-      console.info(`loc`, monitor.getInitialSourceClientOffset(), mouseLocation.current);
+      // console.info(`loc`, monitor.getInitialSourceClientOffset(), mouseLocation.current);
     },
     drop: (item, monitor) => {
       const { id, type, shape } = item;
