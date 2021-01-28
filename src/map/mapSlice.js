@@ -18,11 +18,11 @@ const slice = createSlice({
       state.showGrid = false;
     },
     mapUpdated: (state, action) => {
-      const { title, image, ingameDate } = action.payload;
+      const { title, image, gameDate } = action.payload;
 
       state.title = title;
       state.image = image;
-      state.ingameDate = ingameDate;
+      state.gameDate = gameDate;
     },
   },
 });

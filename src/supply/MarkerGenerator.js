@@ -3,9 +3,9 @@ import { ItemTypes } from '../ItemTypes';
 
 export function MarkerGroup({ id }) {
   const [, drag] = useDrag({
-    item: { type: ItemTypes.TOKEN_GROUP, id, shape: { type: 'marker' } },
+    item: { type: ItemTypes.GENERATOR, id },
     collect: () => ({}),
   });
 
-  return <div ref={drag}>Mar</div>;
+  return <div ref={drag}>RM</div>;
 }

@@ -1,18 +1,18 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { selectEncounter } from './mapSlice';
 
-const tokensAdapter = createEntityAdapter();
+const adapter = createEntityAdapter();
 
-const initialState = tokensAdapter.getInitialState();
+const initialState = adapter.getInitialState();
 
-const tokenSlice = createSlice({
+const slice = createSlice({
   name: 'tokens',
   initialState,
   reducers: {
-    tokenCreated: tokensAdapter.addOne,
-    tokenTrashed: tokensAdapter.removeOne,
-    tokenUpsert: tokensAdapter.upsertOne,
-    tokensUpdated: tokensAdapter.upsertMany,
+    tokenCreated: adapter.addOne,
+    tokenTrashed: adapter.removeOne,
+    tokenUpsert: adapter.upsertOne,
+    tokensUpdated: adapter.upsertMany,
     tokenMoved: (state, action) => {
       const { id, position } = action.payload;
 
@@ -31,7 +31,7 @@ const tokenSlice = createSlice({
   },
 });
 
-export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = tokenSlice.actions;
+export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = slice.actions;
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
   const state = getState();
@@ -60,9 +60,9 @@ export const tokenTrashRequested = (id) => (dispatch, getState, invoke) => {
   invoke('events', encounter, { ...token, deleted: true });
 };
 
-export default tokenSlice.reducer;
+export default slice.reducer;
 
-export const { selectAll: selectAllTokens, selectById: selectTokenById, selectIds: selectTokenIds } = tokensAdapter.getSelectors(
+export const { selectAll: selectAllTokens, selectById: selectTokenById, selectIds: selectTokenIds } = adapter.getSelectors(
   (state) => state.tokens
 );
 

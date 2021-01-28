@@ -1,10 +1,10 @@
 import { nanoid } from '@reduxjs/toolkit';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
 import { tokenPlacementRequested, tokenUpsertRequested } from './tokenSlice';
 import { ItemTypes } from '../ItemTypes';
-import { MeasurementOverlay } from '../measurement/MeasurementOverlay';
+import { RulerOverlay } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
 import './MapLayer.css';
 import { TokenLayer } from './TokenLayer';
@@ -15,25 +15,26 @@ export function MapLayer() {
   const ref = useRef();
   const mouseLocation = useRef();
 
-  const [scale] = useState(1);
-
   const [, drop] = useDrop({
-    accept: [ItemTypes.TOKEN, ItemTypes.TOKEN_GROUP],
+    accept: [ItemTypes.GENERATOR, ItemTypes.PLACED_TOKEN, ItemTypes.STASHED_TOKEN],
     hover: (item, monitor) => {
+      if (item.type !== ItemTypes.PLACED_TOKEN) return;
+
       mouseLocation.current = monitor.getSourceClientOffset();
       // console.info(`loc`, monitor.getInitialSourceClientOffset(), mouseLocation.current);
     },
     drop: (item, monitor) => {
-      const { id, type, shape } = item;
+      const { id, type } = item;
 
       const position = ref.current.clientCoordinatesToMapCoordinates(monitor.getSourceClientOffset());
 
       switch (type) {
-        case ItemTypes.TOKEN:
+        case ItemTypes.PLACED_TOKEN:
+        case ItemTypes.STASHED_TOKEN:
           dispatch(tokenUpsertRequested({ id, position }));
           break;
-        case ItemTypes.TOKEN_GROUP:
-          dispatch(tokenPlacementRequested({ id: nanoid(), group: id, shape, position }));
+        case ItemTypes.GENERATOR:
+          dispatch(tokenPlacementRequested({ id: nanoid(), group: id, position }));
           break;
         default:
       }
@@ -41,11 +42,11 @@ export function MapLayer() {
   });
 
   return (
-    <MeasurementOverlay ref={ref}>
-      <div ref={drop} className="map-layer" style={{ transform: `scale(${scale})` }}>
+    <RulerOverlay ref={ref}>
+      <div ref={drop} className="map-layer">
         <MapImage />
         <TokenLayer />
       </div>
-    </MeasurementOverlay>
+    </RulerOverlay>
   );
 }

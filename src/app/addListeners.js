@@ -1,7 +1,7 @@
 import { connected, connecting } from '../connection/connectionSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { mapUpdated } from '../map/mapSlice';
-import { tokenGroupsUpdated } from '../supply/tokenGroupSlice';
+import { tokenGroupsUpdated } from '../supply/generatorsSlice';
 
 export async function addListeners(connection, { dispatch, getState }) {
   connection.on('newMessage', (message) => {
@@ -11,9 +11,9 @@ export async function addListeners(connection, { dispatch, getState }) {
   connection.on('worldState', (state) => {
     console.log('worldState', state);
 
-    const { title, ingameDate, image, generators, tokens } = state;
+    const { title, gameDate, image, generators, tokens } = state;
 
-    dispatch(mapUpdated({ title, ingameDate, image }));
+    dispatch(mapUpdated({ title, gameDate, image }));
     dispatch(tokenGroupsUpdated(generators));
     dispatch(tokensUpdated(tokens));
 

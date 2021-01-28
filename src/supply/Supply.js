@@ -4,8 +4,8 @@ import { ItemTypes } from '../ItemTypes';
 import { tokenStashRequested } from '../map/tokenSlice';
 import { Stash } from './Stash';
 import './Supply.css';
-import { TokenGroup } from './TokenGroup';
-import { selectClaimedGeneratorIds } from './tokenGroupSlice';
+import { TokenGroup } from './FigureGenerator';
+import { selectClaimedGeneratorIds } from './generatorsSlice';
 import { Trash } from './Trash';
 
 export function Supply() {
@@ -14,7 +14,7 @@ export function Supply() {
   const tokenGroups = useSelector(selectClaimedGeneratorIds);
 
   const [, drop] = useDrop({
-    accept: ItemTypes.TOKEN,
+    accept: ItemTypes.PLACED_TOKEN,
     collect: () => ({}),
     drop: (item) => {
       const { id } = item;

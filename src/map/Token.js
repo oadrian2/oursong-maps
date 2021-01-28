@@ -1,37 +1,37 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
+import { FigureToken } from '../doodads/FigureToken';
 import { ItemTypes } from '../ItemTypes';
-import { NameToken } from '../doodads/NameToken';
+import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/generatorsSlice';
 import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
-import { selectClaimedGeneratorIds } from '../supply/tokenGroupSlice';
 
 export function Token({ id }) {
+  const { group: generatorId } = useSelector((state) => selectTokenById(state, id));
+
   const {
-    group,
-    shape: { prefix, label, allegiance, radius = 30 },
-  } = useSelector((state) => selectTokenById(state, id));
+    shape: { prefix, label, isGroup, allegiance, radius = 1 },
+  } = useSelector((state) => selectGeneratorById(state, generatorId));
 
-  const params = useMemo(() => ({ id, group }), [id, group]);
+  const index = useSelector((state) => selectIndexWithinGroup(state, { id, group: generatorId }));
 
-  const index = useSelector((state) => selectIndexWithinGroup(state, params));
   const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
-  const effectivePrefix = prefix.replace('#', '');
-  const effectiveIndex = prefix.indexOf('#') === -1 ? index : index + 1;
+  const effectivePrefix = prefix;
+  const effectiveIndex = isGroup ? index + 1 : index;
   const numberedLabel = effectiveIndex ? `${effectivePrefix}${effectiveIndex}` : effectivePrefix;
   const numberedTitle = effectiveIndex ? `${label} ${effectiveIndex}` : label;
 
   const [, drag, preview] = useDrag({
-    item: { type: ItemTypes.TOKEN, id },
+    item: { type: ItemTypes.PLACED_TOKEN, id },
     collect: () => ({}),
-    canDrag: () => claimedGeneratorIds.includes(group),
+    canDrag: () => claimedGeneratorIds.includes(generatorId),
   });
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  return <NameToken ref={drag} label={numberedLabel} title={numberedTitle} allegiance={allegiance} radius={radius} />;
+  return <FigureToken ref={drag} label={numberedLabel} title={numberedTitle} allegiance={allegiance} radius={radius} />;
 }

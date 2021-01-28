@@ -2,15 +2,15 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
-import { NameToken } from '../doodads/NameToken';
+import { FigureToken } from '../doodads/FigureToken';
 import { ItemTypes } from '../ItemTypes';
-import { selectTokenGroupById } from './tokenGroupSlice';
+import { selectGeneratorById } from './generatorsSlice';
 
 export function TokenGroup({ id }) {
-  const { prefix, label, allegiance } = useSelector((state) => selectTokenGroupById(state, id));
+  const { prefix, label, allegiance } = useSelector((state) => selectGeneratorById(state, id));
 
   const [, drag, preview] = useDrag({
-    item: { type: ItemTypes.TOKEN_GROUP, id, shape: { type: 'token', prefix, label, allegiance } },
+    item: { type: ItemTypes.GENERATOR, id },
     collect: () => ({}),
   });
 
@@ -18,5 +18,5 @@ export function TokenGroup({ id }) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  return <NameToken ref={drag} label={prefix} title={label} allegiance={allegiance} />;
+  return <FigureToken ref={drag} label={prefix} title={label} allegiance={allegiance} />;
 }

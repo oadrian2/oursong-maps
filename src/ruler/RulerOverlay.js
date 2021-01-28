@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectMeasurement } from '../measurement/measurementSlice';
-import './MeasurementOverlay.css';
+import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, selectMeasurement } from './rulerSlice';
+import './RulerOverlay.css';
 
 function clientCoordinatesToMapCoordinates(element, position) {
   const { x: clientX, y: clientY } = position;
@@ -11,7 +11,7 @@ function clientCoordinatesToMapCoordinates(element, position) {
   return { x: clientX - containerLeft + scrollLeft, y: clientY - containerTop + scrollTop };
 }
 
-export const MeasurementOverlay = forwardRef(({ children }, ref) => {
+export const RulerOverlay = forwardRef(({ children }, ref) => {
   const dispatch = useDispatch();
 
   const measurement = useSelector(selectMeasurement);
@@ -91,4 +91,4 @@ export const MeasurementOverlay = forwardRef(({ children }, ref) => {
   );
 });
 
-MeasurementOverlay.displayName = 'MeasurementOverlay';
+RulerOverlay.displayName = 'RulerOverlay';

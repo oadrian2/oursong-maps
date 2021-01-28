@@ -1,20 +1,17 @@
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
-import tokenGroupsReducer from '../supply/tokenGroupSlice';
-import measurementReducer from '../measurement/measurementSlice';
-import tokenReducer from '../map/tokenSlice';
 import connectionReducer from '../connection/connectionSlice';
 import mapReducer from '../map/mapSlice';
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import tokenReducer from '../map/tokenSlice';
+import rulerReducer from '../ruler/rulerSlice';
+import tokenGroupsReducer from '../supply/generatorsSlice';
 import { addListeners, signalRMiddleware } from './addListeners';
 
-const connection = new HubConnectionBuilder()
-  .configureLogging(LogLevel.Debug)
-  .withUrl(process.env.REACT_APP_HUB_URL)
-  .build();
+const connection = new HubConnectionBuilder().configureLogging(LogLevel.Debug).withUrl(process.env.REACT_APP_HUB_URL).build();
 
 const store = configureStore({
   reducer: {
-    measurements: measurementReducer,
+    ruler: rulerReducer,
     tokenGroups: tokenGroupsReducer,
     tokens: tokenReducer,
     connection: connectionReducer,

@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
-import './NameToken.css';
+import './FigureToken.css';
 
-export const NameToken = forwardRef(({ label, title, allegiance }, ref) => {
+export const FigureToken = forwardRef(({ label, title, allegiance }, ref) => {
   const className =
     {
       [TokenAllegiance.ALLY]: 'token--ally',
@@ -17,7 +17,7 @@ export const NameToken = forwardRef(({ label, title, allegiance }, ref) => {
   );
 });
 
-NameToken.displayName = 'NameToken';
+FigureToken.displayName = 'FigureToken';
 
 export const TokenAllegiance = {
   UNKNOWN: 'unknown',

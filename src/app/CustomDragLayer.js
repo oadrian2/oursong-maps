@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useDragLayer } from 'react-dnd';
 import { Token } from '../map/Token';
 import { ItemTypes } from '../ItemTypes';
-import { TokenGroup } from '../supply/TokenGroup';
+import { TokenGroup } from '../supply/FigureGenerator';
 
 const layerStyles = {
   position: 'fixed',
@@ -37,9 +37,10 @@ export const CustomDragLayer = (props) => {
 
   const renderedItem = useMemo(() => {
     switch (itemType) {
-      case ItemTypes.TOKEN:
+      case ItemTypes.PLACED_TOKEN:
+      case ItemTypes.STASHED_TOKEN:
         return <Token id={item.id} />;
-      case ItemTypes.TOKEN_GROUP:
+      case ItemTypes.GENERATOR:
         return <TokenGroup id={item.id} />;
       default:
         return null;

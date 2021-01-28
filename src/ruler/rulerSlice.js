@@ -1,7 +1,7 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
-const measurementSlice = createSlice({
-  name: 'measurement',
+const slice = createSlice({
+  name: 'ruler',
   initialState: { points: [], origin: null, isPublic: true },
   reducers: {
     pathStarted: (state, action) => {
@@ -30,19 +30,19 @@ const measurementSlice = createSlice({
   },
 });
 
-export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped } = measurementSlice.actions;
+export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped } = slice.actions;
 
-export default measurementSlice.reducer;
+export default slice.reducer;
 
-export const selectPoints = (state) => state.measurements.origin && [state.measurements.origin, ...state.measurements.points];
+export const selectPoints = (state) => state.ruler.origin && [state.ruler.origin, ...state.ruler.points];
 
 export const selectPathAsString = createSelector(
-  [(state) => state.measurements.origin, (state) => state.measurements.points],
+  [(state) => state.ruler.origin, (state) => state.ruler.points],
   (origin, points) => origin && `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`
 );
 
 export const selectPathAsVectors = createSelector(
-  [(state) => state.measurements],
+  [(state) => state.ruler],
   (measurements) =>
     measurements.points.reduce(
       ({ vectors, start }, end) => ({

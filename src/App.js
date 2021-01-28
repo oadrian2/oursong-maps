@@ -7,7 +7,7 @@ import { Header } from './header/Header';
 import { MapLayer } from './map/MapLayer';
 import { SessionDialog } from './session/SessionDialog';
 import { Supply } from './supply/Supply';
-import { selectClaimedGeneratorIds } from './supply/tokenGroupSlice';
+import { selectClaimedGeneratorIds } from './supply/generatorsSlice';
 
 function App() {
   const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);

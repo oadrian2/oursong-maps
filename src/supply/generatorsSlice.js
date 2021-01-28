@@ -1,21 +1,21 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 
-const tokenGroupsAdapter = createEntityAdapter({
+const adapter = createEntityAdapter({
   sortComparer: ({ prefix: prefixA, allegiance: allegianceA }, { prefix: prefixB, allegiance: allegianceB }) =>
     allegianceA.localeCompare(allegianceB) || prefixA.length - prefixB.length || prefixA.localeCompare(prefixB),
 });
 
-const initialState = tokenGroupsAdapter.getInitialState({ intitialAdded: false });
+const initialState = adapter.getInitialState({ intitialAdded: false });
 
-const tokenGroupsSlice = createSlice({
+const slice = createSlice({
   name: 'tokenGroups',
   initialState,
   reducers: {
-    tokenGroupCreated: tokenGroupsAdapter.addOne,
-    tokenGroupTrashed: tokenGroupsAdapter.removeOne,
-    tokenGroupsUpdated: tokenGroupsAdapter.upsertMany,
+    tokenGroupCreated: adapter.addOne,
+    tokenGroupTrashed: adapter.removeOne,
+    tokenGroupsUpdated: adapter.upsertMany,
     generatorsClaimed(state, action) {
-      tokenGroupsAdapter.updateMany(
+      adapter.updateMany(
         state,
         state.ids.map((id) => ({ id, changes: { claimed: action.payload.includes(id) } }))
       );
@@ -23,25 +23,25 @@ const tokenGroupsSlice = createSlice({
   },
 });
 
-export const { tokenGroupCreated, tokenGroupTrashed, tokenGroupsUpdated, generatorsClaimed } = tokenGroupsSlice.actions;
+export const { tokenGroupCreated, tokenGroupTrashed, tokenGroupsUpdated, generatorsClaimed } = slice.actions;
 
 export const tokenGroupUpdateRequested = (tokenGroup) => (dispatch, getState, invoke) => {
   invoke('UpdateGenerator', 123, { generator: tokenGroup });
 };
 
-export default tokenGroupsSlice.reducer;
+export default slice.reducer;
 
 export const {
-  selectIds: selectTokenGroupIds,
-  selectById: selectTokenGroupById,
-  selectAll: selectAllTokenGroups,
-} = tokenGroupsAdapter.getSelectors((state) => state.tokenGroups);
+  selectIds: selectGeneratorIds,
+  selectById: selectGeneratorById,
+  selectAll: selectAllGenerators,
+} = adapter.getSelectors((state) => state.tokenGroups);
 
-export const selectClaimedGeneratorIds = createSelector(selectAllTokenGroups, (generators) =>
+export const selectClaimedGeneratorIds = createSelector(selectAllGenerators, (generators) =>
   generators.filter(({ claimed }) => claimed).map(({ id }) => id)
 );
 
-export const selectGeneratorsByAllegiance = createSelector(selectAllTokenGroups, (generators) =>
+export const selectGeneratorsByAllegiance = createSelector(selectAllGenerators, (generators) =>
   generators.reduce((result, g) => {
     result[g.allegiance] = [...(result[g.allegiance] || []), g.id];
 

@@ -1,5 +1,5 @@
 export const ItemTypes = {
-  TOKEN_GROUP: 'token-group',
-  TOKEN: 'token',
+  GENERATOR: 'generator',
+  PLACED_TOKEN: 'placed-token',
+  STASHED_TOKEN: 'stashed-token',
 };
-
