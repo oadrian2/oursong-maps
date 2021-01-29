@@ -38,8 +38,9 @@ export const CustomDragLayer = (props) => {
   const renderedItem = useMemo(() => {
     switch (itemType) {
       case ItemTypes.PLACED_TOKEN:
+        return <Token id={item.id} dragType={ItemTypes.PLACED_TOKEN} />;
       case ItemTypes.STASHED_TOKEN:
-        return <Token id={item.id} />;
+        return <Token id={item.id} dragType={ItemTypes.STASHED_TOKEN} />;
       case ItemTypes.GENERATOR:
         return <TokenGroup id={item.id} />;
       default:

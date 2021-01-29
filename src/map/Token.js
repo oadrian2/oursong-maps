@@ -3,11 +3,10 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
-import { ItemTypes } from '../ItemTypes';
 import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/generatorsSlice';
 import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
 
-export function Token({ id }) {
+export function Token({ id, dragType }) {
   const { group: generatorId } = useSelector((state) => selectTokenById(state, id));
 
   const {
@@ -24,7 +23,7 @@ export function Token({ id }) {
   const numberedTitle = effectiveIndex ? `${label} ${effectiveIndex}` : label;
 
   const [, drag, preview] = useDrag({
-    item: { type: ItemTypes.PLACED_TOKEN, id },
+    item: { type: dragType, id },
     collect: () => ({}),
     canDrag: () => claimedGeneratorIds.includes(generatorId),
   });
