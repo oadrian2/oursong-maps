@@ -14,9 +14,9 @@ export async function addListeners(connection, { dispatch, getState }) {
 
     if (isLoaded) return;
 
-    const { id, title, gameDate, image, generators, tokens } = state;
+    const { id, title, gameDate, image, map, generators, tokens } = state;
 
-    dispatch(mapUpdated({ id, title, gameDate, image }));
+    dispatch(mapUpdated({ id, title, gameDate, image, map }));
     dispatch(tokenGroupsUpdated(generators));
     dispatch(tokensUpdated(tokens));
     dispatch(loaded());

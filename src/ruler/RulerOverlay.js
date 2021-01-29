@@ -50,7 +50,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   return (
     <div
       ref={containerRef}
-      className="measurement-overlay"
+      className="ruler-overlay"
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}

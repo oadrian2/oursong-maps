@@ -7,6 +7,7 @@ import './Supply.css';
 import { TokenGroup } from './FigureGenerator';
 import { selectClaimedGeneratorIds } from './generatorsSlice';
 import { Trash } from './Trash';
+import { pathStopped } from '../ruler/rulerSlice';
 
 export function Supply() {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ export function Supply() {
       const { id } = item;
 
       dispatch(tokenStashRequested(id));
+      dispatch(pathStopped());
     },
   });
 

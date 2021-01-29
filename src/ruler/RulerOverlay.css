@@ -1,6 +1,6 @@
-.measurement-overlay {
+.ruler-overlay {
   position: relative;
-  outline: none;
+  border: 2px solid black;
 }
 
 .measurement-layer {

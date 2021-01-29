@@ -24,7 +24,7 @@ export function Token({ id, dragType }) {
 
   const [, drag, preview] = useDrag({
     item: { type: dragType, id },
-    collect: () => ({}),
+    collect: () => ({ dragType }),
     canDrag: () => claimedGeneratorIds.includes(generatorId),
   });
 

@@ -2,12 +2,7 @@ import { useSelector } from 'react-redux';
 import { selectMapImage } from './mapSlice';
 
 export function MapImage() {
-  const { src, scale } = useSelector(selectMapImage);
-  const scalePercent = scale.toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 0 });
+  const { src, width } = useSelector(selectMapImage);
 
-  return (
-    <span style={{ display: 'inline-block' }}>
-      <img draggable="false" style={{ width: scalePercent }} src={src} alt="the map" />
-    </span>
-  );
+  return <img draggable="false" style={{ width }} src={src} alt="the map" />;
 }
