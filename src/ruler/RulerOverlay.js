@@ -77,7 +77,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
           </svg>
           <div className="measurement-lengths">
             <div className="measurement-length">
-              <strong>L:</strong>
+              <strong>C:</strong>
               <span>{measurement.lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
             </div>
             <div className="measurement-length">

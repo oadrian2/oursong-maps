@@ -19,6 +19,8 @@
     "react-draggable": "^4.4.3",
     "react-pinch-zoom-pan": "^1.4.5",
     "react-redux": "^7.2.2",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "redux": "^4.0.5",
     "redux-toolkit": "^1.1.2",

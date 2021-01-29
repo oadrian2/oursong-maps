@@ -1,6 +1,12 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { selectEncounter } from './mapSlice';
 
+export const TokenAllegiance = {
+  ALLY: 'ally',
+  ENEMY: 'enemy',
+  UNKNOWN: 'unknown',
+};
+
 const adapter = createEntityAdapter();
 
 const initialState = adapter.getInitialState();

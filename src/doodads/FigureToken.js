@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { TokenAllegiance } from '../map/tokenSlice';
 import './FigureToken.css';
 
 export const FigureToken = forwardRef(({ label, title, allegiance }, ref) => {
@@ -18,9 +19,3 @@ export const FigureToken = forwardRef(({ label, title, allegiance }, ref) => {
 });
 
 FigureToken.displayName = 'FigureToken';
-
-export const TokenAllegiance = {
-  UNKNOWN: 'unknown',
-  ALLY: 'ally',
-  ENEMY: 'enemy',
-};
