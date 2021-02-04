@@ -1,5 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { selectEncounter } from './mapSlice';
+import { selectMapId } from './mapSlice';
 
 export const TokenAllegiance = {
   ALLY: 'ally',
@@ -40,33 +40,33 @@ const slice = createSlice({
 export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = slice.actions;
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateToken', encounter, { ...token, map: encounter, game: 'ttb' });
+  invoke('updateToken', mapId, { ...token, game: mapId.game, map: mapId.id  });
 };
 
 export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateToken', encounter, { id, position: null });
+  invoke('updateToken', mapId, { id, position: null });
 };
 
 export const moveTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateToken', encounter, { id, position });
+  invoke('updateToken', mapId, { id, position });
 }
 
 export const unstashTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateToken', encounter, { id, position });
+  invoke('updateToken', mapId, { id, position });
 }
 
 export const trashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateToken', encounter, { id, deleted: true });
+  invoke('updateToken', mapId, { id, deleted: true });
 };
 
 export default slice.reducer;

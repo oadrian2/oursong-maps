@@ -1,4 +1,4 @@
-import { connected, connecting, mapLoaded, selectEncounter, selectLoaded } from '../map/mapSlice';
+import { connected, connecting, mapLoaded, selectEncounter, selectLoaded, selectMapId } from '../map/mapSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { generatorUpdated } from '../supply/generatorsSlice';
 
@@ -14,23 +14,15 @@ export async function addListeners(connection, { dispatch, getState }) {
 
     if (isLoaded) return;
 
-    const { id, title, gameDate, image, map, generators, tokens } = state;
+    const { id, game, title, gameDate, image, map, generators, tokens } = state;
 
     dispatch(generatorUpdated(generators));
     dispatch(tokensUpdated(tokens));
-    dispatch(mapLoaded({ id, title, gameDate, image, map }));
-  });
-
-  connection.on('tokenUpsert', (token, tokenEncounter) => {
-    const currentEncounter = selectEncounter(getState());
-
-    if (currentEncounter !== tokenEncounter) return;
-
-    dispatch(tokenUpsert(token));
+    dispatch(mapLoaded({ id, game, title, gameDate, image, map }));
   });
 
   connection.on('tokenUpdated', (token) => {
-    const currentMap = selectEncounter(getState());
+    const { id: currentMap } = selectMapId(getState());
 
     if (currentMap !== token.map) return;
 

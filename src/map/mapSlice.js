@@ -3,7 +3,6 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 const slice = createSlice({
   name: 'map',
   initialState: {
-    game: 'ttb',
     connected: false,
     loaded: false,
   },
@@ -15,9 +14,10 @@ const slice = createSlice({
       state.showGrid = false;
     },
     mapLoaded: (state, action) => {
-      const { id, title, image, map, gameDate } = action.payload;
+      const { id, game, title, image, map, gameDate } = action.payload;
 
       state.id = id;
+      state.game = game;
       state.title = title;
       state.image = image;
       state.map = map;
@@ -39,7 +39,7 @@ export default slice.reducer;
 
 export const selectMap = (state) => state.map;
 
-export const selectEncounter = createSelector(selectMap, (map) => map.id);
+export const selectMapId = createSelector(selectMap, ({ game, id }) => ({ game, id }));
 
 export const selectConnected = createSelector(selectMap, ({ connected }) => connected);
 
@@ -50,10 +50,10 @@ export const selectMapImage = createSelector(selectMap, ({ game, id, map: { imag
   width: width * scale,
 }));
 
-export const joinMapRequested = (id) => (dispatch, getState, invoke) => {
-  invoke('joinMap', 'ttb', id);
+export const joinMapRequested = (game, id) => (dispatch, getState, invoke) => {
+  invoke('joinMap', game, id);
 };
 
-export const leaveMapRequested = (id) => (dispatch, getState, invoke) => {
-  invoke('leaveMap', 'ttb', id);
+export const leaveMapRequested = (game, id) => (dispatch, getState, invoke) => {
+  invoke('leaveMap', game, id);
 };

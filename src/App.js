@@ -16,8 +16,8 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/maps/:id" component={MapPage} />
-        <Redirect to="/maps/0rZ9uL3ixv_cPgqEkRlnm" />
+        <Route exact path="/maps/:game/:id" component={MapPage} />
+        <Redirect to="/maps/ttb/0rZ9uL3ixv_cPgqEkRlnm" />
       </Switch>
     </Router>
   );
@@ -35,10 +35,10 @@ function MapPage({ match }) {
   useEffect(() => {
     if (!connected) return;
 
-    dispatch(joinMapRequested(match.params.id));
+    dispatch(joinMapRequested(match.params.game, match.params.id));
 
-    return () => dispatch(leaveMapRequested(match.params.id));
-  }, [connected, dispatch, match.params.id])
+    return () => dispatch(leaveMapRequested(match.params.game, match.params.id));
+  }, [connected, dispatch, match.params.game, match.params.id])
 
 
   if (!loaded) return "Loading...";

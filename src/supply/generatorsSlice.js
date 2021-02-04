@@ -1,5 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
-import { selectEncounter } from '../map/mapSlice';
+import { selectMapId } from '../map/mapSlice';
 
 const adapter = createEntityAdapter({
   sortComparer: ({ prefix: prefixA, allegiance: allegianceA }, { prefix: prefixB, allegiance: allegianceB }) =>
@@ -27,18 +27,16 @@ const slice = createSlice({
 export const { generatorCreated, generatorTrashed, generatorUpdated, generatorsClaimed } = slice.actions;
 
 export const generatorUpdateRequested = (generator) => (dispatch, getState, invoke) => {
-  const encounter = selectEncounter(getState());
+  const mapId = selectMapId(getState());
 
-  invoke('updateGenerator', encounter, { generator });
+  invoke('updateGenerator', mapId, { generator });
 };
 
 export default slice.reducer;
 
-export const {
-  selectIds: selectGeneratorIds,
-  selectById: selectGeneratorById,
-  selectAll: selectAllGenerators,
-} = adapter.getSelectors((state) => state.generators);
+export const { selectIds: selectGeneratorIds, selectById: selectGeneratorById, selectAll: selectAllGenerators } = adapter.getSelectors(
+  (state) => state.generators
+);
 
 export const selectClaimedGeneratorIds = createSelector(selectAllGenerators, (generators) =>
   generators.filter(({ claimed }) => claimed).map(({ id }) => id)
