@@ -2,8 +2,10 @@ import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolk
 import { selectMapId } from '../map/mapSlice';
 
 const adapter = createEntityAdapter({
-  sortComparer: ({ shape: { prefix: prefixA, allegiance: allegianceA } }, { shape: { prefix: prefixB, allegiance: allegianceB } }) =>
-    allegianceA.localeCompare(allegianceB) || prefixA.length - prefixB.length || prefixA.localeCompare(prefixB),
+  sortComparer: (
+    { shape: { prefix: prefixA, allegiance: allegianceA, isGroup: isGroupA } },
+    { shape: { prefix: prefixB, allegiance: allegianceB, isGroup: isGroupB } }
+  ) => allegianceA.localeCompare(allegianceB) || isGroupA - isGroupB || prefixA.localeCompare(prefixB),
 });
 
 const initialState = adapter.getInitialState({ intitialAdded: false });
