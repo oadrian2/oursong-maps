@@ -1,4 +1,4 @@
-import { connected, connecting, mapLoaded, selectEncounter, selectLoaded, selectMapId } from '../map/mapSlice';
+import { connected, connecting, mapLoaded, selectLoaded, selectMapId } from '../map/mapSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { generatorUpdated } from '../supply/generatorsSlice';
 
@@ -27,7 +27,7 @@ export async function addListeners(connection, { dispatch, getState }) {
     if (currentMap !== token.map) return;
 
     dispatch(tokenUpsert(token));
-  })
+  });
 
   connection.onreconnecting(() => {
     dispatch(connecting());
