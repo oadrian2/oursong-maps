@@ -1,6 +1,6 @@
-import { connected, connecting, loaded, mapUpdated, selectEncounter, selectLoaded } from '../map/mapSlice';
+import { connected, connecting, mapLoaded, selectEncounter, selectLoaded } from '../map/mapSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
-import { tokenGroupsUpdated } from '../supply/generatorsSlice';
+import { generatorUpdated } from '../supply/generatorsSlice';
 
 export async function addListeners(connection, { dispatch, getState }) {
   connection.on('newMessage', (message) => {
@@ -16,12 +16,9 @@ export async function addListeners(connection, { dispatch, getState }) {
 
     const { id, title, gameDate, image, map, generators, tokens } = state;
 
-    dispatch(mapUpdated({ id, title, gameDate, image, map }));
-    dispatch(tokenGroupsUpdated(generators));
+    dispatch(generatorUpdated(generators));
     dispatch(tokensUpdated(tokens));
-    dispatch(loaded());
-
-    console.log(getState());
+    dispatch(mapLoaded({ id, title, gameDate, image, map }));
   });
 
   connection.on('tokenUpsert', (token, tokenEncounter) => {
@@ -32,13 +29,13 @@ export async function addListeners(connection, { dispatch, getState }) {
     dispatch(tokenUpsert(token));
   });
 
-  connection.on('groupJoined', (state) => {
-    console.log(state);
-  });
+  connection.on('tokenUpdated', (token) => {
+    const currentMap = selectEncounter(getState());
 
-  connection.onclose(() => {
-    dispatch(connecting());
-  });
+    if (currentMap !== token.map) return;
+
+    dispatch(tokenUpsert(token));
+  })
 
   connection.onreconnecting(() => {
     dispatch(connecting());
@@ -47,8 +44,6 @@ export async function addListeners(connection, { dispatch, getState }) {
   connection.onreconnected(() => {
     dispatch(connected());
   });
-
-  dispatch(connecting());
 
   await connection.start();
 
@@ -64,7 +59,7 @@ export const signalRMiddleware = (connection) => {
     return (next) => (action) => {
       if (action.type === 'broadcast') {
         console.log('broadcasting', action.payload);
-        connection.invoke('broadcast', 123, action.payload);
+        connection.invoke('broadcast', action.payload);
 
         return;
       }

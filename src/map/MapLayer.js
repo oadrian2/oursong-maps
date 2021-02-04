@@ -2,21 +2,20 @@ import { nanoid } from '@reduxjs/toolkit';
 import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { tokenPlacementRequested, tokenUpsertRequested } from './tokenSlice';
 import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay } from '../ruler/RulerOverlay';
+import { movedTo, pathStarted, pathStopped, selectShowRuler } from '../ruler/rulerSlice';
 import { MapImage } from './MapImage';
 import './MapLayer.css';
 import { TokenLayer } from './TokenLayer';
-import { movedTo, pathStarted, pathStopped, selectMeasurement } from '../ruler/rulerSlice';
+import { moveTokenToRequested, tokenPlacementRequested, unstashTokenToRequested } from './tokenSlice';
 
 export function MapLayer() {
   const dispatch = useDispatch();
 
   const ref = useRef();
-  const mouseLocation = useRef();
 
-  const ruler = useSelector(selectMeasurement);
+  const ruler = useSelector(selectShowRuler);
 
   const [, drop] = useDrop({
     accept: [ItemTypes.GENERATOR, ItemTypes.PLACED_TOKEN, ItemTypes.STASHED_TOKEN],
@@ -32,9 +31,6 @@ export function MapLayer() {
       } else {
         dispatch(pathStarted(position));
       }
-
-      mouseLocation.current = monitor.getSourceClientOffset();
-      // console.info(`loc`, monitor.getInitialSourceClientOffset(), mouseLocation.current);
     },
     drop: (item, monitor) => {
       const { id, type } = item;
@@ -44,18 +40,17 @@ export function MapLayer() {
       switch (type) {
         case ItemTypes.PLACED_TOKEN:
           dispatch(pathStopped());
-          dispatch(tokenUpsertRequested({ id, position }));
+          dispatch(moveTokenToRequested({ id, position }));
           break;
         case ItemTypes.STASHED_TOKEN:
-          dispatch(tokenUpsertRequested({ id, position }));
+          dispatch(unstashTokenToRequested({ id, position }));
           break;
         case ItemTypes.GENERATOR:
-          dispatch(tokenPlacementRequested({ id: nanoid(), group: id, position }));
+          dispatch(tokenPlacementRequested({ id: nanoid(), generator: id, position }));
           break;
         default:
       }
     },
-    collect: (monitor, props) => console.log('collecting', monitor.isOver(), props),
   });
 
   return (

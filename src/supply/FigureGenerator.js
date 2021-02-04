@@ -6,7 +6,7 @@ import { FigureToken } from '../doodads/FigureToken';
 import { ItemTypes } from '../ItemTypes';
 import { selectGeneratorById } from './generatorsSlice';
 
-export function TokenGroup({ id }) {
+export function FigureGenerator({ id }) {
   const { prefix, label, allegiance } = useSelector((state) => selectGeneratorById(state, id));
 
   const [, drag, preview] = useDrag({

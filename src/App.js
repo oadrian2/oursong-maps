@@ -27,9 +27,10 @@ function MapPage({ match }) {
   const dispatch = useDispatch();
 
   const connected = useSelector(selectConnected);
+
   const loaded = useSelector(selectLoaded);
 
-  console.log(connected);
+  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
   useEffect(() => {
     if (!connected) return;
@@ -39,7 +40,6 @@ function MapPage({ match }) {
     return () => dispatch(leaveMapRequested(match.params.id));
   }, [connected, dispatch, match.params.id])
 
-  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
   if (!loaded) return "Loading...";
 

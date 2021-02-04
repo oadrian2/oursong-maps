@@ -7,13 +7,13 @@ import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/genera
 import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
 
 export function Token({ id, dragType }) {
-  const { group: generatorId } = useSelector((state) => selectTokenById(state, id));
+  const { generator } = useSelector((state) => selectTokenById(state, id));
 
   const {
     shape: { prefix, label, isGroup, allegiance, radius = 1 },
-  } = useSelector((state) => selectGeneratorById(state, generatorId));
+  } = useSelector((state) => selectGeneratorById(state, generator));
 
-  const index = useSelector((state) => selectIndexWithinGroup(state, { id, group: generatorId }));
+  const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
 
   const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
@@ -25,7 +25,7 @@ export function Token({ id, dragType }) {
   const [, drag, preview] = useDrag({
     item: { type: dragType, id },
     collect: () => ({ dragType }),
-    canDrag: () => claimedGeneratorIds.includes(generatorId),
+    canDrag: () => claimedGeneratorIds.includes(generator),
   });
 
   useEffect(() => {

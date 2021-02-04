@@ -7,7 +7,7 @@
   gap: 0.25rem;
 }
 
-.supply-groups {
+.supply-generators {
     flex: none;
     min-height: var(--tokenSize);
     display: flex;

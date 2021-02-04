@@ -1,4 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { selectEncounter } from '../map/mapSlice';
 
 const adapter = createEntityAdapter({
   sortComparer: ({ prefix: prefixA, allegiance: allegianceA }, { prefix: prefixB, allegiance: allegianceB }) =>
@@ -8,12 +9,12 @@ const adapter = createEntityAdapter({
 const initialState = adapter.getInitialState({ intitialAdded: false });
 
 const slice = createSlice({
-  name: 'tokenGroups',
+  name: 'generators',
   initialState,
   reducers: {
-    tokenGroupCreated: adapter.addOne,
-    tokenGroupTrashed: adapter.removeOne,
-    tokenGroupsUpdated: adapter.upsertMany,
+    generatorCreated: adapter.addOne,
+    generatorTrashed: adapter.removeOne,
+    generatorUpdated: adapter.upsertMany,
     generatorsClaimed(state, action) {
       adapter.updateMany(
         state,
@@ -23,10 +24,12 @@ const slice = createSlice({
   },
 });
 
-export const { tokenGroupCreated, tokenGroupTrashed, tokenGroupsUpdated, generatorsClaimed } = slice.actions;
+export const { generatorCreated, generatorTrashed, generatorUpdated, generatorsClaimed } = slice.actions;
 
-export const tokenGroupUpdateRequested = (tokenGroup) => (dispatch, getState, invoke) => {
-  invoke('UpdateGenerator', 123, { generator: tokenGroup });
+export const generatorUpdateRequested = (generator) => (dispatch, getState, invoke) => {
+  const encounter = selectEncounter(getState());
+
+  invoke('updateGenerator', encounter, { generator });
 };
 
 export default slice.reducer;
@@ -35,7 +38,7 @@ export const {
   selectIds: selectGeneratorIds,
   selectById: selectGeneratorById,
   selectAll: selectAllGenerators,
-} = adapter.getSelectors((state) => state.tokenGroups);
+} = adapter.getSelectors((state) => state.generators);
 
 export const selectClaimedGeneratorIds = createSelector(selectAllGenerators, (generators) =>
   generators.filter(({ claimed }) => claimed).map(({ id }) => id)

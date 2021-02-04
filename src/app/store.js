@@ -1,18 +1,52 @@
+// import { PublicClientApplication } from '@azure/msal-browser';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
 import connectionReducer from '../connection/connectionSlice';
 import mapReducer from '../map/mapSlice';
 import tokenReducer from '../map/tokenSlice';
 import rulerReducer from '../ruler/rulerSlice';
-import tokenGroupsReducer from '../supply/generatorsSlice';
+import generatorReducer from '../supply/generatorsSlice';
 import { addListeners, signalRMiddleware } from './addListeners';
 
-const connection = new HubConnectionBuilder().configureLogging(LogLevel.Debug).withUrl(process.env.REACT_APP_HUB_URL).build();
+// async function login() {
+//   const msalConfig = {
+//     auth: {
+//       clientId: '853567cf-2063-4017-ad06-b3f52839177c',
+//       authority: 'https://login.microsoftonline.com/common',
+//       redirectUri: 'http://localhost:3000',
+//     },
+//     cache: {
+//       cacheLocation: 'sessionStorage',
+//       storeAuthStateInCookie: false,
+//     },
+//   };
+
+//   const msal = new PublicClientApplication(msalConfig);
+
+//   console.log(msal.getAllAccounts());
+
+//   const request = {
+//     scopes: ['openid', 'profile', 'api://853567cf-2063-4017-ad06-b3f52839177c/user_impersonation'],
+//     account: { username: 'orion.adrian@oursong.info' }
+//   };
+
+//   const result = await msal.acquireTokenSilent(request).catch(() => msal.acquireTokenPopup(request));
+
+//   return result.accessToken;
+// }
+
+const login = () => null;
+
+const connection = new HubConnectionBuilder()
+  .withUrl(process.env.REACT_APP_HUB_URL, { accessTokenFactory: login })
+  .withAutomaticReconnect()
+  .configureLogging(LogLevel.Debug)
+  .build();
 
 const store = configureStore({
   reducer: {
     ruler: rulerReducer,
-    tokenGroups: tokenGroupsReducer,
+    generators: generatorReducer,
     tokens: tokenReducer,
     connection: connectionReducer,
     map: mapReducer,

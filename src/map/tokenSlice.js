@@ -43,27 +43,31 @@ export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) =
   const state = getState();
   const encounter = selectEncounter(state);
 
-  invoke('events', encounter, token);
+  invoke('updateToken', encounter, { ...token, map: encounter });
 };
 
-export const tokenUpsertRequested = (token) => (dispatch, getState, invoke) => {
+export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
   const encounter = selectEncounter(getState());
 
-  invoke('events', encounter, token);
+  invoke('updateToken', encounter, { id, position: null });
 };
 
-export const tokenStashRequested = (id) => (dispatch, getState, invoke) => {
+export const moveTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
   const encounter = selectEncounter(getState());
-  const token = selectTokenById(getState(), id);
 
-  invoke('events', encounter, { ...token, position: null });
-};
+  invoke('updateToken', encounter, { id, position });
+}
 
-export const tokenTrashRequested = (id) => (dispatch, getState, invoke) => {
+export const unstashTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
   const encounter = selectEncounter(getState());
-  const token = selectTokenById(getState(), id);
 
-  invoke('events', encounter, { ...token, deleted: true });
+  invoke('updateToken', encounter, { id, position });
+}
+
+export const trashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
+  const encounter = selectEncounter(getState());
+
+  invoke('updateToken', encounter, { id, deleted: true });
 };
 
 export default slice.reducer;
@@ -76,6 +80,6 @@ export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => t
 export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position && !t.deleted));
 
 export const selectIndexWithinGroup = createSelector(
-  [selectAllTokens, (state, { id, group }) => ({ id, group })],
-  (tokens, { id, group }) => tokens.filter((t) => t.group === group).findIndex((t) => t.id === id)
+  [selectAllTokens, (state, { id, generator }) => ({ id, generator })],
+  (tokens, { id, generator }) => tokens.filter((t) => t.generator === generator).findIndex((t) => t.id === id)
 );

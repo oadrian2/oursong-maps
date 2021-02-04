@@ -14,7 +14,7 @@ const slice = createSlice({
     hideGrid: (state) => {
       state.showGrid = false;
     },
-    mapUpdated: (state, action) => {
+    mapLoaded: (state, action) => {
       const { id, title, image, map, gameDate } = action.payload;
 
       state.id = id;
@@ -22,6 +22,7 @@ const slice = createSlice({
       state.image = image;
       state.map = map;
       state.gameDate = gameDate;
+      state.loaded = true;
     },
     connecting: (state) => {
       state.connected = false;
@@ -29,13 +30,10 @@ const slice = createSlice({
     connected: (state) => {
       state.connected = true;
     },
-    loaded: (state) => {
-      state.loaded = true;
-    },
-  },
+  }
 });
 
-export const { mapUpdated, connecting, connected, loaded } = slice.actions;
+export const { mapLoaded, connecting, connected } = slice.actions;
 
 export default slice.reducer;
 
@@ -43,9 +41,9 @@ export const selectMap = (state) => state.map;
 
 export const selectEncounter = createSelector(selectMap, (map) => map.id);
 
-export const selectLoaded = createSelector(selectMap, (map) => map.loaded);
-
 export const selectConnected = createSelector(selectMap, ({ connected }) => connected);
+
+export const selectLoaded = createSelector(selectMap, ({ loaded }) => loaded);
 
 export const selectMapImage = createSelector(selectMap, ({ game, id, map: { image, width, scale } }) => ({
   src: new URL(`/maps/${game}/${id}/${image}`, process.env.REACT_APP_STORAGE_URL).href,

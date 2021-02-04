@@ -34,6 +34,8 @@ export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped } = s
 
 export default slice.reducer;
 
+export const selectShowRuler = createSelector(state => state.ruler.origin, origin => !!origin);
+
 export const selectPoints = (state) => state.ruler.origin && [state.ruler.origin, ...state.ruler.points];
 
 export const selectPathAsString = createSelector(
