@@ -42,7 +42,7 @@ export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstas
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
   const encounter = selectEncounter(getState());
 
-  invoke('updateToken', encounter, { ...token, map: encounter });
+  invoke('updateToken', encounter, { ...token, map: encounter, game: 'ttb' });
 };
 
 export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
