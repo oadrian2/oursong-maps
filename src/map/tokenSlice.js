@@ -40,8 +40,7 @@ const slice = createSlice({
 export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = slice.actions;
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
-  const state = getState();
-  const encounter = selectEncounter(state);
+  const encounter = selectEncounter(getState());
 
   invoke('updateToken', encounter, { ...token, map: encounter });
 };

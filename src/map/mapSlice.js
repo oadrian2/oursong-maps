@@ -51,9 +51,9 @@ export const selectMapImage = createSelector(selectMap, ({ game, id, map: { imag
 }));
 
 export const joinMapRequested = (id) => (dispatch, getState, invoke) => {
-  invoke('joinMap', id);
+  invoke('joinMap', 'ttb', id);
 };
 
 export const leaveMapRequested = (id) => (dispatch, getState, invoke) => {
-  invoke('leaveMap', id);
+  invoke('leaveMap', 'ttb', id);
 };
