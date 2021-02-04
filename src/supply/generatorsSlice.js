@@ -2,7 +2,7 @@ import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolk
 import { selectMapId } from '../map/mapSlice';
 
 const adapter = createEntityAdapter({
-  sortComparer: ({ prefix: prefixA, allegiance: allegianceA }, { prefix: prefixB, allegiance: allegianceB }) =>
+  sortComparer: ({ shape: { prefix: prefixA, allegiance: allegianceA } }, { shape: { prefix: prefixB, allegiance: allegianceB } }) =>
     allegianceA.localeCompare(allegianceB) || prefixA.length - prefixB.length || prefixA.localeCompare(prefixB),
 });
 
@@ -43,8 +43,8 @@ export const selectClaimedGeneratorIds = createSelector(selectAllGenerators, (ge
 );
 
 export const selectGeneratorsByAllegiance = createSelector(selectAllGenerators, (generators) =>
-  generators.reduce((result, g) => {
-    result[g.allegiance] = [...(result[g.allegiance] || []), g.id];
+  generators.reduce((result, { id, shape: { allegiance } }) => {
+    result[allegiance] = [...(result[allegiance] || []), id];
 
     return result;
   }, {})

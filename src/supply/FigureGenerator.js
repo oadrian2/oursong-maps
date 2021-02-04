@@ -7,7 +7,7 @@ import { ItemTypes } from '../ItemTypes';
 import { selectGeneratorById } from './generatorsSlice';
 
 export function FigureGenerator({ id }) {
-  const { prefix, label, allegiance } = useSelector((state) => selectGeneratorById(state, id));
+  const { shape: { prefix, label, allegiance } } = useSelector((state) => selectGeneratorById(state, id));
 
   const [, drag, preview] = useDrag({
     item: { type: ItemTypes.GENERATOR, id },
