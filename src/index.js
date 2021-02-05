@@ -8,11 +8,9 @@ import reportWebVitals from './reportWebVitals';
 import './fonts/Roboto-Regular.ttf';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
+  <Provider store={store}>
+    <App />
+  </Provider>,
   document.getElementById('root')
 );
 

@@ -7,40 +7,15 @@
   box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
-.session-dialog__footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.session-dialog__submit {
-  padding: 6px 16px;
-  font-size: 0.875rem;
-  min-width: 64px;
-  font-family: 'Roboto';
-  font-weight: 500;
-  border-radius: 4px;
-  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-  background-color: #90caf9;
-  line-height: 1.75;
-  letter-spacing: 0.02857em;
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.87);
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-}
-
 .session-dialog__generators {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .generators__group {
   display: flex;
-  gap: 4px;
+  gap: 2px;
 }
 
 .generators__select-all {
