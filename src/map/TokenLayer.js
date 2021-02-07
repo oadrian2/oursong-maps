@@ -9,9 +9,9 @@ export function TokenLayer() {
   const tokens = useSelector(selectActiveTokens, shallowEqual);
 
   const transitions = useTransition(tokens, (token) => token.id, {
-    from: { opacity: 0, transform: 'scale(0.5)' },
-    enter: { opacity: 1, transform: 'scale(1)' },
-    leave: { opacity: 0, transform: 'scale(0.5)' },
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
   });
 
   return transitions.map(({ item: { id, position }, key, props }) => (
