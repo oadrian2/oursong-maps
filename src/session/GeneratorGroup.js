@@ -6,8 +6,8 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }) 
 
   const selectedSet = new Set(selected);
 
-  const onAllSelect = function (newState) {
-    if (newState) {
+  const onAllSelect = function (isSelected) {
+    if (isSelected) {
       generators.forEach((g) => selectedSet.add(g));
     } else {
       generators.forEach((g) => selectedSet.delete(g));
@@ -16,8 +16,8 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }) 
     setSelected([...selectedSet]);
   };
 
-  const onOneSelect = function (newState, key) {
-    if (newState) {
+  const onOneSelect = function (isSelected, key) {
+    if (isSelected) {
       selectedSet.add(key);
     } else {
       selectedSet.delete(key);

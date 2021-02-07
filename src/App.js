@@ -9,7 +9,6 @@ import { Header } from './header/Header';
 import { MapLayer } from './map/MapLayer';
 import { joinMapRequested, leaveMapRequested, selectConnected, selectLoaded } from './map/mapSlice';
 import { SessionDialog } from './session/SessionDialog';
-import { selectClaimedGeneratorIds } from './supply/generatorsSlice';
 import { Supply } from './supply/Supply';
 
 function App() {
@@ -37,8 +36,6 @@ function MapPage({
 
   const loaded = useSelector(selectLoaded);
 
-  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
-
   useEffect(() => {
     if (!connected) return;
 
@@ -63,7 +60,7 @@ function MapPage({
           <MapLayer />
         </div>
       </div>
-      {claimedGeneratorIds.length === 0 && <SessionDialog />}
+      <SessionDialog />
     </DndProvider>
   );
 }

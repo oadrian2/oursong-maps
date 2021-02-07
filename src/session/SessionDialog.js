@@ -16,8 +16,8 @@ export function SessionDialog() {
   const onClick = () => dispatch(generatorsClaimed(selected));
 
   return (
-    <Dialog open={true} aria-labelledby="form-dialog-title">
-      <DialogTitle id="form-dialog-title">Claim Characters</DialogTitle>
+    <Dialog open={claimedGenerators.length === 0} aria-labelledby="session-dialog-title">
+      <DialogTitle id="session-dialog-title">Claim Figures</DialogTitle>
       <DialogContent>
         <div className="session-dialog__generators">
           {Object.keys(generatorGroups).map((key) => (
