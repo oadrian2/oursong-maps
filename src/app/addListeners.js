@@ -2,6 +2,36 @@ import { connected, connecting, mapLoaded, selectLoaded, selectMapId } from '../
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { generatorUpdated } from '../supply/generatorsSlice';
 
+const markerGenerators = [
+  {
+    id: 'marker:red',
+    shapeType: 'marker',
+    movable: false,
+    claimable: false,
+    shape: {
+      color: 'red',
+    }
+  },
+  {
+    id: 'marker:blue',
+    shapeType: 'marker',
+    movable: false,
+    claimable: false,
+    shape: {
+      color: 'blue',
+    }
+  },
+  {
+    id: 'marker:green',
+    shapeType: 'marker',
+    movable: false,
+    claimable: false,
+    shape: {
+      color: 'green',
+    }
+  },
+];
+
 export async function addListeners(connection, { dispatch, getState }) {
   connection.on('newMessage', (message) => {
     dispatch(message);
@@ -16,7 +46,7 @@ export async function addListeners(connection, { dispatch, getState }) {
 
     const { id, game, title, gameDate, image, map, generators, tokens } = state;
 
-    dispatch(generatorUpdated(generators));
+    dispatch(generatorUpdated([...generators, ...markerGenerators]));
     dispatch(tokensUpdated(tokens));
     dispatch(mapLoaded({ id, game, title, gameDate, image, map }));
   });

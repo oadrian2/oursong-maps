@@ -32,6 +32,10 @@ export function MapLayer() {
         dispatch(pathStarted(position));
       }
     },
+    canDrop: (item, monitor) => {
+      console.log(item);
+      return true;
+    },
     drop: (item, monitor) => {
       const { id, type } = item;
 

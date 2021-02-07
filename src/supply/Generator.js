@@ -2,12 +2,13 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
+import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { ItemTypes } from '../ItemTypes';
 import { selectGeneratorById } from './generatorsSlice';
 
-export function MarkerGenerator({ id }) {
-  const { shape } = useSelector((state) => selectGeneratorById(state, id));
+export function Generator({ id }) {
+  const { shapeType, shape } = useSelector((state) => selectGeneratorById(state, id));
 
   const [, drag, preview] = useDrag({
     item: { type: ItemTypes.GENERATOR, id },
@@ -18,5 +19,8 @@ export function MarkerGenerator({ id }) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  return <MarkerToken ref={drag} isTemplate={true} {...shape} />;
+  return {
+      'figure': <FigureToken id={id} ref={drag} isTemplate={true} {...shape} />,
+      'marker': <MarkerToken id={id} ref={drag} isTemplate={true} {...shape} />
+  }[shapeType]
 }

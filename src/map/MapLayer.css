@@ -2,8 +2,3 @@
   display: flex;
   justify-content: center;
 }
-
-.doodad {
-  position: absolute;
-  transition: left .5s, top .5s;
-}

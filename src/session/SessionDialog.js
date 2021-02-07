@@ -9,14 +9,14 @@ export function SessionDialog() {
   const dispatch = useDispatch();
 
   const generatorGroups = useSelector(selectGeneratorsByAllegiance);
-  const claimedGenerators = useSelector(selectClaimedGeneratorIds);
+  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
-  const [selected, setSelected] = useState(claimedGenerators);
+  const [selected, setSelected] = useState(claimedGeneratorIds);
 
   const onClick = () => dispatch(generatorsClaimed(selected));
 
   return (
-    <Dialog open={claimedGenerators.length === 0} aria-labelledby="session-dialog-title">
+    <Dialog open={claimedGeneratorIds.length === 0} aria-labelledby="session-dialog-title">
       <DialogTitle id="session-dialog-title">Claim Figures</DialogTitle>
       <DialogContent>
         <div className="session-dialog__generators">

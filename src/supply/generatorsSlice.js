@@ -3,12 +3,15 @@ import { selectMapId } from '../map/mapSlice';
 
 const adapter = createEntityAdapter({
   sortComparer: (
-    { shape: { prefix: prefixA, allegiance: allegianceA, isGroup: isGroupA } },
-    { shape: { prefix: prefixB, allegiance: allegianceB, isGroup: isGroupB } }
-  ) => allegianceA.localeCompare(allegianceB) || isGroupA - isGroupB || prefixA.localeCompare(prefixB),
+    { shapeType: shapeTypeA, shape: { prefix: prefixA, allegiance: allegianceA, isGroup: isGroupA, color: colorA } },
+    { shapeType: shapeTypeB, shape: { prefix: prefixB, allegiance: allegianceB, isGroup: isGroupB, color: colorB } }
+  ) =>
+    shapeTypeA.localeCompare(shapeTypeB) ||
+    (shapeTypeA === 'figure' && (allegianceA.localeCompare(allegianceB) || isGroupA - isGroupB || prefixA.localeCompare(prefixB))) ||
+    (shapeTypeA === 'marker' && colorA.localeCompare(colorB)),
 });
 
-const initialState = adapter.getInitialState({ intitialAdded: false });
+const initialState = adapter.getInitialState();
 
 const slice = createSlice({
   name: 'generators',
@@ -40,12 +43,26 @@ export const { selectIds: selectGeneratorIds, selectById: selectGeneratorById, s
   (state) => state.generators
 );
 
-export const selectClaimedGeneratorIds = createSelector(selectAllGenerators, (generators) =>
+export const selectFigureGenerators = createSelector(selectAllGenerators, (generators) =>
+  generators.filter(({ shapeType }) => shapeType === 'figure')
+);
+
+export const selectMarkerGenerators = createSelector(selectAllGenerators, (generators) =>
+  generators.filter(({ shapeType }) => shapeType === 'marker')
+);
+
+export const selectFigureGeneratorIds = createSelector(selectFigureGenerators, (generators) => generators.map(({ id }) => id));
+
+export const selectMarkerGeneratorIds = createSelector(selectMarkerGenerators, (generators) => generators.map(({ id }) => id));
+
+export const selectClaimedGeneratorIds = createSelector(selectFigureGenerators, (generators) =>
   generators.filter(({ claimed }) => claimed).map(({ id }) => id)
 );
 
-export const selectGeneratorsByAllegiance = createSelector(selectAllGenerators, (generators) =>
-  generators.reduce((result, { id, shape: { allegiance } }) => {
+export const selectGeneratorsByAllegiance = createSelector(selectFigureGenerators, (generators) =>
+  generators.reduce((result, { id, shapeType, shape: { allegiance } }) => {
+    if (shapeType !== 'figure') return result;
+
     result[allegiance] = [...(result[allegiance] || []), id];
 
     return result;

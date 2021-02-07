@@ -1,5 +1,5 @@
 import { FigureToken } from '../doodads/FigureToken';
-import { FigureGenerator } from '../supply/FigureGenerator';
+import { Generator } from '../supply/Generator';
 
 export function GeneratorGroup({ groupKey, generators, selected, setSelected }) {
   const allSelected = generators.every((id) => selected.includes(id));
@@ -36,7 +36,7 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }) 
 
         return (
           <div key={id} className={`generators__select-one ${oneSelected ? 'selected' : ''}`} onClick={() => onOneSelect(!oneSelected, id)}>
-            <FigureGenerator id={id} />
+            <Generator id={id} />
           </div>
         );
       })}
