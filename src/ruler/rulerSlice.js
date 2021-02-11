@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit';
 import throttle from 'lodash.throttle';
-import { selectMapId } from '../map/mapSlice';
+import { mapLoaded, selectMapId } from '../map/mapSlice';
 
 const adapter = createEntityAdapter();
 
@@ -54,7 +54,7 @@ const slice = createSlice({
     },
   },
   extraReducers: {
-    'map/mapLoaded': (state) => {
+    [mapLoaded]: (state) => {
       adapter.setAll(state, [{ id: self, origin: null, points: [] }]);
     },
   },
@@ -88,7 +88,7 @@ function getRuler(origin, points) {
   const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
 
   const { vectors, lastPoint, lastLength, totalLength, scaledX, scaledY } = points.reduce(
-    ({ vectors, start, totalLength }, end) => {
+    ({ vectors, lastPoint: start, totalLength }, end) => {
       const width = end.x - start.x;
       const height = end.y - start.y;
       const hypot = Math.hypot(width, height);
@@ -97,8 +97,7 @@ function getRuler(origin, points) {
 
       return {
         vectors: [...vectors, { start, end, hypot, scaledX, scaledY }],
-        start: end, // Ending of prior vector becomes start of next one.
-        lastPoint: end,
+        lastPoint: end, // Ending of prior vector becomes start of next one.
         lastLength: hypot,
         totalLength: totalLength + hypot,
         scaledX,
@@ -107,9 +106,7 @@ function getRuler(origin, points) {
     },
     {
       vectors: [],
-      start: origin,
       lastPoint: origin,
-      lastLength: 0.0,
       totalLength: 0.0,
     }
   );

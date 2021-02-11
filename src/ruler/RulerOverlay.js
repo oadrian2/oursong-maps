@@ -93,7 +93,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
           </svg>
           <div
             className="measurement-lengths"
-            style={{ left: lastPoint.x, top: lastPoint.y, transform: `translate(calc(-50% + (${scaledX} / 2)), calc(-50% + (${scaledY} / 2))` }}
+            style={{ left: lastPoint.x, top: lastPoint.y, transform: `translate(calc(-50% + (${scaledX})), calc(-50% + (${scaledY}))` }}
           >
             <div className="measurement-length">
               <strong>C:</strong>

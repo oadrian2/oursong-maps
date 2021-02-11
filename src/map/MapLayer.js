@@ -34,10 +34,6 @@ export function MapLayer() {
         dispatch(requestUpdateRemoteRuler());
       }
     },
-    canDrop: (item, monitor) => {
-      console.log(item);
-      return true;
-    },
     drop: (item, monitor) => {
       const { id, type } = item;
 
