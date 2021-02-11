@@ -59,6 +59,8 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
     if (event.code === 'KeyQ') dispatch(pointPopped());
   }
 
+  console.log(rulerMetrics.map(({ scaledX, scaledY }) => `x: ${scaledX}, y: ${scaledY}`)[0]);
+
   return (
     <div
       ref={containerRef}
@@ -70,7 +72,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
       tabIndex="0"
     >
       {children}
-      {rulerMetrics.map(({ id, isSingle, origin, path, radius, lastPoint, lastLength, totalLength }) => (
+      {rulerMetrics.map(({ id, isSingle, origin, path, radius, lastPoint, lastLength, totalLength, scaledX, scaledY }) => (
         <Fragment key={id}>
           <svg className="measurement-layer">
             <defs>
@@ -89,7 +91,10 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
             <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
             <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
           </svg>
-          <div className="measurement-lengths" style={{ left: lastPoint.x, top: lastPoint.y }}>
+          <div
+            className="measurement-lengths"
+            style={{ left: lastPoint.x, top: lastPoint.y, transform: `translate(calc(-50% + (${scaledX} / 2)), calc(-50% + (${scaledY} / 2))` }}
+          >
             <div className="measurement-length">
               <strong>C:</strong>
               <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>

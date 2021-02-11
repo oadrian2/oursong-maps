@@ -44,7 +44,6 @@ const slice = createSlice({
       if (self.origin === null || self.points.length === 1) return;
 
       self.points.pop();
-
     },
     updateRemoteRuler: (state, action) => {
       const { id, origin, points } = action.payload;
@@ -88,32 +87,38 @@ function getRuler(origin, points) {
 
   const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
 
-  const vectors = points.reduce(
-    ({ vectors, start }, end) => ({
-      vectors: [...vectors, { start, end, hypot: Math.hypot(end.y - start.y, end.x - start.x) }],
-      start: end,
-    }),
+  const { vectors, lastPoint, lastLength, totalLength, scaledX, scaledY } = points.reduce(
+    ({ vectors, start, totalLength }, end) => {
+      const width = end.x - start.x;
+      const height = end.y - start.y;
+      const hypot = Math.hypot(width, height);
+      const scaledX = (width / hypot).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 4 });
+      const scaledY = (height / hypot).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 4 });
+
+      return {
+        vectors: [...vectors, { start, end, hypot, scaledX, scaledY }],
+        start: end, // Ending of prior vector becomes start of next one.
+        lastPoint: end,
+        lastLength: hypot,
+        totalLength: totalLength + hypot,
+        scaledX,
+        scaledY,
+      };
+    },
     {
       vectors: [],
       start: origin,
+      lastPoint: origin,
+      lastLength: 0.0,
+      totalLength: 0.0,
     }
-  ).vectors;
+  );
 
   const isSingle = vectors.length === 1;
 
   const [{ hypot: radius }] = vectors;
 
-  const { lastLength, totalLength } = vectors.reduce(
-    (result, { hypot: length }) => ({
-      lastLength: length,
-      totalLength: length + result.totalLength,
-    }),
-    { lastLength: 0.0, totalLength: 0.0 }
-  );
-
-  const lastPoint = points[points.length - 1];
-
-  return { path, origin, radius, isSingle, lastPoint, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0 };
+  return { path, origin, radius, isSingle, lastPoint, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0, scaledX, scaledY };
 }
 
 export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
