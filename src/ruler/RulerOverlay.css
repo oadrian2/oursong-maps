@@ -14,19 +14,18 @@
 }
 
 .measurement-lengths {
-    position: fixed;
+    position: absolute;
     background: rgb(250, 250, 250);
     border: 2px solid black;
     border-radius: 4px;
     width: 120px;
     height: 4rem;
-    bottom: 2rem;
-    right: 2rem;
     padding: 0.5rem;
     display: flex;
     align-items: stretch;
     flex-direction: column;
     justify-content: center;
+    pointer-events: none;
 }
 
 .measurement-length {

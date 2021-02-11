@@ -5,6 +5,7 @@ import { ItemTypes } from '../ItemTypes';
 import { generatorUpdateRequested } from './generatorsSlice';
 import { trashTokenRequested } from '../map/tokenSlice';
 import './Trash.css';
+import { pathStopped, requestUpdateRemoteRuler } from '../ruler/rulerSlice';
 
 export function Trash() {
   const dispatch = useDispatch();
@@ -17,6 +18,8 @@ export function Trash() {
       switch (item.type) {
         case ItemTypes.PLACED_TOKEN:
         case ItemTypes.STASHED_TOKEN:
+          dispatch(pathStopped());
+          dispatch(requestUpdateRemoteRuler());
           dispatch(trashTokenRequested({ id }));
           break;
         case ItemTypes.GENERATOR:

@@ -1,6 +1,7 @@
 import { connected, connecting, mapLoaded, selectLoaded, selectMapId } from '../map/mapSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
 import { generatorUpdated } from '../supply/generatorsSlice';
+import { updateRemoteRuler } from '../ruler/rulerSlice';
 
 const markerGenerators = [
   {
@@ -57,6 +58,10 @@ export async function addListeners(connection, { dispatch, getState }) {
     if (currentMap !== token.map) return;
 
     dispatch(tokenUpsert(token));
+  });
+
+  connection.on('rulerUpdated', (ruler) => {
+    dispatch(updateRemoteRuler(ruler));
   });
 
   connection.onreconnecting(() => {

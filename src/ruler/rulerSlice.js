@@ -1,77 +1,121 @@
-import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit';
+import throttle from 'lodash.throttle';
+import { selectMapId } from '../map/mapSlice';
+
+const adapter = createEntityAdapter();
+
+const self = nanoid();
+
+const initialState = adapter.getInitialState({ self });
 
 const slice = createSlice({
   name: 'ruler',
-  initialState: { points: [], origin: null, isPublic: true },
+  initialState,
   reducers: {
     pathStarted: (state, action) => {
-      state.origin = action.payload;
-      state.points = [action.payload];
+      const self = state.entities[state.self];
+
+      self.origin = action.payload;
+      self.points = [action.payload];
     },
     pathStopped: (state) => {
-      state.origin = null;
-      state.points = [];
+      const self = state.entities[state.self];
+
+      self.origin = null;
+      self.points = [];
     },
     movedTo: (state, action) => {
-      if (state.points.length === 0) return;
+      const self = state.entities[state.self];
 
-      state.points[state.points.length - 1] = action.payload;
+      if (self.origin === null) return;
+
+      self.points[self.points.length - 1] = action.payload;
     },
     pointPushed: (state) => {
-      if (state.points.length === 0) return;
+      const self = state.entities[state.self];
 
-      state.points.push(...state.points.slice(-1));
+      if (self.origin === null) return;
+
+      self.points.push(...self.points.slice(-1));
     },
     pointPopped: (state) => {
-      if (state.points.length === 0) return;
+      const self = state.entities[state.self];
 
-      state.points.pop();
+      if (self.origin === null || self.points.length === 1) return;
+
+      self.points.pop();
+
+    },
+    updateRemoteRuler: (state, action) => {
+      const { id, origin, points } = action.payload;
+
+      if (id === state.self) return; // We don't update our own ruler via this call.
+
+      adapter.upsertOne(state, { id, origin, points });
+    },
+  },
+  extraReducers: {
+    'map/mapLoaded': (state) => {
+      adapter.setAll(state, [{ id: self, origin: null, points: [] }]);
     },
   },
 });
 
-export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped } = slice.actions;
+export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped, updateRemoteRuler } = slice.actions;
 
 export default slice.reducer;
 
-export const selectShowRuler = createSelector(state => state.ruler.origin, origin => !!origin);
+export const { selectAll: selectAllRulers } = adapter.getSelectors((state) => state.ruler);
 
-export const selectPoints = (state) => state.ruler.origin && [state.ruler.origin, ...state.ruler.points];
+const requestUpdateRemoteRulerThrottled = throttle((dispatch, getState, invoke) => {
+  const mapId = selectMapId(getState());
+  const selfRuler = selectSelf(getState());
 
-export const selectPathAsString = createSelector(
-  [(state) => state.ruler.origin, (state) => state.ruler.points],
-  (origin, points) => origin && `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`
+  invoke('updateRuler', mapId, selfRuler);
+}, 100);
+
+export const requestUpdateRemoteRuler = () => requestUpdateRemoteRulerThrottled;
+
+export const selectSelf = createSelector(
+  (state) => state.ruler.entities[state.ruler.self],
+  (self) => self
 );
 
-export const selectPathAsVectors = createSelector(
-  [(state) => state.ruler],
-  (measurements) =>
-    measurements.points.reduce(
-      ({ vectors, start }, end) => ({
-        vectors: [...vectors, { start, end, length: Math.hypot(end.y - start.y, end.x - start.x) }],
-        start: end,
-      }),
-      {
-        vectors: [],
-        start: measurements.origin,
-      }
-    ).vectors
-);
+export const selectShowRuler = createSelector(selectSelf, (self) => !!self.origin);
 
-export const selectMeasurement = createSelector([selectPathAsVectors, selectPathAsString], (vectors, path) => {
-  if (!path) return null;
+function getRuler(origin, points) {
+  if (origin === null) return null;
+
+  const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
+
+  const vectors = points.reduce(
+    ({ vectors, start }, end) => ({
+      vectors: [...vectors, { start, end, hypot: Math.hypot(end.y - start.y, end.x - start.x) }],
+      start: end,
+    }),
+    {
+      vectors: [],
+      start: origin,
+    }
+  ).vectors;
 
   const isSingle = vectors.length === 1;
 
-  const [{ start: origin, length: radius }] = vectors;
+  const [{ hypot: radius }] = vectors;
 
   const { lastLength, totalLength } = vectors.reduce(
-    (result, { length }) => ({
+    (result, { hypot: length }) => ({
       lastLength: length,
       totalLength: length + result.totalLength,
     }),
     { lastLength: 0.0, totalLength: 0.0 }
   );
 
-  return { path, origin, radius, isSingle, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0 };
+  const lastPoint = points[points.length - 1];
+
+  return { path, origin, radius, isSingle, lastPoint, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0 };
+}
+
+export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
+  return rulers.filter(({ origin }) => !!origin).map(({ id, origin, points }) => ({ id, ...getRuler(origin, points) }));
 });
