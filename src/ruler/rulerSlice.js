@@ -29,6 +29,10 @@ const slice = createSlice({
 
       if (self.origin === null) return;
 
+      const lastPoint = self.points[self.points.length - 1];
+
+      if (lastPoint.x === action.payload.x && lastPoint.y === action.payload.y) return;
+
       self.points[self.points.length - 1] = action.payload;
     },
     pointPushed: (state) => {
@@ -68,19 +72,20 @@ export const { selectAll: selectAllRulers } = adapter.getSelectors((state) => st
 
 const requestUpdateRemoteRulerThrottled = throttle((dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
-  const selfRuler = selectSelf(getState());
+  const selfRuler = selectOwnRuler(getState());
 
   invoke('updateRuler', mapId, selfRuler);
 }, 100);
 
 export const requestUpdateRemoteRuler = () => requestUpdateRemoteRulerThrottled;
 
-export const selectSelf = createSelector(
+export const selectOwnRuler = createSelector(
   (state) => state.ruler.entities[state.ruler.self],
   (self) => self
 );
 
-export const selectShowRuler = createSelector(selectSelf, (self) => !!self.origin);
+export const selectShowRuler = createSelector(selectOwnRuler, (self) => !!self.origin);
+export const selectOwnRulerTailPosition = createSelector(selectOwnRuler, (self) => self.origin && self.points[self.points.length - 1]);
 
 function getRuler(origin, points) {
   if (origin === null) return null;

@@ -15,7 +15,7 @@
 
 .measurement-lengths {
     position: absolute;
-    background: rgba(250, 250, 250, 0.6);
+    background: #eeeeee80;
     border: 2px solid black;
     border-radius: 50%;
     padding: 1.25rem;

@@ -52,15 +52,19 @@ export async function addListeners(connection, { dispatch, getState }) {
     dispatch(mapLoaded({ id, game, title, gameDate, image, map }));
   });
 
-  connection.on('tokenUpdated', (token) => {
+  connection.on('tokenUpdated', (mapId, token) => {
     const { id: currentMap } = selectMapId(getState());
 
-    if (currentMap !== token.map) return;
+    if (currentMap !== mapId.id) return;
 
     dispatch(tokenUpsert(token));
   });
 
-  connection.on('rulerUpdated', (ruler) => {
+  connection.on('rulerUpdated', (mapId, ruler) => {
+    const { id: currentMap } = selectMapId(getState());
+
+    if (currentMap !== mapId.id) return;
+
     dispatch(updateRemoteRuler(ruler));
   });
 
