@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { ItemTypes } from '../ItemTypes';
 import { generatorUpdateRequested } from './generatorsSlice';
 import { trashTokenRequested } from '../map/tokenSlice';
-import './Trash.css';
 import { pathStopped, requestUpdateRemoteRuler } from '../ruler/rulerSlice';
 
 export function Trash() {
@@ -31,7 +30,7 @@ export function Trash() {
   });
 
   return (
-    <div ref={drop} className="trash">
+    <div ref={drop} className="supply-trash">
       <Delete style={{ fontSize: '1.5rem' }} />
     </div>
   );
