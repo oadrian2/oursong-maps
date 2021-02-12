@@ -59,8 +59,6 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
     if (event.code === 'KeyQ') dispatch(pointPopped());
   }
 
-  console.log('rendering RulerOverlay');
-
   return (
     <div
       ref={containerRef}

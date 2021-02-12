@@ -56,8 +56,6 @@ export function MapLayer() {
     },
   });
 
-  console.log('rendering MapLayer');
-
   return (
     <div className="map-layer-wrapper">
       <RulerOverlay ref={ref}>
