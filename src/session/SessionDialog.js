@@ -17,7 +17,7 @@ export function SessionDialog() {
 
   return (
     <Dialog open={claimedGeneratorIds.length === 0} aria-labelledby="session-dialog-title">
-      <DialogTitle id="session-dialog-title">Claim Figures</DialogTitle>
+      <DialogTitle id="session-dialog-title">Claim Models</DialogTitle>
       <DialogContent>
         <div className="session-dialog__generators">
           {Object.keys(generatorGroups).map((key) => (

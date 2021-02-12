@@ -1,36 +1,27 @@
-import { useSelector } from 'react-redux';
-import { Generator } from './Generator';
-import { selectClaimedGeneratorIds, selectFigureGeneratorIds, selectMarkerGenerators } from './generatorsSlice';
+import { Figures } from './Figures';
+import { Markers } from './Markers';
 import { Stash } from './Stash';
 import './Supply.css';
 import { Trash } from './Trash';
 
 export function Supply() {
-  const claimedGenereratorIds = useSelector(selectClaimedGeneratorIds);
-  const allGeneratorIds = useSelector(selectFigureGeneratorIds);
-
-  const shownIds = claimedGenereratorIds.length ? claimedGenereratorIds : allGeneratorIds;
-
-  const markerIds = useSelector(selectMarkerGenerators).map((m) => m.id);
-
   return (
     <div className="supply">
-      <div className="supply-generators">
-        {shownIds.map((id) => (
-          <Generator key={id} id={id} />
-        ))}
+      <div className="supply-fluid-container">
+        <Figures />
       </div>
-      <hr style={{ width: '100%' }} />
-      <div className="supply-generators">
-        {markerIds.map((id) => (
-          <Generator key={id} id={id} />
-        ))}
+      <hr className="supply-rule" />
+      <div className="supply-fixed-container">
+        <Markers />
       </div>
-      <hr style={{ width: '100%' }} />
-      <Stash />
-      <hr style={{ width: '100%' }} />
-      <div className="supply-fill" />
-      <Trash />
+      <hr className="supply-rule" />
+      <div className="supply-fluid-container">
+        <Stash />
+      </div>
+      <hr className="supply-rule" />
+      <div className="supply-fixed-container">
+        <Trash />
+      </div>
     </div>
   );
 }

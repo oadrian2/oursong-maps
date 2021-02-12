@@ -23,13 +23,11 @@ export function Stash() {
   });
 
   return (
-    <div ref={drop} className="supply-stashed">
-      <div className="stash">
-        {tokens.map(({ id }) => (
-          <StashedToken key={id} id={id} />
-        ))}
-        {tokens.length === 0 && <div className="supply-stashed-empty">Stash</div>}
-      </div>
+    <div ref={drop} className="token-container">
+      {tokens.map(({ id }) => (
+        <StashedToken key={id} id={id} />
+      ))}
+      {tokens.length === 0 && <div className="token-container-empty-label">Stash</div>}
     </div>
   );
 }
