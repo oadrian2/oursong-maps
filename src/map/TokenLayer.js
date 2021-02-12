@@ -1,8 +1,7 @@
 import { shallowEqual, useSelector } from 'react-redux';
 import { animated, useTransition } from 'react-spring';
-import { ItemTypes } from '../ItemTypes';
 import './MapLayer.css';
-import { Token } from './Token';
+import { PlacedToken } from './PlacedToken';
 import { selectActiveTokens } from './tokenSlice';
 
 export function TokenLayer() {
@@ -16,7 +15,7 @@ export function TokenLayer() {
 
   return transitions.map(({ item: { id, position }, key, props }) => (
     <animated.div key={key} style={{ ...props, left: position.x, top: position.y }}>
-      <Token id={id} dragType={ItemTypes.PLACED_TOKEN} />
+      <PlacedToken id={id} />
     </animated.div>
   ));
 }

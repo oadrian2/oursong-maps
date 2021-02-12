@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay } from '../ruler/RulerOverlay';
-import { movedTo, pathStarted, pathStopped, requestUpdateRemoteRuler, selectShowRuler } from '../ruler/rulerSlice';
+import { movedTo, pathStarted, requestUpdateRemoteRuler, selectShowRuler } from '../ruler/rulerSlice';
 import { MapImage } from './MapImage';
 import './MapLayer.css';
 import { TokenLayer } from './TokenLayer';
@@ -41,8 +41,6 @@ export function MapLayer() {
 
       switch (type) {
         case ItemTypes.PLACED_TOKEN:
-          dispatch(pathStopped());
-          dispatch(requestUpdateRemoteRuler());
           dispatch(moveTokenToRequested({ id, position }));
           break;
         case ItemTypes.STASHED_TOKEN:

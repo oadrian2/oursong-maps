@@ -21,6 +21,7 @@
   min-height: var(--tokenSize);
   min-width: var(--tokenSize);
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .supply-stashed::-webkit-scrollbar {

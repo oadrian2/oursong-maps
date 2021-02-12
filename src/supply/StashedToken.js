@@ -4,10 +4,11 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
+import { ItemTypes } from '../ItemTypes';
 import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/generatorsSlice';
-import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
+import { selectIndexWithinGroup, selectTokenById } from '../map/tokenSlice';
 
-export function Token({ id, dragType }) {
+export function StashedToken({ id }) {
   const { generator } = useSelector((state) => selectTokenById(state, id));
 
   const { shapeType, shape } = useSelector((state) => selectGeneratorById(state, generator));
@@ -17,8 +18,7 @@ export function Token({ id, dragType }) {
   const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
 
   const [, drag, preview] = useDrag({
-    item: { type: dragType, id },
-    collect: () => ({ dragType }),
+    item: { type: ItemTypes.STASHED_TOKEN, id },
     canDrag: () => claimedGeneratorIds.includes(generator),
   });
 

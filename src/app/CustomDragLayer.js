@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { useDragLayer } from 'react-dnd';
 import { ItemTypes } from '../ItemTypes';
-import { Token } from '../map/Token';
+import { PlacedToken } from '../map/PlacedToken';
 import { Generator } from '../supply/Generator';
+import { StashedToken } from '../supply/StashedToken';
 
 const layerStyles = {
   position: 'fixed',
@@ -38,9 +39,9 @@ export const CustomDragLayer = (props) => {
   const renderedItem = useMemo(() => {
     switch (itemType) {
       case ItemTypes.PLACED_TOKEN:
-        return <Token id={item.id} dragType={ItemTypes.PLACED_TOKEN} />;
+        return <PlacedToken id={item.id} />;
       case ItemTypes.STASHED_TOKEN:
-        return <Token id={item.id} dragType={ItemTypes.STASHED_TOKEN} />;
+        return <StashedToken id={item.id} />;
       case ItemTypes.GENERATOR:
         return <Generator id={item.id} />;
       default:

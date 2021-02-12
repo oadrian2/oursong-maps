@@ -1,10 +1,9 @@
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ItemTypes } from '../ItemTypes';
-import { stashTokenRequested } from '../map/tokenSlice';
+import { selectStashedTokens, stashTokenRequested } from '../map/tokenSlice';
 import { pathStopped } from '../ruler/rulerSlice';
-import { Token } from '../map/Token';
-import { selectStashedTokens } from '../map/tokenSlice';
+import { StashedToken } from './StashedToken';
 import './Supply.css';
 
 export function Stash() {
@@ -27,7 +26,7 @@ export function Stash() {
     <div ref={drop} className="supply-stashed">
       <div className="stash">
         {tokens.map(({ id }) => (
-          <Token key={id} id={id} dragType={ItemTypes.STASHED_TOKEN} />
+          <StashedToken key={id} id={id} />
         ))}
         {tokens.length === 0 && <div className="supply-stashed-empty">Stash</div>}
       </div>
