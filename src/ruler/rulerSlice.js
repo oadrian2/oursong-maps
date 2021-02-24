@@ -1,12 +1,13 @@
 import { createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit';
 import throttle from 'lodash.throttle';
 import { mapLoaded, selectMapId } from '../map/mapSlice';
+import { moveTokenToRequested } from '../map/tokenSlice';
 
 const adapter = createEntityAdapter();
 
 const self = nanoid();
 
-const initialState = adapter.getInitialState({ self });
+const initialState = adapter.getInitialState({ self, suggestedOrigin: null });
 
 const slice = createSlice({
   name: 'ruler',
@@ -15,7 +16,7 @@ const slice = createSlice({
     pathStarted: (state, action) => {
       const self = state.entities[state.self];
 
-      self.origin = action.payload;
+      self.origin = state.suggestedOrigin || action.payload;
       self.points = [action.payload];
     },
     pathStopped: (state) => {
@@ -56,6 +57,9 @@ const slice = createSlice({
 
       adapter.upsertOne(state, { id, origin, points });
     },
+    originSuggested: (state, action) => {
+      state.suggestedOrigin = action.payload;
+    },
   },
   extraReducers: {
     [mapLoaded]: (state) => {
@@ -64,7 +68,7 @@ const slice = createSlice({
   },
 });
 
-export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped, updateRemoteRuler } = slice.actions;
+export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped, originSuggested, updateRemoteRuler } = slice.actions;
 
 export default slice.reducer;
 
@@ -84,8 +88,12 @@ export const selectOwnRuler = createSelector(
   (self) => self
 );
 
+export const selectOwnRulerPath = createSelector(
+  selectOwnRuler,
+  ({ origin, points }) => origin && `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`
+);
+
 export const selectShowRuler = createSelector(selectOwnRuler, (self) => !!self.origin);
-export const selectOwnRulerTailPosition = createSelector(selectOwnRuler, (self) => self.origin && self.points[self.points.length - 1]);
 
 function getRuler(origin, points) {
   if (origin === null) return null;
@@ -97,8 +105,8 @@ function getRuler(origin, points) {
       const width = end.x - start.x;
       const height = end.y - start.y;
       const hypot = Math.hypot(width, height);
-      const scaledX = (width / hypot).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 4 });
-      const scaledY = (height / hypot).toLocaleString('en-US', { style: 'percent', minimumFractionDigits: 4 });
+      const scaledX = toPercent(width / hypot);
+      const scaledY = toPercent(height / hypot);
 
       return {
         vectors: [...vectors, { start, end, hypot, scaledX, scaledY }],
@@ -126,3 +134,18 @@ function getRuler(origin, points) {
 export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
   return rulers.filter(({ origin }) => !!origin).map(({ id, origin, points }) => ({ id, ...getRuler(origin, points) }));
 });
+
+export const pathCompleted = () => (dispatch, getState) => {
+  const state = getState();
+
+  const moving = state.tokens.moving;
+
+  if (moving) {
+    const self = selectOwnRuler(state);
+    const path = [self.origin, ...self.points];
+
+    dispatch(moveTokenToRequested({ id: moving, position: path[path.length - 1], path }));
+  }
+};
+
+const toPercent = (number) => (number * 100).toFixed(4) + '%';

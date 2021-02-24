@@ -1,49 +1,9 @@
 .ruler-overlay {
   position: relative;
-  border: 2px solid black;
-}
-
-.measurement-layer {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  stroke-linejoin: 'round';
-  stroke-linecap: 'round';
-  pointer-events: none;
-}
-
-.measurement-lengths {
-  position: absolute;
-  background: #eeeeee80;
-  border: 2px solid black;
-  border-radius: 50%;
-  padding: 1.25rem;
+  user-select: none;
   display: flex;
-  align-items: stretch;
-  flex-direction: column;
-  justify-content: center;
-  pointer-events: none;
-  height: 8em;
-  width: 8rem;
-  text-shadow: 0px 0px 4px #fff;
-  backdrop-filter: blur(4px);
-}
-
-.measurement-length {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 500;
-}
-
-.back-stroke {
-  stroke-width: 6px;
-  stroke: white;
-  fill: none;
-}
-
-.fore-stroke {
-  stroke-width: 4px;
-  stroke: black;
-  fill: none;
+  border: 2px solid black;
+  margin-left: auto;
+  margin-right: auto;
+  width: min-content;
 }

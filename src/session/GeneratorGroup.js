@@ -29,7 +29,7 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }) 
   return (
     <div className="generators__group">
       <div className={`generators__select-all ${allSelected ? 'selected' : ''}`} onClick={() => onAllSelect(!allSelected)}>
-        <FigureToken prefix="All" label="All" allegiance={groupKey} />
+        <FigureToken prefix="All" label="All" allegiance={groupKey} isTemplate />
       </div>
       {generators.map((id) => {
         const oneSelected = selected.includes(id);

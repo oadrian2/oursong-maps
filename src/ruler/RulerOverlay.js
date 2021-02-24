@@ -1,7 +1,8 @@
-import { forwardRef, useImperativeHandle, useRef, useState, Fragment } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import './RulerOverlay.css';
-import { movedTo, pathStarted, pathStopped, pointPopped, pointPushed, requestUpdateRemoteRuler, selectRulerMetrics } from './rulerSlice';
+import { Rulers } from './Rulers';
+import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed, requestUpdateRemoteRuler } from './rulerSlice';
 
 function clientCoordinatesToMapCoordinates(element, position) {
   const { x: clientX, y: clientY } = position;
@@ -14,18 +15,18 @@ function clientCoordinatesToMapCoordinates(element, position) {
 export const RulerOverlay = forwardRef(({ children }, ref) => {
   const dispatch = useDispatch();
 
-  const rulerMetrics = useSelector(selectRulerMetrics);
-
   const containerRef = useRef();
 
   const [measuring, setMeasuring] = useState(false);
+
+  // const { origin, points } = useSelector(selectOwnRuler);
 
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, { x, y }),
   }));
 
   function onMouseDown(event) {
-    if (event.buttons !== 1 || !event.shiftKey) return; // only left-click
+    // if (event.buttons !== 1 || !event.shiftKey) return; // only left-click
     if (measuring) return;
 
     setMeasuring(true);
@@ -41,7 +42,9 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
 
     setMeasuring(false);
 
-    dispatch(pathStopped());
+    dispatch(pathCompleted());
+    // dispatch(pathStopped([origin, ...points]));
+    dispatch(pathStopped(null));
     dispatch(requestUpdateRemoteRuler());
   }
 
@@ -55,8 +58,21 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   }
 
   function onKeyPress(event) {
+    if (!measuring) return;
+
     if (event.code === 'KeyW') dispatch(pointPushed());
     if (event.code === 'KeyQ') dispatch(pointPopped());
+  }
+
+  function onKeyUp(event) {
+    if (!measuring) return;
+
+    if (event.code === 'Escape') {
+      setMeasuring(false);
+
+      dispatch(pathStopped(null));
+      dispatch(requestUpdateRemoteRuler());
+    }
   }
 
   return (
@@ -67,43 +83,11 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onKeyPress={onKeyPress}
+      onKeyUp={onKeyUp}
       tabIndex="0"
     >
       {children}
-      {rulerMetrics.map(({ id, isSingle, origin, path, radius, lastPoint, lastLength, totalLength, scaledX, scaledY }) => (
-        <Fragment key={id}>
-          <svg className="measurement-layer">
-            <defs>
-              <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
-                <polygon points="0 0, 5 1.25, 0 2.5" />
-              </marker>
-            </defs>
-            <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
-            <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
-            {isSingle && (
-              <>
-                <circle cx={origin.x} cy={origin.y} r={radius} className="back-stroke" />
-                <circle cx={origin.x} cy={origin.y} r={radius} className="fore-stroke" />
-              </>
-            )}
-            <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
-            <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
-          </svg>
-          <div
-            className="measurement-lengths"
-            style={{ left: lastPoint.x, top: lastPoint.y, transform: `translate(calc(-50% + (${scaledX})), calc(-50% + (${scaledY}))` }}
-          >
-            <div className="measurement-length">
-              <strong>C:</strong>
-              <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-            </div>
-            <div className="measurement-length">
-              <strong>T:</strong>
-              <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-            </div>
-          </div>
-        </Fragment>
-      ))}
+      <Rulers />
     </div>
   );
 });

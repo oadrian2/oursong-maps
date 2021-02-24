@@ -1,7 +1,6 @@
 // import { PublicClientApplication } from '@azure/msal-browser';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
-import connectionReducer from '../connection/connectionSlice';
 import mapReducer from '../map/mapSlice';
 import tokenReducer from '../map/tokenSlice';
 import rulerReducer from '../ruler/rulerSlice';
@@ -48,7 +47,6 @@ const store = configureStore({
     ruler: rulerReducer,
     generators: generatorReducer,
     tokens: tokenReducer,
-    connection: connectionReducer,
     map: mapReducer,
   },
   middleware: (getDefaultMiddleware) =>

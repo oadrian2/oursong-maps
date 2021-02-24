@@ -20,7 +20,7 @@ export function Generator({ id }) {
   }, [preview]);
 
   return {
-      'figure': <FigureToken ref={drag} isTemplate={true} {...shape} />,
+      'figure': <FigureToken ref={drag} isTemplate={true} {...shape} scale={1} />,
       'marker': <MarkerToken ref={drag} isTemplate={true} {...shape} />
   }[shapeType]
 }

@@ -1,4 +1,5 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { originSuggested, pathStarted, pathStopped } from '../ruler/rulerSlice';
 import { selectMapId } from './mapSlice';
 
 export const TokenAllegiance = {
@@ -7,7 +8,9 @@ export const TokenAllegiance = {
   UNKNOWN: 'unknown',
 };
 
-const adapter = createEntityAdapter();
+const adapter = createEntityAdapter({
+  baseSize: { default: 30, unit: 'mm', options: [30, 40, 50] },
+});
 
 const initialState = adapter.getInitialState();
 
@@ -34,15 +37,48 @@ const slice = createSlice({
 
       state.entities[id] = position;
     },
+    tokenActivated: (state, action) => {
+      state.active = action.payload;
+    },
+    tokenDeactivated: (state) => {
+      state.active = null;
+    },
+  },
+  extraReducers: {
+    [pathStarted]: (state) => {
+      state.moving = state.active;
+    },
+    [pathStopped]: (state, action) => {
+      state.moving = null;
+    },
   },
 });
 
-export const { tokenCreated, tokenTrashed, tokenMoved, tokenStashed, tokenUnstashed, tokenUpsert, tokensUpdated } = slice.actions;
+export const {
+  tokenCreated,
+  tokenTrashed,
+  tokenMoved,
+  tokenStashed,
+  tokenUnstashed,
+  tokenUpsert,
+  tokensUpdated,
+  tokenActivated,
+  tokenDeactivated,
+} = slice.actions;
+
+const TOKEN_SIZE = 48.0;
+const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
+
+function atMidpoint({ x, y }) {
+  return { x: x + TOKEN_MIDPOINT, y: y + TOKEN_MIDPOINT };
+}
 
 export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
 
-  invoke('updateToken', mapId, { ...token, game: mapId.game, map: mapId.id  });
+  const midpointPosition = atMidpoint(token.position);
+
+  invoke('updateToken', mapId, { ...token, position: midpointPosition, game: mapId.game, map: mapId.id });
 };
 
 export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
@@ -51,22 +87,38 @@ export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
   invoke('updateToken', mapId, { id, position: null });
 };
 
-export const moveTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
+export const moveTokenToRequested = ({ id, position, path }) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
 
-  invoke('updateToken', mapId, { id, position });
-}
+  invoke('updateToken', mapId, { id, position, path });
+};
 
 export const unstashTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
 
-  invoke('updateToken', mapId, { id, position });
-}
+  const midpointPosition = atMidpoint(position);
+
+  invoke('updateToken', mapId, { id, position: midpointPosition });
+};
 
 export const trashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
 
   invoke('updateToken', mapId, { id, deleted: true });
+};
+
+export const tokenEntered = (id) => (dispatch, getState, invoke) => {
+  const { position } = selectTokenById(getState(), id);
+
+  dispatch(tokenActivated(id));
+  // dispatch(movableFocused('TOKEN', id, position));
+  dispatch(originSuggested(position));
+};
+
+export const tokenLeft = (id) => (dispatch, getState, invoke) => {
+  dispatch(tokenDeactivated(id));
+  // dispatch(movableBlured())
+  dispatch(originSuggested(null));
 };
 
 export default slice.reducer;
@@ -81,4 +133,14 @@ export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => to
 export const selectIndexWithinGroup = createSelector(
   [selectAllTokens, (state, { id, generator }) => ({ id, generator })],
   (tokens, { id, generator }) => tokens.filter((t) => t.generator === generator).findIndex((t) => t.id === id)
+);
+
+export const selectPositions = createSelector(selectAllTokens, (tokens) => tokens.map(({ id, position }) => ({ id, position })));
+
+export const selectMapBaseSize = (state) => state.tokens.baseSize;
+
+export const selectMenuTokenId = createSelector(
+  (state) => state.tokens.active,
+  (state) => !!state.tokens.moving,
+  (active, moving) => !moving && active
 );

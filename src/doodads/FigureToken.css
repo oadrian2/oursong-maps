@@ -1,4 +1,4 @@
-.token__circle {
+.token {
   background: black;
   border: 2px solid green;
   border-radius: 50%;
@@ -7,17 +7,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: none;
 }
 
 .token__label {
   color: white;
   font-size: 16px;
+  user-select: none;
 }
 
-.token.token--ally .token__circle {
+.token.token--ally {
   border-color: rgb(20, 152, 196);
 }
 
-.token.token--enemy .token__circle {
+.token.token--enemy {
   border-color: rgb(177, 65, 65);
 }
