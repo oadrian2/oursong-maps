@@ -48,7 +48,7 @@ const slice = createSlice({
     [pathStarted]: (state) => {
       state.moving = state.active;
     },
-    [pathStopped]: (state, action) => {
+    [pathStopped]: (state) => {
       state.moving = null;
     },
   },
@@ -78,7 +78,7 @@ export const tokenPlacementRequested = (token) => (dispatch, getState, invoke) =
 
   const midpointPosition = atMidpoint(token.position);
 
-  invoke('updateToken', mapId, { ...token, position: midpointPosition, game: mapId.game, map: mapId.id });
+  invoke('updateToken', mapId, { ...token, position: midpointPosition, game: mapId.game, map: mapId.id, path: null });
 };
 
 export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
@@ -98,7 +98,7 @@ export const unstashTokenToRequested = ({ id, position }) => (dispatch, getState
 
   const midpointPosition = atMidpoint(position);
 
-  invoke('updateToken', mapId, { id, position: midpointPosition });
+  invoke('updateToken', mapId, { id, position: midpointPosition, path: null });
 };
 
 export const trashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
@@ -111,13 +111,11 @@ export const tokenEntered = (id) => (dispatch, getState, invoke) => {
   const { position } = selectTokenById(getState(), id);
 
   dispatch(tokenActivated(id));
-  // dispatch(movableFocused('TOKEN', id, position));
   dispatch(originSuggested(position));
 };
 
 export const tokenLeft = (id) => (dispatch, getState, invoke) => {
   dispatch(tokenDeactivated(id));
-  // dispatch(movableBlured())
   dispatch(originSuggested(null));
 };
 
