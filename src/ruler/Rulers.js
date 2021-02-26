@@ -1,10 +1,12 @@
 import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
+import { PlacedToken } from '../map/PlacedToken';
 import './Rulers.css';
 import { selectRulerMetrics } from './rulerSlice';
 
-export function Rulers() {
+export function Rulers({ isMoving }) {
   const rulerMetrics = useSelector(selectRulerMetrics);
+  const movingTokenId = useSelector((state) => state.tokens.moving);
 
   return rulerMetrics.map(({ id, isSingle, origin, path, radius, lastPoint, lastLength, totalLength, scaledX, scaledY }) => (
     <Fragment key={id}>
@@ -27,7 +29,11 @@ export function Rulers() {
       </svg>
       <div
         className="measurement-lengths"
-        style={{ left: lastPoint.x, top: lastPoint.y, transform: `translate(calc(-50% + (${scaledX}) * 1.25), calc(-50% + (${scaledY}) * 1.25)` }}
+        style={{
+          left: lastPoint.x,
+          top: lastPoint.y,
+          transform: `translate(calc(-50% + (${scaledX}) * 1.25), calc(-50% + (${scaledY}) * 1.25)`,
+        }}
       >
         <div className="measurement-length">
           <strong>C:</strong>
@@ -38,6 +44,11 @@ export function Rulers() {
           <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
         </div>
       </div>
+      {isMoving && movingTokenId && (
+        <div style={{ position: 'absolute', left: lastPoint.x, top: lastPoint.y, transform: 'translate(-50%, -50%)' }}>
+          <PlacedToken id={movingTokenId} showMenu={false} />
+        </div>
+      )}
     </Fragment>
   ));
 }

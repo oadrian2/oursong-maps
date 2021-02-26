@@ -97,7 +97,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
       tabIndex="0"
     >
       {children}
-      <Rulers />
+      <Rulers isMoving={moving} />
     </div>
   );
 });
