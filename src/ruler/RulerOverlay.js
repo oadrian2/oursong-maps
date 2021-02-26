@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './RulerOverlay.css';
 import { Rulers } from './Rulers';
 import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed, requestUpdateRemoteRuler } from './rulerSlice';
@@ -18,18 +18,24 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   const containerRef = useRef();
 
   const [measuring, setMeasuring] = useState(false);
+  const [moving, setMoving] = useState(false);
 
   // const { origin, points } = useSelector(selectOwnRuler);
 
+  const activeTokenId = useSelector(state => state.tokens.active);
+  
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, { x, y }),
   }));
 
   function onMouseDown(event) {
-    // if (event.buttons !== 1 || !event.shiftKey) return; // only left-click
     if (measuring) return;
 
     setMeasuring(true);
+
+    if ((event.shiftKey || event.ctrlKey || event.altKey) && !!activeTokenId) {
+      setMoving(true);
+    }
 
     const position = clientCoordinatesToMapCoordinates(containerRef.current, { x: event.pageX, y: event.pageY });
 
@@ -41,9 +47,12 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
     if (!measuring) return;
 
     setMeasuring(false);
+    setMoving(false);
 
-    dispatch(pathCompleted());
-    // dispatch(pathStopped([origin, ...points]));
+    if (moving) {
+      dispatch(pathCompleted());
+    }
+
     dispatch(pathStopped(null));
     dispatch(requestUpdateRemoteRuler());
   }
@@ -69,6 +78,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
 
     if (event.code === 'Escape') {
       setMeasuring(false);
+      setMoving(false);
 
       dispatch(pathStopped(null));
       dispatch(requestUpdateRemoteRuler());
