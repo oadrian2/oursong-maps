@@ -45,6 +45,8 @@ export const selectConnected = createSelector(selectMap, ({ connected }) => conn
 
 export const selectLoaded = createSelector(selectMap, ({ loaded }) => loaded);
 
+export const selectMapTitle = createSelector(selectMap, ({ title }) => title);
+
 export const selectMapImage = createSelector(selectMap, ({ game, id, map: { image, width, scale } }) => ({
   src: new URL(`/maps/${game}/${id}/${image}`, process.env.REACT_APP_STORAGE_URL).href,
   width: width * scale,

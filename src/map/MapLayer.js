@@ -1,10 +1,12 @@
 import { nanoid } from '@reduxjs/toolkit';
 import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useTitle } from 'react-use';
 import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
+import { selectMapTitle } from './mapSlice';
 import { TokenLayer } from './TokenLayer';
 import { tokenPlacementRequested, unstashTokenToRequested } from './tokenSlice';
 
@@ -12,6 +14,10 @@ export function MapLayer() {
   const dispatch = useDispatch();
 
   const ref = useRef();
+
+  const title = useSelector(selectMapTitle);
+
+  useTitle(`OurSong Maps - ${title}`);
 
   const [, drop] = useDrop({
     accept: [ItemTypes.GENERATOR, ItemTypes.STASHED_TOKEN],
