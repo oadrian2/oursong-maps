@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { TokenAllegiance } from '../map/tokenSlice';
 import './FigureToken.css';
 
-export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, allegiance, isGroup, scale = 1 }, ref) => {
+export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, allegiance, isGroup, overlay, scale = 1 }, ref) => {
   const allegianceClass =
     {
       [TokenAllegiance.ALLY]: 'token--ally',
@@ -20,18 +20,28 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     const effectiveLabel = `${prefix}${isGroup ? index + 1 : index || ''}`;
     const effectiveTitle = `${label} ${isGroup ? index + 1 : index || ''}`;
 
-    return <RoundToken ref={ref} label={effectiveLabel} title={effectiveTitle} scale={scale} allegianceClass={allegianceClass} />;
+    return (
+      <RoundToken
+        ref={ref}
+        label={effectiveLabel}
+        title={effectiveTitle}
+        scale={scale}
+        allegianceClass={allegianceClass}
+        overlay={overlay}
+      />
+    );
   }
 });
 
 FigureToken.displayName = 'FigureToken';
 
-const RoundToken = forwardRef(({ label, title, scale, allegianceClass }, ref) => {
+const RoundToken = forwardRef(({ label, title, scale, allegianceClass, overlay }, ref) => {
   return (
     <div className={`token ${allegianceClass}`} ref={ref} title={title} style={{ transform: `scale(${scale})` }}>
       <span className="token__label" draggable="false">
         {label}
       </span>
+      <div className={`token__overlay ${overlay ? 'visible' : ''}`}>{overlay}</div>
     </div>
   );
 });
