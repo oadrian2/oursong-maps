@@ -8,7 +8,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { selectGeneratorById } from '../supply/generatorsSlice';
-import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, tokenEntered, tokenLeft, trashTokenRequested, selectMenuTokenId } from './tokenSlice';
+import {
+  selectIndexWithinGroup,
+  selectTokenById,
+  stashTokenRequested,
+  tokenEntered,
+  tokenLeft,
+  trashTokenRequested,
+  selectMenuTokenId,
+} from './tokenSlice';
 
 const TOKEN_SIZE = 48;
 const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
@@ -17,15 +25,21 @@ export function PlacedToken({ id, showMenu }) {
   const dispatch = useDispatch();
 
   const { position: selfPosition, generator } = useSelector((state) => selectTokenById(state, id));
+  const { shapeType, shape: selfShape } = useSelector((state) => selectGeneratorById(state, generator));
 
-  const { shapeType, shape } = useSelector((state) => selectGeneratorById(state, generator));
-
-  const menuId = useSelector(selectMenuTokenId);
-  const { position: activePosition } = useSelector((state) => selectTokenById(state, menuId)) || {};
+  const activeId = useSelector(selectMenuTokenId);
+  const { position: activePosition, generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeId)) || {};
+  const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
 
-  const overlay = id !== menuId && activePosition && (Math.hypot(activePosition.x - selfPosition.x, activePosition.y - selfPosition.y) / TOKEN_SIZE).toFixed(1);
+  const selfScale = (selfShape.baseSize ?? 30) / 30;
+  const activeScale = (activeShape?.baseSize ?? 30) / 30;
+
+  const overlay =
+    id !== activeId &&
+    activePosition &&
+    (Math.hypot(activePosition.x - selfPosition.x, activePosition.y - selfPosition.y) / TOKEN_SIZE - selfScale / 2 - activeScale / 2 + 1).toFixed(1);
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -39,9 +53,9 @@ export function PlacedToken({ id, showMenu }) {
   const trashPosition = (7 / 4) * Math.PI;
 
   return (
-    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {shapeType === 'figure' && <FigureToken index={index} {...shape} overlay={overlay} />}
-      {shapeType === 'marker' && <MarkerToken index={index} {...shape} overlay={overlay} />}
+    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }}>
+      {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} scale={selfScale} />}
+      {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} />}
       <AnimatePresence>
         {showMenu && (
           <>
@@ -66,7 +80,7 @@ function ArcFab({ children, angle, onClick = () => {} }) {
   const endDistance = TOKEN_SIZE * 1.25;
 
   const startX = Math.cos(angle) * startDistance;
-  const startY = Math.sin(angle) * startDistance
+  const startY = Math.sin(angle) * startDistance;
 
   const endX = Math.cos(angle) * endDistance;
   const endY = Math.sin(angle) * endDistance;

@@ -46,7 +46,7 @@
   backdrop-filter: blur(8px);
   opacity: 0;
 
-  transition: opacity 0.2s ease-in;
+  transition: all 250ms;
 
   pointer-events: none;
 }
