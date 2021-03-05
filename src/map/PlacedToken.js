@@ -2,7 +2,7 @@ import Fab from '@material-ui/core/Fab';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
@@ -10,12 +10,12 @@ import { MarkerToken } from '../doodads/MarkerToken';
 import { selectGeneratorById } from '../supply/generatorsSlice';
 import {
   selectIndexWithinGroup,
+  selectMenuTokenId,
   selectTokenById,
   stashTokenRequested,
   tokenEntered,
   tokenLeft,
   trashTokenRequested,
-  selectMenuTokenId,
 } from './tokenSlice';
 
 const TOKEN_SIZE = 48;
@@ -24,14 +24,18 @@ const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
 export function PlacedToken({ id }) {
   const dispatch = useDispatch();
 
+  const activeId = useSelector(selectMenuTokenId);
+
   const { position: selfPosition, generator } = useSelector((state) => selectTokenById(state, id));
   const { shapeType, shape: selfShape } = useSelector((state) => selectGeneratorById(state, generator));
 
-  const activeId = useSelector(selectMenuTokenId);
   const { position: activePosition, generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeId)) || {};
   const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
+
+  // const { position: selfPosition, shapeType, shape: selfShape, index } = useSelector((state) => selectTokenShapeById(state, id));
+  // const { position: activePosition, shape: activeShape } = useSelector((state) => selectTokenShapeById(state, activeId)) || {};
 
   const selfScale = (selfShape.baseSize ?? 30) / 30;
   const activeScale = (activeShape?.baseSize ?? 30) / 30;
@@ -41,6 +45,7 @@ export function PlacedToken({ id }) {
 
   const overlay =
     showingActive &&
+    activePosition &&
     !isActive &&
     measurementStrategy['center-to-center-normalized'](activePosition, selfPosition, activeScale, selfScale).toFixed(1);
 
