@@ -6,7 +6,7 @@ export function Markers() {
   const markerIds = useSelector(selectMarkerGenerators).map((m) => m.id);
 
   return (
-    <div className="token-container">
+    <div className="token-container" style={{transform: 'translateY(16px)'}}>
       {markerIds.map((id) => <Generator key={id} id={id} />)}
     </div>
   );

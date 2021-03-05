@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import { TokenAllegiance } from '../map/tokenSlice';
 import './FigureToken.css';
@@ -20,15 +21,7 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     const effectiveLabel = `${prefix}${isGroup ? index + 1 : index || ''}`;
     const effectiveTitle = `${label} ${isGroup ? index + 1 : index || ''}`;
 
-    return (
-      <RoundToken
-        ref={ref}
-        label={effectiveLabel}
-        title={effectiveTitle}
-        allegianceClass={allegianceClass}
-        overlay={overlay}
-      />
-    );
+    return <RoundToken ref={ref} label={effectiveLabel} title={effectiveTitle} allegianceClass={allegianceClass} overlay={overlay} />;
   }
 });
 
@@ -40,7 +33,19 @@ const RoundToken = forwardRef(({ label, title, scale, allegianceClass, overlay }
       <span className="token__label" draggable="false">
         {label}
       </span>
-      <div className={`token__overlay ${overlay ? 'visible' : ''}`}>{overlay}</div>
+      <AnimatePresence>
+        {overlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.87 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className={`token__overlay`}
+          >
+            {overlay}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 });

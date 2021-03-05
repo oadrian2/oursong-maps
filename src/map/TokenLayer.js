@@ -55,7 +55,7 @@ function AnimatedPlacedToken({ id }) {
         zIndex: id === menuTokenId ? 100 : 0,
       }}
     >
-      <PlacedToken id={id} showMenu={id === menuTokenId} />
+      <PlacedToken id={id} />
     </motion.div>
   );
 }

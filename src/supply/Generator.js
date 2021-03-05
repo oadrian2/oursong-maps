@@ -21,6 +21,6 @@ export function Generator({ id }) {
 
   return {
       'figure': <FigureToken ref={drag} isTemplate={true} {...shape} scale={1} />,
-      'marker': <MarkerToken ref={drag} isTemplate={true} {...shape} />
+      'marker': <MarkerToken ref={drag} isTemplate={true} {...shape} effectRadius={0} />
   }[shapeType]
 }

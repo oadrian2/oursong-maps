@@ -21,7 +21,7 @@ import {
 const TOKEN_SIZE = 48;
 const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
 
-export function PlacedToken({ id, showMenu }) {
+export function PlacedToken({ id }) {
   const dispatch = useDispatch();
 
   const { position: selfPosition, generator } = useSelector((state) => selectTokenById(state, id));
@@ -36,10 +36,13 @@ export function PlacedToken({ id, showMenu }) {
   const selfScale = (selfShape.baseSize ?? 30) / 30;
   const activeScale = (activeShape?.baseSize ?? 30) / 30;
 
+  const showingActive = !!activeId;
+  const isActive = id === activeId;
+
   const overlay =
-    id !== activeId &&
-    activePosition &&
-    (Math.hypot(activePosition.x - selfPosition.x, activePosition.y - selfPosition.y) / TOKEN_SIZE - selfScale / 2 - activeScale / 2 + 1).toFixed(1);
+    showingActive &&
+    !isActive &&
+    measurementStrategy['center-to-center-normalized'](activePosition, selfPosition, activeScale, selfScale).toFixed(1);
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -48,16 +51,16 @@ export function PlacedToken({ id, showMenu }) {
   const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
   const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);
 
-  const killPosition = (1 / 4) * Math.PI;
-  const stashPosition = (0 / 4) * Math.PI;
-  const trashPosition = (7 / 4) * Math.PI;
+  const killPosition = +0.25 * Math.PI;
+  const stashPosition = 0;
+  const trashPosition = -0.25 * Math.PI;
 
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }}>
-      {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} scale={selfScale} />}
-      {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} />}
+      {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
+      {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
       <AnimatePresence>
-        {showMenu && (
+        {isActive && showingActive && (
           <>
             <ArcFab angle={killPosition} onClick={onKillClick}>
               <ClearIcon />
@@ -76,7 +79,7 @@ export function PlacedToken({ id, showMenu }) {
 }
 
 function ArcFab({ children, angle, onClick = () => {} }) {
-  const startDistance = TOKEN_SIZE * 0;
+  const startDistance = 0;
   const endDistance = TOKEN_SIZE * 1.25;
 
   const startX = Math.cos(angle) * startDistance;
@@ -111,3 +114,25 @@ function ArcFab({ children, angle, onClick = () => {} }) {
     </motion.div>
   );
 }
+
+function centerToCenterDistance(originPosition, targetPosition) {
+  return Math.hypot(originPosition.x - targetPosition.x, originPosition.y - targetPosition.y) / TOKEN_SIZE;
+}
+
+function edgeToEdgeDistance(originPosition, targetPosition, originScale, targetScale) {
+  const radiusAdjustment = (originScale + targetScale) / 2;
+
+  return centerToCenterDistance(originPosition, targetPosition) - radiusAdjustment;
+}
+
+function centerToCenterNormalizedDistance(originPosition, targetPosition, originScale, targetScale) {
+  const radiusAdjustment = (originScale + targetScale) / 2 - 1; // center-to-center, but adjust all bases to 1" for calculation
+
+  return centerToCenterDistance(originPosition, targetPosition) - radiusAdjustment;
+}
+
+const measurementStrategy = {
+  'center-to-center': centerToCenterDistance,
+  'edge-to-edge': edgeToEdgeDistance,
+  'center-to-center-normalized': centerToCenterNormalizedDistance,
+};
