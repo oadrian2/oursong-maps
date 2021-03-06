@@ -47,6 +47,7 @@ export function PlacedToken({ id }) {
     showingActive &&
     activePosition &&
     !isActive &&
+    selfPosition &&
     measurementStrategy['center-to-center-normalized'](activePosition, selfPosition, activeScale, selfScale).toFixed(1);
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
