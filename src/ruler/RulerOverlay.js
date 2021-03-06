@@ -1,5 +1,7 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectTokenById } from '../map/tokenSlice';
+import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import './RulerOverlay.css';
 import { Rulers } from './Rulers';
 import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed, requestUpdateRemoteRuler } from './rulerSlice';
@@ -22,8 +24,10 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
 
   // const { origin, points } = useSelector(selectOwnRuler);
 
-  const activeTokenId = useSelector(state => state.tokens.active);
-  
+  const activeTokenId = useSelector((state) => state.tokens.active);
+  const { generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeTokenId)) || {};
+  const claimedGenerators = useSelector(selectClaimedGeneratorIds);
+
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }) => clientCoordinatesToMapCoordinates(containerRef.current, { x, y }),
   }));
@@ -33,7 +37,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
 
     setMeasuring(true);
 
-    if ((event.shiftKey || event.ctrlKey || event.altKey) && !!activeTokenId) {
+    if ((event.shiftKey || event.ctrlKey || event.altKey) && !!activeTokenId && claimedGenerators.includes(activeGenerator)) {
       setMoving(true);
     }
 
