@@ -43,7 +43,14 @@
 
   border-radius: 50%;
 
-  backdrop-filter: blur(8px);
+  background: black;
 
   pointer-events: none;
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .token__overlay {
+    background: transparent;
+    backdrop-filter: blur(8px);
+  }
 }
