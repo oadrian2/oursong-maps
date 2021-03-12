@@ -1,6 +1,6 @@
 .token {
   background: black;
-  border: 2px solid green;
+  border: 2px solid #00796B;
   border-radius: 50%;
   width: 3rem;
   height: 3rem;
@@ -17,11 +17,15 @@
 }
 
 .token.token--ally {
-  border-color: rgb(20, 152, 196);
+  border-color: #1976D2;
 }
 
 .token.token--enemy {
-  border-color: rgb(177, 65, 65);
+  border-color: #D32F2F;
+}
+
+.token.token--target {
+  border-color: #FFEB3B;
 }
 
 .token__overlay {

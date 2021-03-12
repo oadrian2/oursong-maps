@@ -15,7 +15,7 @@ export function TokenLayer() {
   return (
     <AnimatePresence>
       {tokens.map(({ id }) => (
-        <motion.div key={id} variants={variants} initial="hidden" exit="hidden" animate="visible">
+        <motion.div key={id} variants={variants} initial="hidden" animate="visible" exit="hidden">
           <AnimatedPlacedToken id={id} />
         </motion.div>
       ))}

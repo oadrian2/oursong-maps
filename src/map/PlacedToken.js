@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { selectGeneratorById } from '../supply/generatorsSlice';
+import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, edgeToEdgeCellDistance } from './metrics';
 import {
   selectIndexWithinGroup,
   selectMenuTokenId,
@@ -15,7 +16,7 @@ import {
   stashTokenRequested,
   tokenEntered,
   tokenLeft,
-  trashTokenRequested,
+  trashTokenRequested
 } from './tokenSlice';
 
 const TOKEN_SIZE = 48;
@@ -45,8 +46,8 @@ export function PlacedToken({ id }) {
 
   const overlay =
     showingActive &&
-    activePosition &&
     !isActive &&
+    activePosition &&
     selfPosition &&
     measurementStrategy['center-to-center-normalized'](activePosition, selfPosition, activeScale, selfScale).toFixed(1);
 
@@ -121,24 +122,8 @@ function ArcFab({ children, angle, onClick = () => {} }) {
   );
 }
 
-function centerToCenterDistance(originPosition, targetPosition) {
-  return Math.hypot(originPosition.x - targetPosition.x, originPosition.y - targetPosition.y) / TOKEN_SIZE;
-}
-
-function edgeToEdgeDistance(originPosition, targetPosition, originScale, targetScale) {
-  const radiusAdjustment = (originScale + targetScale) / 2;
-
-  return centerToCenterDistance(originPosition, targetPosition) - radiusAdjustment;
-}
-
-function centerToCenterNormalizedDistance(originPosition, targetPosition, originScale, targetScale) {
-  const radiusAdjustment = (originScale + targetScale) / 2 - 1; // center-to-center, but adjust all bases to 1" for calculation
-
-  return centerToCenterDistance(originPosition, targetPosition) - radiusAdjustment;
-}
-
 const measurementStrategy = {
-  'center-to-center': centerToCenterDistance,
-  'edge-to-edge': edgeToEdgeDistance,
-  'center-to-center-normalized': centerToCenterNormalizedDistance,
+  'center-to-center': centerToCenterCellDistance,
+  'edge-to-edge': edgeToEdgeCellDistance,
+  'center-to-center-normalized': centerToCenterNormalizedCellDistance,
 };

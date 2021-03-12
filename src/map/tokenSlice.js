@@ -1,10 +1,12 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { originSuggested, pathStarted, pathStopped } from '../ruler/rulerSlice';
+import { selectGeneratorById } from '../supply/generatorsSlice';
 import { selectMapId } from './mapSlice';
 
 export const TokenAllegiance = {
   ALLY: 'ally',
   ENEMY: 'enemy',
+  TARGET: 'target',
   UNKNOWN: 'unknown',
 };
 
@@ -129,7 +131,7 @@ export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => t
 export const selectActiveTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !!t.position && !t.deleted));
 
 export const selectIndexWithinGroup = createSelector(
-  [selectAllTokens, (state, { id, generator }) => ({ id, generator })],
+  [selectAllTokens, (_, { id, generator }) => ({ id, generator })],
   (tokens, { id, generator }) => tokens.filter((t) => t.generator === generator).findIndex((t) => t.id === id)
 );
 
@@ -141,4 +143,20 @@ export const selectMenuTokenId = createSelector(
   (state) => state.tokens.active,
   (state) => !!state.tokens.moving,
   (active, moving) => !moving && active
+);
+
+export const selectTokenShapeById = createSelector(
+  (state, id) => {
+    if (!id) return null;
+
+    const token = selectTokenById(state, id);
+    const generator = selectGeneratorById(state, token.generator);
+    const index = selectIndexWithinGroup(state, { id, generator: token.generator });
+
+    const { position } = token;
+    const { shape, shapeType } = generator;
+
+    return { index, position, shape, shapeType };
+  },
+  (result) => result
 );

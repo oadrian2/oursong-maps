@@ -8,6 +8,7 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     {
       [TokenAllegiance.ALLY]: 'token--ally',
       [TokenAllegiance.ENEMY]: 'token--enemy',
+      [TokenAllegiance.TARGET]: 'token--target',
     }[allegiance] || 'token-unknown';
 
   if (isTemplate) {
