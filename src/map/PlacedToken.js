@@ -7,17 +7,11 @@ import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
+import { MeasurementStrategy } from '../ruler/movementSlice';
 import { selectGeneratorById } from '../supply/generatorsSlice';
 import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, edgeToEdgeCellDistance } from './metrics';
-import {
-  selectIndexWithinGroup,
-  selectMenuTokenId,
-  selectTokenById,
-  stashTokenRequested,
-  tokenEntered,
-  tokenLeft,
-  trashTokenRequested
-} from './tokenSlice';
+import { selectFocusedTokenId, selectSelectedTokenId, tokenEntered, tokenLeft, tokenSelected } from './selectionSlice';
+import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
 
 const TOKEN_SIZE = 48;
 const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
@@ -25,7 +19,7 @@ const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
 export function PlacedToken({ id }) {
   const dispatch = useDispatch();
 
-  const activeId = useSelector(selectMenuTokenId);
+  const activeId = useSelector(selectFocusedTokenId);
 
   const { position: selfPosition, generator } = useSelector((state) => selectTokenById(state, id));
   const { shapeType, shape: selfShape } = useSelector((state) => selectGeneratorById(state, generator));
@@ -34,6 +28,8 @@ export function PlacedToken({ id }) {
   const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
+
+  const selectedTokenId = useSelector(selectSelectedTokenId);
 
   // const { position: selfPosition, shapeType, shape: selfShape, index } = useSelector((state) => selectTokenShapeById(state, id));
   // const { position: activePosition, shape: activeShape } = useSelector((state) => selectTokenShapeById(state, activeId)) || {};
@@ -44,12 +40,14 @@ export function PlacedToken({ id }) {
   const showingActive = !!activeId;
   const isActive = id === activeId;
 
+  const strategy = measurementStrategy[MeasurementStrategy.centerToCenterNormalized];
+
   const overlay =
     showingActive &&
     !isActive &&
     activePosition &&
     selfPosition &&
-    measurementStrategy['center-to-center-normalized'](activePosition, selfPosition, activeScale, selfScale).toFixed(1);
+    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1);
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -58,16 +56,18 @@ export function PlacedToken({ id }) {
   const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
   const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);
 
+  const onClick = useCallback(() => dispatch(tokenSelected(id)), [dispatch, id]);
+
   const killPosition = +0.25 * Math.PI;
   const stashPosition = 0;
   const trashPosition = -0.25 * Math.PI;
 
   return (
-    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }}>
+    <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }} onClick={onClick}>
       {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
       <AnimatePresence>
-        {isActive && showingActive && (
+        {selectedTokenId === id && (
           <>
             <ArcFab angle={killPosition} onClick={onKillClick}>
               <ClearIcon />
@@ -123,7 +123,7 @@ function ArcFab({ children, angle, onClick = () => {} }) {
 }
 
 const measurementStrategy = {
-  'center-to-center': centerToCenterCellDistance,
-  'edge-to-edge': edgeToEdgeCellDistance,
-  'center-to-center-normalized': centerToCenterNormalizedCellDistance,
+  [MeasurementStrategy.centerToCenter]: centerToCenterCellDistance,
+  [MeasurementStrategy.edgeToEdge]: edgeToEdgeCellDistance,
+  [MeasurementStrategy.centerToCenterNormalized]: centerToCenterNormalizedCellDistance,
 };

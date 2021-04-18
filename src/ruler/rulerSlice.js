@@ -78,8 +78,8 @@ const requestUpdateRemoteRulerThrottled = throttle((dispatch, getState, invoke) 
   const mapId = selectMapId(getState());
   const selfRuler = selectOwnRuler(getState());
 
-  invoke('updateRuler', mapId, selfRuler);
-}, 100);
+  invoke('updateRuler', mapId, selfRuler, new Date());
+}, 200);
 
 export const requestUpdateRemoteRuler = () => requestUpdateRemoteRulerThrottled;
 
@@ -100,18 +100,20 @@ function getRuler(origin, points) {
 
   const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
 
-  const { vectors, lastPoint, lastLength, totalLength, scaledX, scaledY } = points.reduce(
+  const { vectors, lastPoint, lastLength, lastAngle, totalLength, scaledX, scaledY } = points.reduce(
     ({ vectors, lastPoint: start, totalLength }, end) => {
       const width = end.x - start.x;
       const height = end.y - start.y;
       const hypot = Math.hypot(width, height);
       const scaledX = toPercent(width / hypot);
       const scaledY = toPercent(height / hypot);
+      const angle = Math.atan2(width, height);
 
       return {
         vectors: [...vectors, { start, end, hypot, scaledX, scaledY }],
         lastPoint: end, // Ending of prior vector becomes start of next one.
         lastLength: hypot,
+        lastAngle: angle,
         totalLength: totalLength + hypot,
         scaledX,
         scaledY,
@@ -128,7 +130,18 @@ function getRuler(origin, points) {
 
   const [{ hypot: radius }] = vectors;
 
-  return { path, origin, radius, isSingle, lastPoint, lastLength: lastLength / 48.0, totalLength: totalLength / 48.0, scaledX, scaledY };
+  return {
+    path,
+    origin,
+    radius,
+    isSingle,
+    lastPoint,
+    lastAngle,
+    lastLength: lastLength / 48.0,
+    totalLength: totalLength / 48.0,
+    scaledX,
+    scaledY,
+  };
 }
 
 export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
@@ -138,13 +151,17 @@ export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
 export const pathCompleted = () => (dispatch, getState) => {
   const state = getState();
 
-  const moving = state.tokens.moving;
+  const moving = state.selection.selected;
 
   if (moving) {
     const self = selectOwnRuler(state);
     const path = [self.origin, ...self.points];
+    const { x: startX, y: startY } = path[path.length - 2];
+    const { x: endX, y: endY } = path[path.length - 1];
 
-    dispatch(moveTokenToRequested({ id: moving, position: path[path.length - 1], path }));
+    dispatch(
+      moveTokenToRequested({ id: moving, position: { x: endX, y: endY }, angle: Math.atan2(-(endY - startY), endX - startX), path })
+    );
   }
 };
 

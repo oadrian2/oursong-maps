@@ -41,3 +41,9 @@
   stroke: black;
   fill: none;
 }
+
+.arc {
+  fill: hsla(0, 0%, 80%, 0.2);
+  stroke: hsla(0, 0%, 80%, 0.5);
+  stroke-width: 1px;
+}

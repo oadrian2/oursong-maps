@@ -1,10 +1,11 @@
 // import { PublicClientApplication } from '@azure/msal-browser';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
-import mapReducer from '../map/mapSlice';
-import tokenReducer from '../map/tokenSlice';
-import rulerReducer from '../ruler/rulerSlice';
-import generatorReducer from '../supply/generatorsSlice';
+import map from '../map/mapSlice';
+import tokens from '../map/tokenSlice';
+import ruler from '../ruler/rulerSlice';
+import generators from '../supply/generatorsSlice';
+import selection from '../map/selectionSlice';
 import { addListeners, signalRMiddleware } from './addListeners';
 
 // async function login() {
@@ -43,12 +44,7 @@ const connection = new HubConnectionBuilder()
   .build();
 
 const store = configureStore({
-  reducer: {
-    ruler: rulerReducer,
-    generators: generatorReducer,
-    tokens: tokenReducer,
-    map: mapReducer,
-  },
+  reducer: { ruler, generators, tokens, map, selection },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {

@@ -60,10 +60,12 @@ export async function addListeners(connection, { dispatch, getState }) {
     dispatch(tokenUpsert(token));
   });
 
-  connection.on('rulerUpdated', (mapId, ruler) => {
+  connection.on('rulerUpdated', (mapId, ruler, timestamp) => {
     const { id: currentMap } = selectMapId(getState());
 
     if (currentMap !== mapId.id) return;
+
+    console.log(timestamp);
 
     dispatch(updateRemoteRuler(ruler));
   });

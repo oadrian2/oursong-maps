@@ -89,10 +89,10 @@ export const stashTokenRequested = ({ id }) => (dispatch, getState, invoke) => {
   invoke('updateToken', mapId, { id, position: null });
 };
 
-export const moveTokenToRequested = ({ id, position, path }) => (dispatch, getState, invoke) => {
+export const moveTokenToRequested = ({ id, position, angle, path }) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());
 
-  invoke('updateToken', mapId, { id, position, path });
+  invoke('updateToken', mapId, { id, position, angle, path });
 };
 
 export const unstashTokenToRequested = ({ id, position }) => (dispatch, getState, invoke) => {

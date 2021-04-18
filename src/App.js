@@ -1,3 +1,4 @@
+import { nanoid } from '@reduxjs/toolkit';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,12 +18,16 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/maps/:game/:id" component={MapPage} />
-          <Route exact path="/create" component={() => <div>Creation goes here.</div>} />
+          <Route exact path="/create" component={IDs} />
           <Route path="/" component={() => <div>The GM will send you a link.</div>} />
         </Switch>
       </Router>
     </>
   );
+}
+
+function IDs() {
+  return <pre>{[...Array(20)].map(() => nanoid() + '\n')}</pre>;
 }
 
 function MapPage({

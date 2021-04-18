@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectSelectedTokenId, tokenDeselected } from '../map/selectionSlice';
 import { selectTokenById } from '../map/tokenSlice';
 import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import './RulerOverlay.css';
@@ -23,8 +24,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   const [moving, setMoving] = useState(false);
 
   // const { origin, points } = useSelector(selectOwnRuler);
-
-  const activeTokenId = useSelector((state) => state.tokens.active);
+  const activeTokenId = useSelector(selectSelectedTokenId);
   const { generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeTokenId)) || {};
   const claimedGenerators = useSelector(selectClaimedGeneratorIds);
 
@@ -33,6 +33,8 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   }));
 
   function onMouseDown(event) {
+    if (event.button !== 2) return;
+
     if (measuring) return;
 
     setMeasuring(true);
@@ -78,9 +80,11 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
   }
 
   function onKeyUp(event) {
-    if (!measuring) return;
-
     if (event.code === 'Escape') {
+      dispatch(tokenDeselected(null));
+
+      if (!measuring) return;
+
       setMeasuring(false);
       setMoving(false);
 

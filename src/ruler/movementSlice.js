@@ -2,14 +2,14 @@ import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 
 const adapter = createEntityAdapter();
 
-const MeasurementStyles = {
+export const MeasurementStrategy = {
   centerToCenter: 'center-to-center',
   edgeToEdge: 'edge-to-edge',
   centerToCenterNormalized: 'center-to-center-normalized'
 }
 
 const initialState = adapter.getInitialState({
-  measurementStyle: MeasurementStyles.centerToCenter
+  measurementStyle: MeasurementStrategy.centerToCenter
 });
 
 const slice = createSlice({
