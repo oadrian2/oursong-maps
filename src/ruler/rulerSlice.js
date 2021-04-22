@@ -160,7 +160,7 @@ export const pathCompleted = () => (dispatch, getState) => {
     const { x: endX, y: endY } = path[path.length - 1];
 
     dispatch(
-      moveTokenToRequested({ id: moving, position: { x: endX, y: endY }, angle: Math.atan2(-(endY - startY), endX - startX), path })
+      moveTokenToRequested({ id: moving, position: { x: endX, y: endY }, angle: Math.atan2(endY - startY, endX - startX), path })
     );
   }
 };

@@ -25,3 +25,13 @@ export function centerToCenterNormalizedCellDistance(originPosition, targetPosit
 
   return centerToCenterCellDistance(originPosition, targetPosition) - radiusAdjustment;
 }
+
+export function connection(selfPosition, selfFacing, targetPosition, targetFacing) {
+  const angleToTarget = Math.atan2(targetPosition.y - selfPosition.y, targetPosition.x - selfPosition.x);
+  const angleToSelf = Math.atan2(selfPosition.y - targetPosition.y, selfPosition.x - targetPosition.x);
+
+  const isSelfFacingTarget = Math.cos(angleToTarget - selfFacing) > 0;
+  const isTargetFacingSelf = Math.cos(angleToSelf - targetFacing) > 0;
+
+  return [isSelfFacingTarget, isTargetFacingSelf];
+}

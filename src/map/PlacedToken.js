@@ -1,30 +1,28 @@
-import Fab from '@material-ui/core/Fab';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { degToRad, offsetAngle } from '../app/math';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { MeasurementStrategy } from '../ruler/movementSlice';
 import { selectGeneratorById } from '../supply/generatorsSlice';
-import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, edgeToEdgeCellDistance } from './metrics';
+import { ArcFab } from './ArcFab';
+import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, connection, edgeToEdgeCellDistance } from './metrics';
 import { selectFocusedTokenId, selectSelectedTokenId, tokenEntered, tokenLeft, tokenSelected } from './selectionSlice';
 import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
-
-const TOKEN_SIZE = 48;
-const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
 
 export function PlacedToken({ id }) {
   const dispatch = useDispatch();
 
   const activeId = useSelector(selectFocusedTokenId);
 
-  const { position: selfPosition, generator } = useSelector((state) => selectTokenById(state, id));
+  const { position: selfPosition, angle: selfFacing, generator } = useSelector((state) => selectTokenById(state, id));
   const { shapeType, shape: selfShape } = useSelector((state) => selectGeneratorById(state, generator));
 
-  const { position: activePosition, generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeId)) || {};
+  const { position: activePosition, angle: activeFacing, generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeId)) || {};
   const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
@@ -42,12 +40,14 @@ export function PlacedToken({ id }) {
 
   const strategy = measurementStrategy[MeasurementStrategy.centerToCenterNormalized];
 
+  const [sft, tfs] = (showingActive && !isActive && activePosition && selfPosition && connection(activePosition, activeFacing, selfPosition, selfFacing)) || [false, false];
+
   const overlay =
     showingActive &&
     !isActive &&
     activePosition &&
     selfPosition &&
-    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1);
+    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1) + ' ' + (!sft ? 'X' : tfs ? 'F' : 'B');
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -62,10 +62,22 @@ export function PlacedToken({ id }) {
   const stashPosition = 0;
   const trashPosition = -0.25 * Math.PI;
 
+  const origin = { x: 24, y: 24 };
+  const edge = { x: 46, y: 24 };
+  const bot = offsetAngle(origin, edge, degToRad(-10));
+  const top = offsetAngle(origin, edge, degToRad(+10));
+
+  const facingPath = `M ${bot.x} ${bot.y} A 24 24 0 0 1 ${top.x} ${top.y} L ${40} ${origin.y}`;
+
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }} onClick={onClick}>
       {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
+      {shapeType === 'figure' && (
+        <svg style={{ position: 'absolute', top: 0, width: '100%', height: '100%', transform: `rotate(${selfFacing}rad)` }}>
+          <path d={facingPath} fill="white" />
+        </svg>
+      )}
       <AnimatePresence>
         {selectedTokenId === id && (
           <>
@@ -82,43 +94,6 @@ export function PlacedToken({ id }) {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-function ArcFab({ children, angle, onClick = () => {} }) {
-  const startDistance = 0;
-  const endDistance = TOKEN_SIZE * 1.25;
-
-  const startX = Math.cos(angle) * startDistance;
-  const startY = Math.sin(angle) * startDistance;
-
-  const endX = Math.cos(angle) * endDistance;
-  const endY = Math.sin(angle) * endDistance;
-  const delay = 0.3;
-
-  const variants = {
-    hidden: { opacity: 0, left: TOKEN_MIDPOINT + startX, top: TOKEN_MIDPOINT - startY, transition: { delay }, pointerEvents: 'none' },
-    visible: { opacity: 1, left: TOKEN_MIDPOINT + endX, top: TOKEN_MIDPOINT - endY, transition: { delay }, pointerEvents: 'all' },
-  };
-
-  return (
-    <motion.div
-      variants={variants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      style={{ transform: 'translate(-50%, -50%)', position: 'absolute', zIndex: 100 }}
-    >
-      <Fab
-        color="primary"
-        size="small"
-        onClick={onClick}
-        onMouseDown={(event) => event.stopPropagation()}
-        onMouseUp={(event) => event.stopPropagation()}
-      >
-        {children}
-      </Fab>
-    </motion.div>
   );
 }
 

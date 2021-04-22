@@ -72,13 +72,6 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
     dispatch(requestUpdateRemoteRuler());
   }
 
-  function onKeyPress(event) {
-    if (!measuring) return;
-
-    if (event.code === 'KeyW') dispatch(pointPushed());
-    if (event.code === 'KeyQ') dispatch(pointPopped());
-  }
-
   function onKeyUp(event) {
     if (event.code === 'Escape') {
       dispatch(tokenDeselected(null));
@@ -91,6 +84,9 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
       dispatch(pathStopped(null));
       dispatch(requestUpdateRemoteRuler());
     }
+
+    if (event.code === 'KeyW') dispatch(pointPushed());
+    if (event.code === 'KeyQ') dispatch(pointPopped());
   }
 
   return (
@@ -100,7 +96,6 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
-      onKeyPress={onKeyPress}
       onKeyUp={onKeyUp}
       tabIndex="0"
     >

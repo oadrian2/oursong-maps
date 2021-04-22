@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
+import { degToRad, offsetAngle } from '../app/math';
 import { PlacedToken } from '../map/PlacedToken';
 import './Rulers.css';
 import { selectRulerMetrics } from './rulerSlice';
@@ -33,10 +34,10 @@ export function Rulers({ isMoving }) {
 }
 
 export function ArcCircle({ origin, lastPoint, radius }) {
-  const negPosition = offsetAngle(origin, lastPoint, degToRad(-10));
-  const posPosition = offsetAngle(origin, lastPoint, degToRad(+10));
+  const negPosition = offsetAngle(origin, lastPoint, degToRad(-15));
+  const posPosition = offsetAngle(origin, lastPoint, degToRad(+15));
 
-  const path = `M ${negPosition.x} ${negPosition.y}, A ${radius} ${radius}, 0, 0, 1, ${posPosition.x}, ${posPosition.y} L ${origin.x} ${origin.y} Z`;
+  const path = `M ${negPosition.x} ${negPosition.y} A ${radius} ${radius} 0 0 1 ${posPosition.x} ${posPosition.y} L ${origin.x} ${origin.y} Z`;
 
   return (
     <>
@@ -68,10 +69,3 @@ export function LengthsDisplay({ position, scaledX, scaledY, lastLength, totalLe
     </div>
   );
 }
-
-const degToRad = (deg) => (Math.PI / 180) * deg;
-
-const offsetAngle = (origin, point, angle) => ({
-  x: origin.x + (point.x - origin.x) * Math.cos(angle) + (origin.y - point.y) * Math.sin(angle),
-  y: origin.y + (point.x - origin.x) * Math.sin(angle) + (point.y - origin.y) * Math.cos(angle),
-});
