@@ -43,23 +43,16 @@ export function PlacedToken({ id }) {
   const selfScale = (selfShape.baseSize ?? 30) / 30;
   const activeScale = (activeShape?.baseSize ?? 30) / 30;
 
-  const showingActive = !!activeId;
-  const isActive = id === activeId;
-
-  const strategy = measurementStrategy[MeasurementStrategy.centerToCenterNormalized];
-
-  const [sft, tfs] = (showingActive &&
-    !isActive &&
-    activePosition &&
-    selfPosition &&
-    tokenConnection(activePosition, activeFacing, selfPosition, selfFacing)) || [false, false];
-
   const overlay =
-    showingActive &&
-    !isActive &&
+    !!activeId &&
+    activeId !== id &&
     activePosition &&
     selfPosition &&
-    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1) + (!sft ? 'X' : tfs ? 'F' : 'B');
+    overlayText(
+      { position: activePosition, facing: activeFacing, scale: activeScale },
+      { position: selfPosition, facing: selfFacing, scale: selfScale },
+      measurementStrategy[MeasurementStrategy.centerToCenterNormalized]
+    );
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -76,8 +69,8 @@ export function PlacedToken({ id }) {
 
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }} onClick={onClick}>
-      {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
+      {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'figure' && <TokenFacing facing={selfFacing} />}
       <AnimatePresence>
         {selectedTokenId === id && (
@@ -103,14 +96,27 @@ export function TokenFacing({ facing }) {
   const edge = { x: CELL_DIAMETER - 2.0 /* border width */, y: CELL_RADIUS };
   const bot = offsetAngle(origin, edge, degToRad(-10));
   const top = offsetAngle(origin, edge, degToRad(+10));
+  
+  const tip = CELL_DIAMETER - 6.0; /* tip length */
 
-  const facingPath = `M ${bot.x} ${bot.y} A ${CELL_RADIUS} ${CELL_RADIUS} 0 0 1 ${top.x} ${top.y} L ${40} ${origin.y}`;
+  const facingPath = `M ${bot.x} ${bot.y} A ${CELL_RADIUS} ${CELL_RADIUS} 0 0 1 ${top.x} ${top.y} L ${tip} ${origin.y}`;
 
   return (
     <svg style={{ position: 'absolute', top: 0, width: '100%', height: '100%', transform: `rotate(${facing}rad)` }}>
       <path d={facingPath} fill="white" />
     </svg>
   );
+}
+
+function overlayText(origin, target, strategy) {
+  const { position: originPosition, facing: originFacing, scale: originScale } = origin;
+  const { position: targetPosition, facing: targetFacing, scale: targetScale } = target;
+
+  const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(originPosition, originFacing, targetPosition, targetFacing);
+
+  const range = strategy(originPosition, targetPosition, targetScale, originScale);
+
+  return range.toFixed(1) + (!isOriginFacingTarget ? 'X' : isTargetFacingOrigin ? 'F' : 'B');
 }
 
 const measurementStrategy = {
