@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { PlacedToken } from './PlacedToken';
+import { selectFocusedTokenId, selectSelectedTokenId } from './selectionSlice';
 import { selectActiveTokens, selectTokenById } from './tokenSlice';
 
 export function TokenLayer() {
@@ -44,7 +45,8 @@ function AnimatedPlacedToken({ id }) {
     // return () => controls.stop();
   }, [targetPath, position, controls]);
 
-  // const menuTokenId = useSelector(selectMenuTokenId);
+  const focusedId = useSelector(selectFocusedTokenId);
+  const selectedId = useSelector(selectSelectedTokenId);
 
   return (
     <motion.div
@@ -52,7 +54,7 @@ function AnimatedPlacedToken({ id }) {
       style={{
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
-        // zIndex: id === menuTokenId ? 100 : 0,
+        zIndex: id === (selectedId || focusedId) ? 100 : 0,
       }}
     >
       <PlacedToken id={id} />
