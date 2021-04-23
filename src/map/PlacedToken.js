@@ -11,14 +11,14 @@ import { MeasurementStrategy } from '../ruler/movementSlice';
 import { selectGeneratorById } from '../supply/generatorsSlice';
 import { ArcFab } from './ArcFab';
 import {
+  CELL_DIAMETER,
+  CELL_RADIUS,
   centerToCenterCellDistance,
   centerToCenterNormalizedCellDistance,
-  tokenConnection,
   edgeToEdgeCellDistance,
-  CELL_RADIUS,
-  CELL_DIAMETER,
+  tokenConnection,
 } from './metrics';
-import { selectFocusedTokenId, selectSelectedTokenId, tokenEntered, tokenLeft, tokenSelected } from './selectionSlice';
+import { selectFocusedTokenId, selectSelectedTokenId, tokenBlurred, tokenHovered, tokenSelected } from './selectionSlice';
 import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
 
 export function PlacedToken({ id }) {
@@ -54,8 +54,8 @@ export function PlacedToken({ id }) {
       measurementStrategy[MeasurementStrategy.centerToCenterNormalized]
     );
 
-  const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
-  const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
+  const onMouseEnter = useCallback(() => dispatch(tokenHovered(id)), [dispatch, id]);
+  const onMouseLeave = useCallback(() => dispatch(tokenBlurred(id)), [dispatch, id]);
 
   const onKillClick = useCallback(() => console.log('kill'), []);
   const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
@@ -96,7 +96,7 @@ export function TokenFacing({ facing }) {
   const edge = { x: CELL_DIAMETER - 2.0 /* border width */, y: CELL_RADIUS };
   const bot = offsetAngle(origin, edge, degToRad(-10));
   const top = offsetAngle(origin, edge, degToRad(+10));
-  
+
   const tip = CELL_DIAMETER - 6.0; /* tip length */
 
   const facingPath = `M ${bot.x} ${bot.y} A ${CELL_RADIUS} ${CELL_RADIUS} 0 0 1 ${top.x} ${top.y} L ${tip} ${origin.y}`;
