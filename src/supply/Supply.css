@@ -32,10 +32,11 @@
 .token-container {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   min-height: var(--tokenSize);
   min-width: var(--tokenSize);
   gap: 0.25rem;
-  height: 100%;
+  min-height: 100%;
 }
 
 .token-container-empty-label {

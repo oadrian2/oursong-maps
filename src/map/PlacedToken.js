@@ -10,7 +10,14 @@ import { MarkerToken } from '../doodads/MarkerToken';
 import { MeasurementStrategy } from '../ruler/movementSlice';
 import { selectGeneratorById } from '../supply/generatorsSlice';
 import { ArcFab } from './ArcFab';
-import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, connection, edgeToEdgeCellDistance } from './metrics';
+import {
+  centerToCenterCellDistance,
+  centerToCenterNormalizedCellDistance,
+  tokenConnection,
+  edgeToEdgeCellDistance,
+  CELL_RADIUS,
+  CELL_DIAMETER,
+} from './metrics';
 import { selectFocusedTokenId, selectSelectedTokenId, tokenEntered, tokenLeft, tokenSelected } from './selectionSlice';
 import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
 
@@ -22,7 +29,8 @@ export function PlacedToken({ id }) {
   const { position: selfPosition, angle: selfFacing, generator } = useSelector((state) => selectTokenById(state, id));
   const { shapeType, shape: selfShape } = useSelector((state) => selectGeneratorById(state, generator));
 
-  const { position: activePosition, angle: activeFacing, generator: activeGenerator } = useSelector((state) => selectTokenById(state, activeId)) || {};
+  const { position: activePosition, angle: activeFacing, generator: activeGenerator } =
+    useSelector((state) => selectTokenById(state, activeId)) || {};
   const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
@@ -40,14 +48,18 @@ export function PlacedToken({ id }) {
 
   const strategy = measurementStrategy[MeasurementStrategy.centerToCenterNormalized];
 
-  const [sft, tfs] = (showingActive && !isActive && activePosition && selfPosition && connection(activePosition, activeFacing, selfPosition, selfFacing)) || [false, false];
+  const [sft, tfs] = (showingActive &&
+    !isActive &&
+    activePosition &&
+    selfPosition &&
+    tokenConnection(activePosition, activeFacing, selfPosition, selfFacing)) || [false, false];
 
   const overlay =
     showingActive &&
     !isActive &&
     activePosition &&
     selfPosition &&
-    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1) + ' ' + (!sft ? 'X' : tfs ? 'F' : 'B');
+    strategy(activePosition, selfPosition, activeScale, selfScale).toFixed(1) + (!sft ? 'X' : tfs ? 'F' : 'B');
 
   const onMouseEnter = useCallback(() => dispatch(tokenEntered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenLeft(id)), [dispatch, id]);
@@ -62,22 +74,11 @@ export function PlacedToken({ id }) {
   const stashPosition = 0;
   const trashPosition = -0.25 * Math.PI;
 
-  const origin = { x: 24, y: 24 };
-  const edge = { x: 46, y: 24 };
-  const bot = offsetAngle(origin, edge, degToRad(-10));
-  const top = offsetAngle(origin, edge, degToRad(+10));
-
-  const facingPath = `M ${bot.x} ${bot.y} A 24 24 0 0 1 ${top.x} ${top.y} L ${40} ${origin.y}`;
-
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }} onClick={onClick}>
       {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
-      {shapeType === 'figure' && (
-        <svg style={{ position: 'absolute', top: 0, width: '100%', height: '100%', transform: `rotate(${selfFacing}rad)` }}>
-          <path d={facingPath} fill="white" />
-        </svg>
-      )}
+      {shapeType === 'figure' && <TokenFacing facing={selfFacing} />}
       <AnimatePresence>
         {selectedTokenId === id && (
           <>
@@ -94,6 +95,21 @@ export function PlacedToken({ id }) {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export function TokenFacing({ facing }) {
+  const origin = { x: CELL_RADIUS, y: CELL_RADIUS };
+  const edge = { x: CELL_DIAMETER - 2.0 /* border width */, y: CELL_RADIUS };
+  const bot = offsetAngle(origin, edge, degToRad(-10));
+  const top = offsetAngle(origin, edge, degToRad(+10));
+
+  const facingPath = `M ${bot.x} ${bot.y} A ${CELL_RADIUS} ${CELL_RADIUS} 0 0 1 ${top.x} ${top.y} L ${40} ${origin.y}`;
+
+  return (
+    <svg style={{ position: 'absolute', top: 0, width: '100%', height: '100%', transform: `rotate(${facing}rad)` }}>
+      <path d={facingPath} fill="white" />
+    </svg>
   );
 }
 
