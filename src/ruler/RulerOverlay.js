@@ -39,7 +39,7 @@ export const RulerOverlay = forwardRef(({ children }, ref) => {
 
     setMeasuring(true);
 
-    if ((event.shiftKey || event.ctrlKey || event.altKey) && !!activeTokenId && claimedGenerators.includes(activeGenerator)) {
+    if (!!activeTokenId && claimedGenerators.includes(activeGenerator)) {
       setMoving(true);
     }
 
