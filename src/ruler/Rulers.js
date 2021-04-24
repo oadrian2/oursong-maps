@@ -2,12 +2,13 @@ import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { degToRad, offsetAngle } from '../app/math';
 import { PlacedToken } from '../map/PlacedToken';
+import { selectSelectedTokenId } from '../map/selectionSlice';
 import './Rulers.css';
 import { selectRulerMetrics } from './rulerSlice';
 
 export function Rulers({ isMoving }) {
   const rulerMetrics = useSelector(selectRulerMetrics);
-  const movingTokenId = useSelector((state) => state.tokens.moving);
+  const selectedTokenId = useSelector(selectSelectedTokenId);
 
   return rulerMetrics.map(({ id, isSingle, origin, path, radius, lastPoint, lastLength, totalLength, scaledX, scaledY }) => {
     return (
@@ -23,9 +24,9 @@ export function Rulers({ isMoving }) {
           {isSingle && <ArcCircle origin={origin} radius={radius} lastPoint={lastPoint} />}
         </svg>
         <LengthsDisplay position={lastPoint} scaledX={scaledX} scaledY={scaledY} lastLength={lastLength} totalLength={totalLength} />
-        {isMoving && movingTokenId && (
+        {isMoving && selectedTokenId && (
           <div style={{ position: 'absolute', left: lastPoint.x, top: lastPoint.y, transform: 'translate(-50%, -50%)' }}>
-            <PlacedToken id={movingTokenId} showMenu={false} />
+            <PlacedToken id={selectedTokenId} showMenu={false} />
           </div>
         )}
       </Fragment>

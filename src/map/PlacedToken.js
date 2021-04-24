@@ -21,7 +21,7 @@ import {
 import { selectFocusedTokenId, selectSelectedTokenId, tokenBlurred, tokenHovered, tokenSelected } from './selectionSlice';
 import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
 
-export function PlacedToken({ id }) {
+export function PlacedToken({ id, showMenu }) {
   const dispatch = useDispatch();
 
   const activeId = useSelector(selectFocusedTokenId);
@@ -73,7 +73,7 @@ export function PlacedToken({ id }) {
       {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'figure' && <TokenFacing facing={selfFacing} />}
       <AnimatePresence>
-        {selectedTokenId === id && (
+        {selectedTokenId === id && showMenu !== false && (
           <>
             <ArcFab angle={killPosition} onClick={onKillClick}>
               <ClearIcon />
