@@ -1,7 +1,6 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
-import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import { PlacedToken } from './PlacedToken';
 import { selectFocusedTokenId, selectSelectedTokenId } from './selectionSlice';
 import { selectActiveTokens, selectTokenById } from './tokenSlice';
