@@ -26,10 +26,12 @@ export function TokenLayer() {
 }
 
 function AnimatedPlacedToken({ id }) {
-  const { position, path: targetPath, generator } = useSelector((state) => selectTokenById(state, id));
-  const claimed = useSelector(selectClaimedGeneratorIds);
+  const { position, path: targetPath } = useSelector((state) => selectTokenById(state, id));
 
-  const isClaimed = claimed.includes(generator);
+  const focusedId = useSelector(selectFocusedTokenId);
+  const selectedId = useSelector(selectSelectedTokenId);
+
+  const isSelected = selectedId === id;
 
   const controls = useAnimation();
 
@@ -49,9 +51,6 @@ function AnimatedPlacedToken({ id }) {
     // return () => controls.stop();
   }, [targetPath, position, controls]);
 
-  const focusedId = useSelector(selectFocusedTokenId);
-  const selectedId = useSelector(selectSelectedTokenId);
-
   return (
     <motion.div
       animate={controls}
@@ -61,7 +60,7 @@ function AnimatedPlacedToken({ id }) {
         zIndex: id === (selectedId || focusedId) ? 100 : undefined,
       }}
     >
-      <PlacedToken id={id} showMenu={selectedId === id && isClaimed} />
+      <PlacedToken id={id} showMenu={isSelected} />
     </motion.div>
   );
 }

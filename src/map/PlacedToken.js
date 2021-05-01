@@ -8,7 +8,7 @@ import { degToRad, offsetAngle } from '../app/math';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { MeasurementStrategy } from '../ruler/movementSlice';
-import { selectGeneratorById } from '../supply/generatorsSlice';
+import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/generatorsSlice';
 import { ArcFab } from './ArcFab';
 import {
   CELL_DIAMETER,
@@ -35,6 +35,10 @@ export function PlacedToken({ id, showMenu }) {
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
 
+  const claimed = useSelector(selectClaimedGeneratorIds);
+
+  const isClaimed = claimed.includes(generator);
+
   // const { position: selfPosition, shapeType, shape: selfShape, index } = useSelector((state) => selectTokenShapeById(state, id));
   // const { position: activePosition, shape: activeShape } = useSelector((state) => selectTokenShapeById(state, activeId)) || {};
 
@@ -59,7 +63,11 @@ export function PlacedToken({ id, showMenu }) {
   const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
   const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);
 
-  const onClick = useCallback(() => dispatch(tokenSelected(id)), [dispatch, id]);
+  const onClick = useCallback(() => {
+    if (!isClaimed) return;
+
+    dispatch(tokenSelected(id));
+  }, [dispatch, id, isClaimed]);
 
   const killPosition = +0.25 * Math.PI;
   const stashPosition = 0;
