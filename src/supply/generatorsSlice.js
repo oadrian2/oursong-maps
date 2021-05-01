@@ -18,7 +18,6 @@ const slice = createSlice({
   initialState,
   reducers: {
     generatorCreated: adapter.addOne,
-    generatorTrashed: adapter.removeOne,
     generatorUpdated: adapter.upsertMany,
     generatorsClaimed(state, action) {
       adapter.updateMany(
@@ -29,7 +28,7 @@ const slice = createSlice({
   },
 });
 
-export const { generatorCreated, generatorTrashed, generatorUpdated, generatorsClaimed } = slice.actions;
+export const { generatorCreated, generatorUpdated, generatorsClaimed } = slice.actions;
 
 export const generatorUpdateRequested = (generator) => (dispatch, getState, invoke) => {
   const mapId = selectMapId(getState());

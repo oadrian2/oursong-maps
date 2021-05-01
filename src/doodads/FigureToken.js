@@ -1,24 +1,24 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import { TokenAllegiance } from '../map/tokenSlice';
-import './FigureToken.css';
+import { Overlay } from './Overlay';
+import { TokenBase } from './TokenBase';
 
-export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, allegiance, isGroup, overlay, angle = -Math.PI / 2 }, ref) => {
-  const allegianceClass =
+export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, allegiance, isGroup, overlay }, ref) => {
+  const color =
     {
-      [TokenAllegiance.ALLY]: 'token--ally',
-      [TokenAllegiance.ENEMY]: 'token--enemy',
-      [TokenAllegiance.TARGET]: 'token--target',
-    }[allegiance] || 'token-unknown';
+      [TokenAllegiance.ALLY]: 'blue',
+      [TokenAllegiance.ENEMY]: 'red',
+      [TokenAllegiance.TARGET]: 'yellow',
+    }[allegiance] || 'green';
 
   if (isTemplate) {
     const effectiveLabel = `${prefix}${isGroup ? '#' : ''}`;
     const effectiveTitle = label;
 
     return (
-      <RoundToken ref={ref} title={effectiveTitle} allegianceClass={allegianceClass}>
+      <TokenBase title={effectiveTitle} color={color}>
         {effectiveLabel}
-      </RoundToken>
+      </TokenBase>
     );
   } else {
     // Group tokens present as Ab1, Ab2, Ab3, etc.
@@ -27,38 +27,10 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     const effectiveTitle = `${label} ${isGroup ? index + 1 : index || ''}`;
 
     return (
-      <RoundToken ref={ref} title={effectiveTitle} allegianceClass={allegianceClass}>
+      <TokenBase title={effectiveTitle} color={color}>
         {effectiveLabel}
         {overlay && <Overlay>{overlay}</Overlay>}
-      </RoundToken>
+      </TokenBase>
     );
   }
 });
-
-FigureToken.displayName = 'FigureToken';
-
-const RoundToken = forwardRef(({ children, title, allegianceClass }, ref) => {
-  return (
-    <div className={`token ${allegianceClass}`} ref={ref} title={title}>
-      {children}
-    </div>
-  );
-});
-
-RoundToken.displayName = 'RoundToken';
-
-export function Overlay({ children }) {
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.87 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="overlay"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
-}

@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useEffect } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
+import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import { PlacedToken } from './PlacedToken';
 import { selectFocusedTokenId, selectSelectedTokenId } from './selectionSlice';
 import { selectActiveTokens, selectTokenById } from './tokenSlice';
@@ -25,7 +26,10 @@ export function TokenLayer() {
 }
 
 function AnimatedPlacedToken({ id }) {
-  const { position, path: targetPath } = useSelector((state) => selectTokenById(state, id));
+  const { position, path: targetPath, generator } = useSelector((state) => selectTokenById(state, id));
+  const claimed = useSelector(selectClaimedGeneratorIds);
+
+  const isClaimed = claimed.includes(generator);
 
   const controls = useAnimation();
 
@@ -54,10 +58,10 @@ function AnimatedPlacedToken({ id }) {
       style={{
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
-        zIndex: id === (selectedId || focusedId) ? 100 : 0,
+        zIndex: id === (selectedId || focusedId) ? 100 : undefined,
       }}
     >
-      <PlacedToken id={id} />
+      <PlacedToken id={id} showMenu={selectedId === id && isClaimed} />
     </motion.div>
   );
 }

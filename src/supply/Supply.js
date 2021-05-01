@@ -2,7 +2,6 @@ import { Figures } from './Figures';
 import { Markers } from './Markers';
 import { Stash } from './Stash';
 import './Supply.css';
-import { Trash } from './Trash';
 
 export function Supply() {
   return (
@@ -17,10 +16,6 @@ export function Supply() {
       <hr className="supply-rule" />
       <div className="supply-fluid-container">
         <Stash />
-      </div>
-      <hr className="supply-rule" />
-      <div className="supply-fixed-container">
-        <Trash />
       </div>
     </div>
   );

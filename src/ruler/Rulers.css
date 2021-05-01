@@ -10,6 +10,7 @@
 
 .measurement-lengths {
   position: absolute;
+  top: 0;
   background: #eeeeee80;
   border: 2px solid black;
   border-radius: 50%;

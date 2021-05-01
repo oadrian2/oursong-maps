@@ -23,12 +23,14 @@ export function Rulers({ isMoving }) {
           <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
           {isSingle && <ArcCircle origin={origin} radius={radius} lastPoint={lastPoint} />}
         </svg>
-        <LengthsDisplay position={lastPoint} scaledX={scaledX} scaledY={scaledY} lastLength={lastLength} totalLength={totalLength} />
-        {isMoving && selectedTokenId && (
-          <div style={{ position: 'absolute', left: lastPoint.x, top: lastPoint.y, transform: 'translate(-50%, -50%)' }}>
-            <PlacedToken id={selectedTokenId} showMenu={false} />
-          </div>
-        )}
+        <div style={{ position: 'absolute', top: 0, transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
+          <LengthsDisplay scaledX={scaledX} scaledY={scaledY} lastLength={lastLength} totalLength={totalLength} />
+          {isMoving && selectedTokenId && (
+            <div style={{position: 'absolute', top: 0, transform: `translate(-50%, -50%)`}}>
+              <PlacedToken id={selectedTokenId} showMenu={false} />
+            </div>
+          )}
+        </div>
       </Fragment>
     );
   });
@@ -49,14 +51,12 @@ export function ArcCircle({ origin, lastPoint, radius }) {
   );
 }
 
-export function LengthsDisplay({ position, scaledX, scaledY, lastLength, totalLength }) {
+export function LengthsDisplay({ scaledX, scaledY, lastLength, totalLength }) {
   return (
     <div
       className="measurement-lengths"
       style={{
-        left: position.x,
-        top: position.y,
-        transform: `translate(calc(-50% + (${scaledX}) * 1.25), calc(-50% + (${scaledY}) * 1.25)`,
+        transform: `translate(calc(-50% + ${scaledX} * 1.25), calc(-50% + ${scaledY} * 1.25)`,
       }}
     >
       <div className="measurement-length">

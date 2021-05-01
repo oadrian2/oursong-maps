@@ -6,7 +6,7 @@ const TOKEN_MIDPOINT = TOKEN_SIZE / 2;
 
 export function ArcFab({ children, angle, onClick = () => {} }) {
     const startDistance = 0;
-    const endDistance = TOKEN_SIZE * 1.25;
+    const endDistance = TOKEN_SIZE * 1.5;
   
     const startX = Math.cos(angle) * startDistance;
     const startY = Math.sin(angle) * startDistance;
