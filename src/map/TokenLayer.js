@@ -75,7 +75,7 @@ function AnimatedPlacedToken({ id }) {
       }}
     >
       <PlacedToken id={id} onClick={onClick} />
-      <AnimatePresence>{isSelected && <TokenMenu />}</AnimatePresence>
+      <AnimatePresence>{isSelected && <TokenMenu id={id} />}</AnimatePresence>
     </motion.div>
   );
 }
