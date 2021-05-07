@@ -16,7 +16,7 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     const effectiveTitle = label;
 
     return (
-      <TokenBase title={effectiveTitle} color={color}>
+      <TokenBase ref={ref} title={effectiveTitle} color={color}>
         {effectiveLabel}
       </TokenBase>
     );
@@ -27,7 +27,7 @@ export const FigureToken = forwardRef(({ isTemplate, index, prefix, label, alleg
     const effectiveTitle = `${label} ${isGroup ? index + 1 : index || ''}`;
 
     return (
-      <TokenBase title={effectiveTitle} color={color}>
+      <TokenBase ref={ref} title={effectiveTitle} color={color}>
         {effectiveLabel}
         {overlay && <Overlay>{overlay}</Overlay>}
       </TokenBase>

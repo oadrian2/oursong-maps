@@ -1,7 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
+import React from 'react';
 
-export function TokenBase({ children, title, color }) {
+export const TokenBase = React.forwardRef(({ children, title, color }, ref) => {
   const colorMap = {
     red: '#d32f2f',
     blue: '#1976d2',
@@ -11,6 +12,7 @@ export function TokenBase({ children, title, color }) {
 
   return (
     <div
+      ref={ref}
       title={title}
       css={css`
         display: grid;
@@ -36,4 +38,6 @@ export function TokenBase({ children, title, color }) {
       {children}
     </div>
   );
-}
+});
+
+TokenBase.displayName = 'TokenBase';

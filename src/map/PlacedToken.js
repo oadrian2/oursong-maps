@@ -1,27 +1,23 @@
-import ArchiveIcon from '@material-ui/icons/Archive';
-import ClearIcon from '@material-ui/icons/Clear';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { AnimatePresence } from 'framer-motion';
+/** @jsxImportSource @emotion/react */
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { degToRad, offsetAngle } from '../app/math';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { MeasurementStrategy } from '../ruler/movementSlice';
-import { selectClaimedGeneratorIds, selectGeneratorById } from '../supply/generatorsSlice';
-import { ArcFab } from './ArcFab';
+import { selectGeneratorById } from '../supply/generatorsSlice';
 import {
   CELL_DIAMETER,
   CELL_RADIUS,
   centerToCenterCellDistance,
   centerToCenterNormalizedCellDistance,
   edgeToEdgeCellDistance,
-  tokenConnection,
+  tokenConnection
 } from './metrics';
-import { selectFocusedTokenId, tokenBlurred, tokenHovered, tokenSelected } from './selectionSlice';
-import { selectIndexWithinGroup, selectTokenById, stashTokenRequested, trashTokenRequested } from './tokenSlice';
+import { selectFocusedTokenId, tokenBlurred, tokenHovered } from './selectionSlice';
+import { selectIndexWithinGroup, selectTokenById } from './tokenSlice';
 
-export function PlacedToken({ id, showMenu }) {
+export function PlacedToken({ id, onClick }) { 
   const dispatch = useDispatch();
 
   const activeId = useSelector(selectFocusedTokenId);
@@ -34,10 +30,6 @@ export function PlacedToken({ id, showMenu }) {
   const { shape: activeShape } = useSelector((state) => selectGeneratorById(state, activeGenerator)) || {};
 
   const index = useSelector((state) => selectIndexWithinGroup(state, { id, generator: generator }));
-
-  const claimed = useSelector(selectClaimedGeneratorIds);
-
-  const isClaimed = claimed.includes(generator);
 
   // const { position: selfPosition, shapeType, shape: selfShape, index } = useSelector((state) => selectTokenShapeById(state, id));
   // const { position: activePosition, shape: activeShape } = useSelector((state) => selectTokenShapeById(state, activeId)) || {};
@@ -59,40 +51,11 @@ export function PlacedToken({ id, showMenu }) {
   const onMouseEnter = useCallback(() => dispatch(tokenHovered(id)), [dispatch, id]);
   const onMouseLeave = useCallback(() => dispatch(tokenBlurred(id)), [dispatch, id]);
 
-  const onKillClick = useCallback(() => console.log('kill'), []);
-  const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
-  const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);
-
-  const onClick = useCallback(() => {
-    if (!isClaimed) return;
-
-    dispatch(tokenSelected(id));
-  }, [dispatch, id, isClaimed]);
-
-  const killPosition = +0.25 * Math.PI;
-  const stashPosition = 0;
-  const trashPosition = -0.25 * Math.PI;
-
   return (
     <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ transform: `scale(${selfScale})` }} onClick={onClick}>
       {shapeType === 'marker' && <MarkerToken index={index} {...selfShape} effectRadius={2} />}
       {shapeType === 'figure' && <FigureToken index={index} {...selfShape} overlay={overlay} />}
       {shapeType === 'figure' && <TokenFacing facing={selfFacing} />}
-      <AnimatePresence>
-        {showMenu && (
-          <>
-            <ArcFab angle={killPosition} onClick={onKillClick}>
-              <ClearIcon />
-            </ArcFab>
-            <ArcFab angle={stashPosition} onClick={onStashClick}>
-              <ArchiveIcon />
-            </ArcFab>
-            <ArcFab angle={trashPosition} onClick={onTrashClick}>
-              <DeleteIcon />
-            </ArcFab>
-          </>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

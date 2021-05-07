@@ -8,29 +8,6 @@
   pointer-events: none;
 }
 
-.measurement-lengths {
-  position: absolute;
-  top: 0;
-  background: #eeeeee80;
-  border: 2px solid black;
-  border-radius: 50%;
-  padding: 1.25rem;
-  display: flex;
-  align-items: stretch;
-  flex-direction: column;
-  justify-content: center;
-  height: 8em;
-  width: 8rem;
-  text-shadow: 0px 0px 4px #fff;
-  backdrop-filter: blur(4px);
-}
-
-.measurement-length {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 500;
-}
-
 .back-stroke {
   stroke-width: 6px;
   stroke: white;
@@ -41,10 +18,4 @@
   stroke-width: 4px;
   stroke: black;
   fill: none;
-}
-
-.arc {
-  fill: hsla(0, 0%, 80%, 0.2);
-  stroke: hsla(0, 0%, 80%, 0.5);
-  stroke-width: 1px;
 }

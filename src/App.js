@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import { nanoid } from '@reduxjs/toolkit';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';

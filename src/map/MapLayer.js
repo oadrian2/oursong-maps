@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import { nanoid } from '@reduxjs/toolkit';
 import { useRef } from 'react';
 import { useDrop } from 'react-dnd';

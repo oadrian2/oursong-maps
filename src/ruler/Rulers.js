@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import { Fragment } from 'react';
 import { useSelector } from 'react-redux';
 import { degToRad, offsetAngle } from '../app/math';
@@ -26,7 +27,7 @@ export function Rulers({ isMoving }) {
         <div style={{ position: 'absolute', top: 0, transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
           <LengthsDisplay scaledX={scaledX} scaledY={scaledY} lastLength={lastLength} totalLength={totalLength} />
           {isMoving && selectedTokenId && (
-            <div style={{position: 'absolute', top: 0, transform: `translate(-50%, -50%)`}}>
+            <div style={{ position: 'absolute', top: 0, transform: `translate(-50%, -50%)` }}>
               <PlacedToken id={selectedTokenId} showMenu={false} />
             </div>
           )}
@@ -40,11 +41,11 @@ export function ArcCircle({ origin, lastPoint, radius }) {
   const negPosition = offsetAngle(origin, lastPoint, degToRad(-15));
   const posPosition = offsetAngle(origin, lastPoint, degToRad(+15));
 
-  const path = `M ${negPosition.x} ${negPosition.y} A ${radius} ${radius} 0 0 1 ${posPosition.x} ${posPosition.y} L ${origin.x} ${origin.y} Z`;
+  const sprayShape = `M ${negPosition.x} ${negPosition.y} A ${radius} ${radius} 0 0 1 ${posPosition.x} ${posPosition.y} L ${origin.x} ${origin.y} Z`;
 
   return (
     <>
-      <path className="arc" d={path} />
+      <OverlayShape d={sprayShape} />
       <circle cx={origin.x} cy={origin.y} r={radius} className="back-stroke" />
       <circle cx={origin.x} cy={origin.y} r={radius} className="fore-stroke" />
     </>
@@ -53,20 +54,57 @@ export function ArcCircle({ origin, lastPoint, radius }) {
 
 export function LengthsDisplay({ scaledX, scaledY, lastLength, totalLength }) {
   return (
-    <div
-      className="measurement-lengths"
-      style={{
-        transform: `translate(calc(-50% + ${scaledX} * 1.25), calc(-50% + ${scaledY} * 1.25)`,
-      }}
-    >
-      <div className="measurement-length">
+    <SpokePositioned scaledX={scaledX} scaledY={scaledY}>
+      <MeasurementCircle>
         <strong>C:</strong>
         <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-      </div>
-      <div className="measurement-length">
         <strong>T:</strong>
         <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-      </div>
-    </div>
+      </MeasurementCircle>
+    </SpokePositioned>
   );
 }
+
+export const CenterPositioned = styled.div`
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -50%);
+`;
+
+export const SpokePositioned = styled.div`
+  position: absolute;
+  top: 0;
+  transform: translate(calc(${({ scaledX }) => scaledX} * 1.25), calc(${({ scaledY }) => scaledY} * 1.25));
+`;
+
+export const OverlayShape = styled.path`
+  fill: hsla(0, 0%, 80%, 0.25);
+  stroke: hsla(0, 0%, 80%, 0.5);
+  stroke-width: 1px;
+`;
+
+OverlayShape.displayName = 'OverlayShape';
+
+export const MeasurementCircle = styled.div`
+  transform: translate(-50%, -50%);
+
+  display: grid;
+  grid-template: auto / auto auto;
+  justify-content: space-between;
+  align-content: center;
+  gap: 4px;
+
+  background: #eeeeee80;
+  font-weight: 500;
+
+  border: 2px solid black;
+  border-radius: 50%;
+  padding: 1.25rem;
+  height: 8em;
+  width: 8rem;
+
+  text-shadow: 0px 0px 4px #fff;
+  backdrop-filter: blur(4px);
+`;
+
+MeasurementCircle.displayName = 'MeasurementCircle';

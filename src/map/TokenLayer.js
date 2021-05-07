@@ -1,8 +1,11 @@
+/** @jsxImportSource @emotion/react */
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import { useEffect } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useCallback, useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import { PlacedToken } from './PlacedToken';
-import { selectFocusedTokenId, selectSelectedTokenId } from './selectionSlice';
+import { selectFocusedTokenId, selectSelectedTokenId, tokenSelected } from './selectionSlice';
+import { TokenMenu } from './TokenMenu';
 import { selectActiveTokens, selectTokenById } from './tokenSlice';
 
 export function TokenLayer() {
@@ -25,12 +28,18 @@ export function TokenLayer() {
 }
 
 function AnimatedPlacedToken({ id }) {
-  const { position, path: targetPath } = useSelector((state) => selectTokenById(state, id));
+  const dispatch = useDispatch();
+
+  const { position, path: targetPath, generator } = useSelector((state) => selectTokenById(state, id));
 
   const focusedId = useSelector(selectFocusedTokenId);
   const selectedId = useSelector(selectSelectedTokenId);
 
+  const claimed = useSelector(selectClaimedGeneratorIds);
+
+  const isClaimed = claimed.includes(generator);
   const isSelected = selectedId === id;
+  const isFocused = focusedId === id;
 
   const controls = useAnimation();
 
@@ -50,16 +59,23 @@ function AnimatedPlacedToken({ id }) {
     // return () => controls.stop();
   }, [targetPath, position, controls]);
 
+  const onClick = useCallback(() => {
+    if (!isClaimed) return;
+
+    dispatch(tokenSelected(id));
+  }, [dispatch, id, isClaimed]);
+
   return (
     <motion.div
       animate={controls}
       style={{
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
-        zIndex: id === (selectedId || focusedId) ? 100 : undefined,
+        zIndex: isFocused || isSelected ? 100 : undefined,
       }}
     >
-      <PlacedToken id={id} showMenu={isSelected} />
+      <PlacedToken id={id} onClick={onClick} />
+      <AnimatePresence>{isSelected && <TokenMenu />}</AnimatePresence>
     </motion.div>
   );
 }
