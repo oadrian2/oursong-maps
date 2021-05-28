@@ -1,6 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
+
+        {
+            "type": "pwa-msedge",
+            "request": "launch",
+            "name": "Launch  Edge against localhost",
+            "url": "http://localhost:3000/maps/sw/J9bSPNXMj1p1N56p35AaH",
+            "webRoot": "${workspaceFolder}/src"
+        },
         {
             "type": "edge",
             "request": "attach",
