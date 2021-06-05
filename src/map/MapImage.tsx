@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectMapImage } from './mapSlice';
+import { useDispatch } from 'react-redux';
+import { useRecoilValue } from 'recoil';
 import { tokenDeselected } from './selectionSlice';
+import { mapImage } from './State';
 
 export function MapImage() {
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ export function MapImage() {
     [dispatch]
   );
 
-  const { src, width } = useSelector(selectMapImage);
+  const { src, width } = useRecoilValue(mapImage);
 
   return <img draggable="false" style={{ width }} src={src} alt="the map" onClick={onClick} />;
 }

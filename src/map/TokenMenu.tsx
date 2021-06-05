@@ -1,16 +1,18 @@
 import ArchiveIcon from '@material-ui/icons/Archive';
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from '@material-ui/icons/Delete';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import CheckIcon from '@material-ui/icons/Check';
-import ClearIcon from '@material-ui/icons/Clear';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ArcFab } from './ArcFab';
-import { selectTokenById, stashTokenRequested, toggleTokenVisibilityRequested, trashTokenRequested } from './tokenSlice';
-import { pathStarted, requestUpdateRemoteRuler } from '../ruler/rulerSlice';
+import { useRecoilState } from 'recoil';
 import { RootState } from '../app/store';
+import { pathStarted, requestUpdateRemoteRuler } from '../ruler/rulerSlice';
+import { ArcFab } from './ArcFab';
+import { tokenActive } from './State';
+import { selectTokenById, stashTokenRequested, toggleTokenVisibilityRequested, trashTokenRequested } from './tokenSlice';
 
 export function TokenMenu({ id }: TokenMenuProps) {
   const dispatch = useDispatch();
@@ -21,13 +23,16 @@ export function TokenMenu({ id }: TokenMenuProps) {
   const trashPosition = -0.75 * Math.PI;
   const activePosition = 0 * Math.PI;
 
-  const { visible = true, active = true, position } = useSelector((state: RootState) => selectTokenById(state, id))!;
+  const { position, visible = true } = useSelector((state: RootState) => selectTokenById(state, id))!;
+
+  // const [visible, setVisible] = useRecoilState(tokenVisible(id));
+  const [active, setActive] = useRecoilState(tokenActive(id));
 
   const onMoveClick = useCallback(() => {
     dispatch(pathStarted(position));
     dispatch(requestUpdateRemoteRuler());
   }, [dispatch, position]);
-  const onActiveClick = useCallback(() => console.log('active'), []);
+  const onActiveClick = useCallback(() => setActive(!active), [active, setActive]);
   const onVisibleClick = useCallback(() => dispatch(toggleTokenVisibilityRequested({ id, visible: !visible })), [dispatch, visible, id]);
   const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
   const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);

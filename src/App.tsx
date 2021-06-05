@@ -1,15 +1,17 @@
 import styled from '@emotion/styled';
 import { nanoid } from '@reduxjs/toolkit';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, RouteComponentProps, Switch } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 import './App.css';
 import { CustomDragLayer } from './app/CustomDragLayer';
 import { Header } from './header/Header';
 import { MapLayer } from './map/MapLayer';
 import { joinMapRequested, leaveMapRequested, selectConnected, selectLoaded } from './map/mapSlice';
+import { mapId } from './map/State';
 import { SessionDialog } from './session/SessionDialog';
 import { Supply } from './supply/Supply';
 
@@ -18,7 +20,7 @@ function App() {
     <>
       <Router>
         <Switch>
-          <Route exact path="/maps/:game/:id" component={MapPage} />
+          <Route exact path="/maps/:game/:id" component={LoadingMapPage} />
           <Route exact path="/create" component={IDs} />
           <Route path="/" component={() => <div>The GM will send you a link.</div>} />
         </Switch>
@@ -31,11 +33,25 @@ function IDs() {
   return <pre>{[...Array(20)].map(() => nanoid() + '\n')}</pre>;
 }
 
-function MapPage({
+function LoadingMapPage({
   match: {
     params: { game, id },
   },
 }: RouteComponentProps<{ game: string; id: string }>) {
+  const setMap = useSetRecoilState(mapId);
+
+  useEffect(() => {
+    setMap({ game, id });
+  }, [setMap, game, id]);
+
+  return (
+    <React.Suspense fallback={<LoadingMessage>Loading...</LoadingMessage>}>
+      <MapPage game={game} id={id} />
+    </React.Suspense>
+  );
+}
+
+function MapPage({ game, id }: { game: string; id: string }) {
   const dispatch = useDispatch();
 
   const connected = useSelector(selectConnected);

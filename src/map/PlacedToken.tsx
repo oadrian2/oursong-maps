@@ -1,21 +1,24 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { degToRad, Facing, offsetAngle, Point, Scale } from '../app/math';
-import { FigureToken } from '../doodads/FigureToken';
-import { MarkerToken } from '../doodads/MarkerToken';
-import { MeasurementStrategy } from '../ruler/movementSlice';
-import { selectGeneratorById } from '../supply/generatorsSlice';
 import {
   CELL_DIAMETER,
   CELL_RADIUS,
   centerToCenterCellDistance,
   centerToCenterNormalizedCellDistance,
+  degToRad,
   edgeToEdgeCellDistance,
+  Facing,
+  offsetAngle,
+  Placement,
   tokenConnection,
 } from '../app/math';
+import { RootState } from '../app/store';
+import { FigureToken } from '../doodads/FigureToken';
+import { MarkerToken } from '../doodads/MarkerToken';
+import { MeasurementStrategy } from '../ruler/movementSlice';
+import { selectGeneratorById } from '../supply/generatorsSlice';
 import { selectFocusedTokenId, tokenBlurred, tokenHovered } from './selectionSlice';
 import { selectIndexWithinGroup, selectTokenById, TokenID } from './tokenSlice';
-import { RootState } from '../app/store';
 
 export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
   const dispatch = useDispatch();
@@ -24,7 +27,7 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
 
   const {
     position: selfPosition,
-    facing: selfFacing = null,
+    facing: selfFacing,
     generator,
     visible = true,
   } = useSelector((state: RootState) => selectTokenById(state, id)!);
@@ -96,17 +99,10 @@ export function TokenFacing({ facing }: TokenFacingProps) {
 
 type TokenFacingProps = { facing: Facing };
 
-function overlayText(
-  origin: { position: Point; facing: Facing; scale: Scale },
-  target: { position: Point; facing: Facing; scale: Scale },
-  strategy: (originPosition: Point, targetPosition: Point, originScale: Scale, targetScale: Scale) => number
-) {
-  const { position: originPosition, facing: originFacing, scale: originScale } = origin;
-  const { position: targetPosition, facing: targetFacing, scale: targetScale } = target;
+function overlayText(origin: Placement, target: Placement, strategy: (origin: Placement, target: Placement) => number) {
+  const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(origin, target);
 
-  const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(originPosition, originFacing, targetPosition, targetFacing);
-
-  const range = strategy(originPosition, targetPosition, targetScale, originScale)!;
+  const range = strategy(origin, target)!;
 
   return range.toFixed(1) + (!isOriginFacingTarget ? 'X' : isTargetFacingOrigin ? 'F' : 'B');
 }

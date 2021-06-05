@@ -14,7 +14,7 @@ export enum TokenAllegiance {
 
 export type TokenID = string;
 
-interface Token {
+export interface Token {
   id: TokenID;
   generator: string;
   position: Point | null;

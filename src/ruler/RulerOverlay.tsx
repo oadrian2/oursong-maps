@@ -117,12 +117,16 @@ export const RulerOverlayWrapper = styled.div`
 
   margin-left: auto;
   margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 
   width: min-content;
 
   position: relative;
 
   user-select: none;
+
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 `;
 
 RulerOverlayWrapper.displayName = 'RulerOverlayWrapper';

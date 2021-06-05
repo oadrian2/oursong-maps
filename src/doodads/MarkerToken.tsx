@@ -4,13 +4,17 @@ import { forwardRef } from 'react';
 const CELL_SIZE = 48.0;
 
 export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(({ color, effectRadius = 0, label, isTemplate = false }, ref) => {
-  const hue = { red: 0, green: 120, blue: 240 }[color];
+  const hue = {
+    red: 0,
+    green: 120,
+    blue: 240,
+  }[color];
   const radius = CELL_SIZE * effectRadius;
 
   return (
     <MarkerTokenShape ref={ref} title={label} hue={hue} radius={radius}>
+      {!!radius && <MarkerTokenAura />}
       <MarkerTokenPlacemat />
-      { radius && <MarkerTokenAura /> }
       <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={label} />
     </MarkerTokenShape>
   );
@@ -20,17 +24,16 @@ MarkerToken.displayName = 'MarkerToken';
 
 export type MarkerColor = 'red' | 'green' | 'blue';
 
-export type MarkerTokenProps = { color: MarkerColor; effectRadius?: number; label: string, isTemplate?: boolean };
+export type MarkerTokenProps = { color: MarkerColor; effectRadius?: number; label: string; isTemplate?: boolean };
 
-
-export const MarkerTokenShape = styled.div<{ hue: number, radius: number }>`
+export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 48px;
   height: 48px;
   --color: ${({ hue }: { hue: number }) => hue};
-  --radius: ${({ radius }: { radius: number }) => radius};
+  --radius: ${({ radius }: { radius: number }) => radius}px;
 `;
 
 MarkerTokenShape.displayName = 'MarkerTokenShape';

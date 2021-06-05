@@ -18,20 +18,20 @@ export function ArcFab({ children, angle, onClick = () => {} }: ArcFabProps) {
   const endY = Math.sin(angle) * endDistance;
   const delay = 0.3;
 
-  const variants = {
+  const variants: any = {
     hidden: {
       opacity: 0,
       left: TOKEN_MIDPOINT + startX,
       top: TOKEN_MIDPOINT - startY,
       transition: { delay },
-      applyAtStart: { pointerEvents: 'none' },
+      pointerEvents: 'none',
     },
     visible: {
       opacity: 1,
       left: TOKEN_MIDPOINT + endX,
       top: TOKEN_MIDPOINT - endY,
       transition: { delay },
-      applyAtEnd: { pointerEvents: 'all' },
+      transitionEnd: { pointerEvents: 'all' },
     },
   };
 

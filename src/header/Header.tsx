@@ -1,11 +1,14 @@
 import styled from '@emotion/styled';
-import { useSelector } from 'react-redux';
-import { selectMap } from '../map/mapSlice';
+import { useTitle } from 'react-use';
+import { useRecoilValue } from 'recoil';
+import { mapTitle } from '../map/State';
 
 export function Header() {
-  const { title, gameDate = 'TBD' } = useSelector(selectMap);
+  const title = useRecoilValue(mapTitle);
 
-  return <Title>{title ? `${title} (${gameDate})` : '...'}</Title>;
+  useTitle(`OurSong Maps - ${title}`);
+
+  return <Title>{title}</Title>;
 }
 
 export const Title = styled.span`

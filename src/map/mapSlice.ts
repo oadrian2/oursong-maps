@@ -51,19 +51,6 @@ export const selectConnected = createSelector(selectMap, ({ connected }) => conn
 
 export const selectLoaded = createSelector(selectMap, ({ loaded }) => loaded);
 
-export const selectMapTitle = createSelector(selectMap, ({ title }) => title);
-
-export const selectMapImage = createSelector(selectMap, ({ game, id, map }) => {
-  if (!game || !id || !map) throw Error('Map not loaded');
-
-  const { image, width, scale } = map;
-
-  return {
-    src: new URL(`/maps/${game}/${id}/${image}`, process.env.REACT_APP_STORAGE_URL).href,
-    width: width * scale,
-  };
-});
-
 export const joinMapRequested = (game: string, id: string) => (dispatch: AppDispatch, getState: () => RootState, invoke: Invoke) => {
   invoke('joinMap', game, id);
 };

@@ -1,6 +1,9 @@
 export type Point = { x: number; y: number };
-export type Facing = number;
 export type Scale = number;
+export type Facing = number;
+export type Angle = number;
+
+export type Placement = { position: Point, scale: Scale, facing?: Facing };
 
 export const CELL_DIAMETER = 48.0;
 export const CELL_RADIUS = CELL_DIAMETER / 2.0;
@@ -14,33 +17,45 @@ export const toPixels = (distance: number) => distance * CELL_DIAMETER;
 
 export const pixelDistance = (positionA: Point, positionB: Point) => Math.hypot(positionB.x - positionA.x, positionB.y - positionA.y);
 
-export function centerToCenterCellDistance(originPosition: Point, targetPosition: Point) {
+export function centerToCenterCellDistance(origin: Placement, target: Placement) {
+  const { position: originPosition } = origin;
+  const { position: targetPosition } = target;
+
   return toCells(Math.hypot(originPosition.x - targetPosition.x, originPosition.y - targetPosition.y));
 }
 
-export function edgeToEdgeCellDistance(originPosition: Point, targetPosition: Point, originScale: Scale, targetScale: Scale) {
+export function edgeToEdgeCellDistance(origin: Placement, target: Placement) {
+  const { scale: originScale } = origin;
+  const { scale: targetScale } = target;
+
   const radiusAdjustment = (originScale + targetScale) / 2;
 
-  return centerToCenterCellDistance(originPosition, targetPosition) - radiusAdjustment;
+  return centerToCenterCellDistance(origin, target) - radiusAdjustment;
 }
 
-export function centerToCenterNormalizedCellDistance(originPosition: Point, targetPosition: Point, originScale: Scale, targetScale: Scale) {
+export function centerToCenterNormalizedCellDistance(origin: Placement, target: Placement) {
+  const { scale: originScale } = origin;
+  const { scale: targetScale } = target;
+
   const radiusAdjustment = (originScale + targetScale) / 2 - 1; // center-to-center, but adjust all bases to 1" for calculation
 
-  return centerToCenterCellDistance(originPosition, targetPosition) - radiusAdjustment;
+  return centerToCenterCellDistance(origin, target) - radiusAdjustment;
 }
 
-export function tokenConnection(selfPosition: Point, selfFacing: Facing, targetPosition: Point, targetFacing: Facing): [boolean, boolean] {
-  const angleToTarget = Math.atan2(targetPosition.y - selfPosition.y, targetPosition.x - selfPosition.x);
-  const angleToSelf = Math.atan2(selfPosition.y - targetPosition.y, selfPosition.x - targetPosition.x);
+export function tokenConnection(origin: Placement, target: Placement): [boolean, boolean] {
+  const { position: originPosition, scale: originFacing } = origin;
+  const { position: targetPosition, scale: targetFacing } = target;
 
-  const isSelfFacingTarget = Math.cos(angleToTarget - selfFacing) >= 0;
-  const isTargetFacingSelf = Math.cos(angleToSelf - targetFacing) >= 0;
+  const angleToTarget = Math.atan2(targetPosition.y - originPosition.y, targetPosition.x - originPosition.x);
+  const angleToOrigin = Math.atan2(originPosition.y - targetPosition.y, originPosition.x - targetPosition.x);
 
-  return [isSelfFacingTarget, isTargetFacingSelf];
+  const isOriginFacingTarget = Math.cos(angleToTarget - originFacing) >= 0;
+  const isTargetFacingOrigin = Math.cos(angleToOrigin - targetFacing) >= 0;
+
+  return [isOriginFacingTarget, isTargetFacingOrigin];
 }
 
-export function offsetAngle(origin: Point, point: Point, angle: number): Point {
+export function offsetAngle(origin: Point, point: Point, angle: Angle): Point {
   return {
     x: origin.x + (point.x - origin.x) * Math.cos(angle) + (origin.y - point.y) * Math.sin(angle),
     y: origin.y + (point.x - origin.x) * Math.sin(angle) + (point.y - origin.y) * Math.cos(angle),

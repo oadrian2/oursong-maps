@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { RecoilRoot } from 'recoil';
 import App from './App';
 import store from './app/store';
 import './fonts/Roboto-Regular.ttf';
@@ -9,7 +10,9 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <RecoilRoot>
+      <App />
+    </RecoilRoot>
   </Provider>,
   document.getElementById('root')
 );

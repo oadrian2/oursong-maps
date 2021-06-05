@@ -1,13 +1,14 @@
-/** @jsxImportSource @emotion/react */
+import styled from '@emotion/styled';
+import { Switch } from '@material-ui/core';
 import { nanoid } from '@reduxjs/toolkit';
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
-import { useTitle } from 'react-use';
+import { useDispatch } from 'react-redux';
+import { useRecoilState } from 'recoil';
 import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
-import { selectMapTitle } from './mapSlice';
+import { viewInactiveState } from './State';
 import { TokenLayer } from './TokenLayer';
 import { tokenPlacementRequested, unstashTokenToRequested } from './tokenSlice';
 
@@ -16,13 +17,11 @@ export function MapLayer() {
 
   const ref = useRef<any>();
 
-  const title = useSelector(selectMapTitle);
-
-  useTitle(`OurSong Maps - ${title}`);
+  const [viewInactive, setViewInactive] = useRecoilState(viewInactiveState);
 
   const [, drop] = useDrop({
     accept: [ItemTypes.GENERATOR, ItemTypes.STASHED_TOKEN],
-    drop: (item: { id: string, type: string }, monitor) => {
+    drop: (item: { id: string; type: string }, monitor) => {
       const { id, type } = item;
 
       const position = ref.current?.clientCoordinatesToMapCoordinates(monitor.getSourceClientOffset());
@@ -39,12 +38,27 @@ export function MapLayer() {
     },
   });
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setViewInactive(event.target.checked);
+  };
+
   return (
-    <RulerOverlay ref={ref}>
-      <div ref={drop} className="map-layer">
-        <MapImage />
-        <TokenLayer />
-      </div>
-    </RulerOverlay>
+    <>
+      <RulerOverlay ref={ref}>
+        <div ref={drop}>
+          <MapImage />
+          <TokenLayer />
+        </div>
+      </RulerOverlay>
+      <MapCommandConsole>
+        <Switch checked={viewInactive} onChange={handleChange} />
+      </MapCommandConsole>
+    </>
   );
 }
+
+export const MapCommandConsole = styled.div`
+  position: fixed;
+  right: 2rem;
+  top: 5rem;
+`;
