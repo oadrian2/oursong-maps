@@ -31,15 +31,21 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }) 
       <div className={`generators__select-all ${allSelected ? 'selected' : ''}`} onClick={() => onAllSelect(!allSelected)}>
         <FigureToken prefix="All" label="All" allegiance={groupKey} isTemplate />
       </div>
-      {generators.map((id) => {
-        const oneSelected = selected.includes(id);
+      <div className="generators__select-ones">
+        {generators.map((id) => {
+          const oneSelected = selected.includes(id);
 
-        return (
-          <div key={id} className={`generators__select-one ${oneSelected ? 'selected' : ''}`} onClick={() => onOneSelect(!oneSelected, id)}>
-            <Generator id={id} />
-          </div>
-        );
-      })}
+          return (
+            <div
+              key={id}
+              className={`generators__select-one ${oneSelected ? 'selected' : ''}`}
+              onClick={() => onOneSelect(!oneSelected, id)}
+            >
+              <Generator id={id} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

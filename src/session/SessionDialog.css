@@ -22,3 +22,13 @@
 .selected {
   border-color: lightgreen;
 }
+
+.generators__select-all,
+.generators__select-ones {
+  height: 100%;
+}
+
+.generators__select-ones {
+  display: flex;
+  flex-wrap: wrap;
+}
