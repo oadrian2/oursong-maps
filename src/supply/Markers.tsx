@@ -1,13 +1,15 @@
-import { useSelector } from 'react-redux';
+import { useRecoilValue } from 'recoil';
+import { markerGeneratorListState } from '../map/State';
 import { Generator } from './Generator';
-import { selectMarkerGenerators } from './generatorsSlice';
 
 export function Markers() {
-  const markerIds = useSelector(selectMarkerGenerators).map(({ id }) => id);
+  const markerIds = useRecoilValue(markerGeneratorListState);
 
   return (
-    <div className="token-container" style={{transform: 'translateY(16px)'}}>
-      {markerIds.map((id) => <Generator key={id} id={id} />)}
+    <div className="token-container" style={{ transform: 'translateY(16px)' }}>
+      {markerIds.map((id) => (
+        <Generator key={id} id={id} />
+      ))}
     </div>
   );
 }

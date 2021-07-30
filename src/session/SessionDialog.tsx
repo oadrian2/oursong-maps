@@ -1,23 +1,22 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { claimedFigureGeneratorListState, generatorsByAllegianceState } from '../map/State';
 import { TokenAllegiance } from '../map/tokenSlice';
-import { generatorsClaimed, selectClaimedGeneratorIds, selectGeneratorsByAllegiance } from '../supply/generatorsSlice';
 import { GeneratorGroup } from './GeneratorGroup';
 import './SessionDialog.css';
 
 export function SessionDialog() {
-  const dispatch = useDispatch();
+  const generatorGroups = useRecoilValue(generatorsByAllegianceState);
+  const [claimedIDs, setClaimedIDs] = useRecoilState(claimedFigureGeneratorListState);
+  const [selectedIDs, setSelectedIDs] = useState(claimedIDs);
 
-  const generatorGroups = useSelector(selectGeneratorsByAllegiance);
-  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
-
-  const [selected, setSelected] = useState(claimedGeneratorIds);
-
-  const onClick = () => dispatch(generatorsClaimed(selected));
+  const handleClaimClick = () => {
+    setClaimedIDs(selectedIDs);
+  };
 
   return (
-    <Dialog open={claimedGeneratorIds.length === 0} aria-labelledby="session-dialog-title">
+    <Dialog open={claimedIDs.length === 0} aria-labelledby="session-dialog-title">
       <DialogTitle id="session-dialog-title">Claim Models</DialogTitle>
       <DialogContent>
         <div className="session-dialog__generators">
@@ -26,14 +25,14 @@ export function SessionDialog() {
               key={key}
               groupKey={key as TokenAllegiance}
               generators={generatorGroups[key as TokenAllegiance]}
-              selected={selected}
-              setSelected={setSelected}
+              selected={selectedIDs}
+              setSelected={setSelectedIDs}
             />
           ))}
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClick} color="primary">
+        <Button onClick={handleClaimClick} color="primary">
           Claim
         </Button>
       </DialogActions>

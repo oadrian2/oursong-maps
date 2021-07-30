@@ -1,13 +1,12 @@
 import styled from '@emotion/styled';
 import React, { forwardRef, ReactNode, useImperativeHandle, useRef, useState } from 'react';
 import { XYCoord } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../app/store';
-import { selectSelectedTokenId, tokenDeselected } from '../map/selectionSlice';
-import { selectTokenById } from '../map/tokenSlice';
-import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
+import { useDispatch } from 'react-redux';
+import { useRecoilState } from 'recoil';
+import { selectedTokenIdState } from '../map/State';
 import { Rulers } from './Rulers';
-import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed, requestUpdateRemoteRuler } from './rulerSlice';
+import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed } from './rulerSlice';
+import { useRuler } from './userRuler';
 
 function clientCoordinatesToMapCoordinates(element: HTMLElement, position: XYCoord) {
   const { x: clientX, y: clientY } = position;
@@ -17,7 +16,9 @@ function clientCoordinatesToMapCoordinates(element: HTMLElement, position: XYCoo
   return { x: clientX - containerLeft + scrollLeft, y: clientY - containerTop + scrollTop };
 }
 
-export const RulerOverlay = forwardRef(({ children }: RulerOverlayProps, ref) => {
+export type RulerOverlayHandle = { clientCoordinatesToMapCoordinates: (position: XYCoord) => XYCoord };
+
+export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({ children }: RulerOverlayProps, ref) => {
   const dispatch = useDispatch();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,10 +26,9 @@ export const RulerOverlay = forwardRef(({ children }: RulerOverlayProps, ref) =>
   const [measuring, setMeasuring] = useState(false);
   const [moving, setMoving] = useState(false);
 
-  // const { origin, points } = useSelector(selectOwnRuler);
-  const activeTokenId = useSelector(selectSelectedTokenId);
-  const { generator: activeGenerator } = useSelector((state: RootState) => selectTokenById(state, activeTokenId!)) || {};
-  const claimedGenerators = useSelector(selectClaimedGeneratorIds);
+  const [selectedTokenId, setSelectedTokenId] = useRecoilState(selectedTokenIdState);
+
+  const [, { start, stop, moveTo, pushWaypoint, popWaypoint }] = useRuler();
 
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }: XYCoord) => clientCoordinatesToMapCoordinates(containerRef.current!, { x, y }),
@@ -41,14 +41,15 @@ export const RulerOverlay = forwardRef(({ children }: RulerOverlayProps, ref) =>
 
     setMeasuring(true);
 
-    if (!!activeTokenId && claimedGenerators.includes(activeGenerator!)) {
+    if (!!selectedTokenId) {
       setMoving(true);
     }
 
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
+    start(position);
+
     dispatch(pathStarted(position));
-    dispatch(requestUpdateRemoteRuler());
   }
 
   function onMouseUp() {
@@ -58,11 +59,12 @@ export const RulerOverlay = forwardRef(({ children }: RulerOverlayProps, ref) =>
     setMoving(false);
 
     if (moving) {
-      dispatch(pathCompleted());
+      dispatch(pathCompleted(selectedTokenId));
     }
 
+    stop();
+
     dispatch(pathStopped());
-    dispatch(requestUpdateRemoteRuler());
   }
 
   function onMouseMove(event: React.MouseEvent) {
@@ -70,25 +72,33 @@ export const RulerOverlay = forwardRef(({ children }: RulerOverlayProps, ref) =>
 
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
+    moveTo(position);
+
     dispatch(movedTo(position));
-    dispatch(requestUpdateRemoteRuler());
   }
 
   function onKeyUp(event: React.KeyboardEvent) {
     if (event.code === 'Escape') {
-      dispatch(tokenDeselected(null));
+      setSelectedTokenId(null);
 
       if (!measuring) return;
 
       setMeasuring(false);
       setMoving(false);
 
+      stop();
       dispatch(pathStopped());
-      dispatch(requestUpdateRemoteRuler());
     }
 
-    if (event.code === 'KeyW') dispatch(pointPushed());
-    if (event.code === 'KeyQ') dispatch(pointPopped());
+    if (event.code === 'KeyW') {
+      pushWaypoint();
+      dispatch(pointPushed());
+    }
+
+    if (event.code === 'KeyQ') {
+      popWaypoint();
+      dispatch(pointPopped());
+    }
   }
 
   return (

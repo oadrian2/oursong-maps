@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { useSelector } from 'react-redux';
-import { RootState } from '../app/store';
+import { useRecoilValue } from 'recoil';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { ItemTypes } from '../ItemTypes';
-import { selectGeneratorById } from './generatorsSlice';
+import { generatorState } from '../map/State';
 
 export function Generator({ id }: GeneratorProps) {
-  const { shapeType, shape } = useSelector((state: RootState) => selectGeneratorById(state, id)!);
+  const generator = useRecoilValue(generatorState(id))!;
 
   const [, drag, preview] = useDrag({
     item: { type: ItemTypes.GENERATOR, id },
@@ -20,10 +19,12 @@ export function Generator({ id }: GeneratorProps) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  return {
-    figure: <FigureToken ref={drag} isTemplate={true} {...shape} index={0} />,
-    marker: <MarkerToken ref={drag} isTemplate={true} {...shape} effectRadius={0} />,
-  }[shapeType];
+  return (
+    <>
+      {generator.shapeType === 'figure' && <FigureToken ref={drag} isTemplate={true} {...generator.shape} index={0} />}
+      {generator.shapeType === 'marker' && <MarkerToken ref={drag} isTemplate={true} {...generator.shape} effectRadius={0} />}
+    </>
+  );
 }
 
-type GeneratorProps = { id: string | number };
+type GeneratorProps = { id: string };

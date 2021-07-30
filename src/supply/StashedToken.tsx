@@ -2,35 +2,33 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
-import { FigureToken } from '../doodads/FigureToken';
-import { MarkerToken } from '../doodads/MarkerToken';
-import { ItemTypes } from '../ItemTypes';
-import { selectClaimedGeneratorIds, selectGeneratorById } from './generatorsSlice';
-import { selectIndexWithinGroup, selectTokenById, TokenID } from '../map/tokenSlice';
+import { useRecoilValue } from 'recoil';
 import { RootState } from '../app/store';
+import { FigureToken } from '../doodads/FigureToken';
+import { ItemTypes } from '../ItemTypes';
+import { generatorState, isControlledGeneratorState, isFigureGenerator } from '../map/State';
+import { selectIndexWithinGroup, selectTokenById, TokenID } from '../map/tokenSlice';
 
 export function StashedToken({ id }: StashTokenProps) {
-  const { generator } = useSelector((state: RootState) => selectTokenById(state, id)!);
+  const { generator: generatorId } = useSelector((state: RootState) => selectTokenById(state, id)!);
+  const generator = useRecoilValue(generatorState(generatorId))!;
 
-  const { shapeType, shape } = useSelector((state: RootState) => selectGeneratorById(state, generator)!);
+  const index = useSelector((state: RootState) => selectIndexWithinGroup(state, { id, generator: generatorId }));
 
-  const index = useSelector((state: RootState) => selectIndexWithinGroup(state, { id, generator: generator }));
-
-  const claimedGeneratorIds = useSelector(selectClaimedGeneratorIds);
+  const isClaimed = useRecoilValue(isControlledGeneratorState(generatorId));
 
   const [, drag, preview] = useDrag({
     item: { type: ItemTypes.STASHED_TOKEN, id },
-    canDrag: () => claimedGeneratorIds.includes(generator),
+    canDrag: () => isClaimed,
   });
 
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  return {
-    figure: <FigureToken ref={drag} {...shape} index={index} />,
-    marker: <MarkerToken ref={drag} {...shape} />,
-  }[shapeType];
+  if (isFigureGenerator(generator)) return <FigureToken ref={drag} {...generator.shape} index={index} />;
+
+  return null;
 }
 
 type StashTokenProps = { id: TokenID };

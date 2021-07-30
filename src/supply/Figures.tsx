@@ -1,9 +1,9 @@
-import { useSelector } from 'react-redux';
+import { useRecoilValue } from 'recoil';
+import { claimedFigureGeneratorListState } from '../map/State';
 import { Generator } from './Generator';
-import { selectClaimedGeneratorIds } from './generatorsSlice';
 
 export function Figures() {
-  const claimedGenereratorIds = useSelector(selectClaimedGeneratorIds);
+  const claimedGenereratorIds = useRecoilValue(claimedFigureGeneratorListState);
 
   return (
     <div className="token-container">

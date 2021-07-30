@@ -1,11 +1,11 @@
 // import { PublicClientApplication } from '@azure/msal-browser';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { HubConnection } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
+import { api } from '../api/ws';
 import map from '../map/mapSlice';
+import selection from '../map/selectionSlice';
 import tokens from '../map/tokenSlice';
 import ruler from '../ruler/rulerSlice';
-import generators from '../supply/generatorsSlice';
-import selection from '../map/selectionSlice';
 import { addListeners, signalRMiddleware } from './addListeners';
 
 // async function login() {
@@ -35,14 +35,10 @@ import { addListeners, signalRMiddleware } from './addListeners';
 //   return result.accessToken;
 // }
 
-const connection = new HubConnectionBuilder()
-  .withUrl(process.env.REACT_APP_HUB_URL!)
-  .withAutomaticReconnect()
-  .configureLogging(LogLevel.Debug)
-  .build();
+const connection = api.connection;
 
 const store = configureStore({
-  reducer: { ruler, generators, tokens, map, selection },
+  reducer: { ruler, tokens, map, selection },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
@@ -51,7 +47,7 @@ const store = configureStore({
     }).concat(signalRMiddleware(connection)),
 });
 
-addListeners(connection, store);
+addListeners(api, store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

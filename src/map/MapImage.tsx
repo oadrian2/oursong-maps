@@ -1,23 +1,22 @@
-/** @jsxImportSource @emotion/react */
 import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { useRecoilValue } from 'recoil';
-import { tokenDeselected } from './selectionSlice';
-import { mapImage } from './State';
+import { mapImageState } from './State';
 
-export function MapImage() {
-  const dispatch = useDispatch();
-
-  const onClick = useCallback(
+export function MapImage({ onClick = () => {} }: MapImageProps) {
+  const handleClick = useCallback(
     (event) => {
       if (event.button === 2) return;
 
-      dispatch(tokenDeselected(null));
+      onClick(event);
     },
-    [dispatch]
+    [onClick]
   );
 
-  const { src, width } = useRecoilValue(mapImage);
+  const { src, width } = useRecoilValue(mapImageState);
 
-  return <img draggable="false" style={{ width }} src={src} alt="the map" onClick={onClick} />;
+  return <img draggable="false" style={{ width }} src={src} alt="the map" onClick={handleClick} />;
+}
+
+export interface MapImageProps {
+  onClick?: React.MouseEventHandler;
 }

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import { useTitle } from 'react-use';
 import { useRecoilValue } from 'recoil';
-import { mapTitle } from '../map/State';
+import { mapTitleState } from '../map/State';
 
 export function Header() {
-  const title = useRecoilValue(mapTitle);
+  const title = useRecoilValue(mapTitleState);
 
   useTitle(`OurSong Maps - ${title}`);
 

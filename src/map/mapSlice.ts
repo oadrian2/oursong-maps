@@ -1,5 +1,5 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { AppDispatch, Invoke, RootState } from '../app/store';
+import { RootState } from '../app/store';
 
 interface Map {
   id?: string;
@@ -10,6 +10,7 @@ interface Map {
   gameDate?: Date;
   connected: boolean;
   loaded: boolean;
+  connectionId?: string;
 }
 
 const slice = createSlice({
@@ -33,8 +34,9 @@ const slice = createSlice({
     connecting: (state) => {
       state.connected = false;
     },
-    connected: (state) => {
+    connected: (state, action) => {
       state.connected = true;
+      state.connectionId = action.payload;
     },
   },
 });
@@ -50,11 +52,3 @@ export const selectMapId = createSelector(selectMap, ({ game, id }) => ({ game, 
 export const selectConnected = createSelector(selectMap, ({ connected }) => connected);
 
 export const selectLoaded = createSelector(selectMap, ({ loaded }) => loaded);
-
-export const joinMapRequested = (game: string, id: string) => (dispatch: AppDispatch, getState: () => RootState, invoke: Invoke) => {
-  invoke('joinMap', game, id);
-};
-
-export const leaveMapRequested = (game: string, id: string) => (dispatch: AppDispatch, getState: () => RootState, invoke: Invoke) => {
-  invoke('leaveMap', game, id);
-};

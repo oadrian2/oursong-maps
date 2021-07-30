@@ -3,28 +3,32 @@ import { forwardRef } from 'react';
 
 const CELL_SIZE = 48.0;
 
-export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(({ color, effectRadius = 0, label, isTemplate = false }, ref) => {
-  const hue = {
-    red: 0,
-    green: 120,
-    blue: 240,
-  }[color];
-  const radius = CELL_SIZE * effectRadius;
+export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(
+  ({ color = 'green', effectRadius = 0, label, isTemplate = false }, ref) => {
+    const hue = {
+      red: 0,
+      green: 120,
+      blue: 240,
+      yellow: 120,
+    }[color];
 
-  return (
-    <MarkerTokenShape ref={ref} title={label} hue={hue} radius={radius}>
-      {!!radius && <MarkerTokenAura />}
-      <MarkerTokenPlacemat />
-      <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={label} />
-    </MarkerTokenShape>
-  );
-});
+    const radius = CELL_SIZE * effectRadius;
+
+    return (
+      <MarkerTokenShape ref={ref} title={label} hue={hue} radius={radius}>
+        {!!radius && <MarkerTokenAura />}
+        <MarkerTokenPlacemat />
+        <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={label} />
+      </MarkerTokenShape>
+    );
+  }
+);
 
 MarkerToken.displayName = 'MarkerToken';
 
-export type MarkerColor = 'red' | 'green' | 'blue';
+export type MarkerColor = 'red' | 'green' | 'blue' | 'yellow';
 
-export type MarkerTokenProps = { color: MarkerColor; effectRadius?: number; label: string; isTemplate?: boolean };
+export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; label: string; isTemplate?: boolean };
 
 export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
   display: flex;

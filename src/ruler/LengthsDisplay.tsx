@@ -1,16 +1,38 @@
-import { SpokePositioned, MeasurementCircle } from './Rulers';
+import styled from '@emotion/styled';
 
-export function LengthsDisplay({ scaledX, scaledY, lastLength, totalLength }: LengthsDisplayProps) {
+export function LengthsDisplay({ lastLength, totalLength }: LengthsDisplayProps) {
   return (
-    <SpokePositioned scaledX={scaledX} scaledY={scaledY}>
-      <MeasurementCircle>
-        <strong>C:</strong>
-        <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-        <strong>T:</strong>
-        <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
-      </MeasurementCircle>
-    </SpokePositioned>
+    <MeasurementCircle>
+      <strong>C:</strong>
+      <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
+      <strong>T:</strong>
+      <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
+    </MeasurementCircle>
   );
 }
 
-export type LengthsDisplayProps = { scaledX: string; scaledY: string; lastLength: number; totalLength: number };
+export type LengthsDisplayProps = { lastLength: number; totalLength: number };
+
+export const MeasurementCircle = styled.div`
+  transform: translate(-50%, -50%);
+
+  display: grid;
+  grid-template: auto / auto auto;
+  justify-content: space-between;
+  align-content: center;
+  gap: 4px;
+
+  background: #eeeeee80;
+  font-weight: 500;
+
+  border: 2px solid black;
+  border-radius: 50%;
+  padding: 1.25rem;
+  height: 8em;
+  width: 8rem;
+
+  text-shadow: 0px 0px 4px #fff;
+  backdrop-filter: blur(4px);
+`;
+
+MeasurementCircle.displayName = 'MeasurementCircle';

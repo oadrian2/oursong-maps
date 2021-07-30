@@ -1,30 +1,31 @@
 import styled from '@emotion/styled';
 import { Switch } from '@material-ui/core';
 import { nanoid } from '@reduxjs/toolkit';
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useDispatch } from 'react-redux';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { ItemTypes } from '../ItemTypes';
-import { RulerOverlay } from '../ruler/RulerOverlay';
+import { RulerOverlay, RulerOverlayHandle } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
-import { viewInactiveState } from './State';
+import { selectedTokenIdState, viewInactiveState } from './State';
 import { TokenLayer } from './TokenLayer';
 import { tokenPlacementRequested, unstashTokenToRequested } from './tokenSlice';
 
 export function MapLayer() {
   const dispatch = useDispatch();
 
-  const ref = useRef<any>();
+  const ref = useRef<RulerOverlayHandle>(null);
 
   const [viewInactive, setViewInactive] = useRecoilState(viewInactiveState);
+  const setSelectedTokenId = useSetRecoilState(selectedTokenIdState);
 
   const [, drop] = useDrop({
     accept: [ItemTypes.GENERATOR, ItemTypes.STASHED_TOKEN],
     drop: (item: { id: string; type: string }, monitor) => {
       const { id, type } = item;
 
-      const position = ref.current?.clientCoordinatesToMapCoordinates(monitor.getSourceClientOffset());
+      const position = ref.current!.clientCoordinatesToMapCoordinates(monitor.getSourceClientOffset()!);
 
       switch (type) {
         case ItemTypes.STASHED_TOKEN:
@@ -38,20 +39,19 @@ export function MapLayer() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setViewInactive(event.target.checked);
-  };
+  const handleViewInactiveChange = (event: React.ChangeEvent<HTMLInputElement>) => setViewInactive(event.target.checked);
+  const handleMapImageClick = useCallback(() => setSelectedTokenId(null), [setSelectedTokenId]);
 
   return (
     <>
       <RulerOverlay ref={ref}>
         <div ref={drop}>
-          <MapImage />
+          <MapImage onClick={handleMapImageClick} />
           <TokenLayer />
         </div>
       </RulerOverlay>
       <MapCommandConsole>
-        <Switch checked={viewInactive} onChange={handleChange} />
+        <Switch checked={viewInactive} onChange={handleViewInactiveChange} />
       </MapCommandConsole>
     </>
   );

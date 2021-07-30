@@ -1,8 +1,7 @@
-import { createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit';
-import throttle from 'lodash.throttle';
+import { createEntityAdapter, createSlice } from '@reduxjs/toolkit';
 import { Point } from '../app/math';
 import { RootState } from '../app/store';
-import { mapLoaded, selectMapId } from '../map/mapSlice';
+import { mapLoaded } from '../map/mapSlice';
 import { moveTokenToRequested } from '../map/tokenSlice';
 
 interface Ruler {
@@ -13,9 +12,7 @@ interface Ruler {
 
 const adapter = createEntityAdapter<Ruler>();
 
-const self = nanoid();
-
-const initialState = adapter.getInitialState({ self, suggestedOrigin: null });
+const initialState = adapter.getInitialState({ self: 'should not see', suggestedOrigin: null });
 
 const slice = createSlice({
   name: 'ruler',
@@ -58,138 +55,29 @@ const slice = createSlice({
 
       self.points.pop();
     },
-    updateRemoteRuler: (state, action) => {
-      const { id, origin, points } = action.payload;
-
-      if (id === state.self) return; // We don't update our own ruler via this call.
-
-      adapter.upsertOne(state, { id, origin, points });
-    },
     originSuggested: (state, action) => {
       state.suggestedOrigin = action.payload;
+    },
+    setSelf: (state, action) => {
+      state.self = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(mapLoaded.type, (state) => {
-      adapter.setAll(state, [{ id: self, origin: null, points: [] }]);
+      adapter.setAll(state, [{ id: state.self, origin: null, points: [] }]);
     });
   },
 });
 
-export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped, originSuggested, updateRemoteRuler } = slice.actions;
+export const { pathStarted, pathStopped, movedTo, pointPushed, pointPopped, originSuggested, setSelf } = slice.actions;
 
 export default slice.reducer;
 
-export const { selectAll: selectAllRulers } = adapter.getSelectors((state: RootState) => state.ruler);
-
-const requestUpdateRemoteRulerThrottled = throttle((dispatch, getState, invoke) => {
-  const mapId = selectMapId(getState());
-  const selfRuler = selectOwnRuler(getState());
-
-  invoke('updateRuler', mapId, selfRuler, new Date());
-}, 200);
-
-export const requestUpdateRemoteRuler = () => requestUpdateRemoteRulerThrottled;
-
-export const selectOwnRuler = createSelector(
-  (state: RootState) => state.ruler.entities[state.ruler.self],
-  (self) => self!
-);
-
-export const selectOwnRulerPath = createSelector(
-  selectOwnRuler,
-  ({ origin, points }: Ruler) => origin && `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`
-);
-
-export const selectShowRuler = createSelector(selectOwnRuler, (self) => !!self.origin);
-
-type Vector = { start: Point; end: Point; hypot: number; scaledX: string; scaledY: string };
-
-type PathData = {
-  vectors: Vector[];
-  lastPoint: Point;
-  lastLength: number;
-  totalLength: number;
-  lastAngle: number;
-  scaledX: string;
-  scaledY: string;
-};
-
-export type RulerData = {
-  id?: string;
-  path: string;
-  origin: Point;
-  radius: number;
-  isSingle: boolean;
-  lastPoint: Point;
-  lastAngle: number;
-  lastLength: number;
-  totalLength: number;
-  scaledX: string,
-  scaledY: string,
-}
-
-function getRuler({ id, origin, points }: Ruler): RulerData {
-  if (!origin) throw Error(`Parameter 'origin' is required.`);
-
-  const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
-
-  const { vectors, lastPoint, lastLength, lastAngle, totalLength, scaledX, scaledY } = points.reduce(
-    ({ vectors, lastPoint: start, totalLength }: PathData, end: Point) => {
-      const width = end.x - start.x;
-      const height = end.y - start.y;
-      const hypot = Math.hypot(width, height);
-      const scaledX = toPercent(width / hypot);
-      const scaledY = toPercent(height / hypot);
-      const angle = Math.atan2(width, height);
-
-      return {
-        vectors: [...vectors, { start, end, hypot, scaledX, scaledY }],
-        lastPoint: end, // Ending of prior vector becomes start of next one.
-        lastLength: hypot,
-        lastAngle: angle,
-        totalLength: totalLength + hypot,
-        scaledX,
-        scaledY,
-      };
-    },
-    {
-      vectors: [],
-      lastPoint: origin,
-      totalLength: 0.0,
-    } as unknown as PathData
-  ) as PathData;
-
-  const isSingle = vectors.length === 1;
-
-  const [{ hypot: radius }] = vectors;
-
-  return {
-    id,
-    path,
-    origin,
-    radius,
-    isSingle,
-    lastPoint,
-    lastAngle,
-    lastLength: lastLength / 48.0,
-    totalLength: totalLength / 48.0,
-    scaledX,
-    scaledY,
-  };
-}
-
-export const selectRulerMetrics = createSelector(selectAllRulers, (rulers) => {
-  return rulers.filter(({ origin }: Ruler) => origin !== null).map(getRuler);
-});
-
-export const pathCompleted = () => (dispatch: any, getState: () => RootState) => {
+export const pathCompleted = (moving: string | null) => (dispatch: any, getState: () => RootState) => {
   const state = getState();
 
-  const moving = state.selection.selected;
-
   if (moving) {
-    const self: Ruler = selectOwnRuler(state);
+    const self: Ruler = state.ruler.entities[state.ruler.self]!;
     const path: Point[] = [self.origin!, ...self.points];
     const { x: startX, y: startY } = path[path.length - 2];
     const { x: endX, y: endY } = path[path.length - 1];
@@ -197,5 +85,3 @@ export const pathCompleted = () => (dispatch: any, getState: () => RootState) =>
     dispatch(moveTokenToRequested({ id: moving, position: { x: endX, y: endY }, facing: Math.atan2(endY - startY, endX - startX), path }));
   }
 };
-
-const toPercent = (number: number) => (number * 100).toFixed(4) + '%';

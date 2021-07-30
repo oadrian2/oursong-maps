@@ -1,16 +1,13 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useCallback, useEffect } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { Point } from '../app/math';
-import { RootState } from '../app/store';
-import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
 import { PlacedToken } from './PlacedToken';
-import { selectFocusedTokenId, selectSelectedTokenId, tokenSelected } from './selectionSlice';
+import { activeTokenIDsState, isControlledGeneratorState, selectedTokenIdState, tokenState } from './State';
 import { TokenMenu } from './TokenMenu';
-import { selectActiveTokens, selectTokenById } from './tokenSlice';
 
 export function TokenLayer() {
-  const tokens = useSelector(selectActiveTokens, shallowEqual);
+  const tokenIDs = useRecoilValue(activeTokenIDsState);
 
   const variants = {
     visible: { opacity: 1 },
@@ -19,7 +16,7 @@ export function TokenLayer() {
 
   return (
     <AnimatePresence>
-      {tokens.map(({ id }) => (
+      {tokenIDs.map((id) => (
         <motion.div key={id} variants={variants} initial="hidden" animate="visible" exit="hidden">
           <AnimatedPlacedToken id={id} />
         </motion.div>
@@ -29,18 +26,12 @@ export function TokenLayer() {
 }
 
 function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
-  const dispatch = useDispatch();
+  const [selectedTokenId, setSelectedTokenId] = useRecoilState(selectedTokenIdState);
 
-  const { position, path: targetPath, generator } = useSelector((state: RootState) => selectTokenById(state, id))!;
+  const { position, path: targetPath, generator } = useRecoilValue(tokenState(id))!;
 
-  const focusedId = useSelector(selectFocusedTokenId);
-  const selectedId = useSelector(selectSelectedTokenId);
-
-  const claimed = useSelector(selectClaimedGeneratorIds);
-
-  const isClaimed = claimed.includes(generator);
-  const isSelected = selectedId === id;
-  const isFocused = focusedId === id;
+  const isClaimed = useRecoilValue(isControlledGeneratorState(generator));
+  const isSelected = selectedTokenId === id;
 
   const controls = useAnimation();
 
@@ -52,19 +43,16 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
     const xCoords = segments.map(({ x }: Point) => x);
     const yCoords = segments.map(({ y }: Point) => y);
 
-    controls.start({
-      left: xCoords,
-      top: yCoords,
-    });
+    controls.start({ left: xCoords, top: yCoords });
 
     // return () => controls.stop();
   }, [targetPath, position, controls]);
 
-  const onClick = useCallback(() => {
+  const handleTokenClick = useCallback(() => {
     if (!isClaimed) return;
 
-    dispatch(tokenSelected(id));
-  }, [dispatch, id, isClaimed]);
+    setSelectedTokenId(id);
+  }, [setSelectedTokenId, id, isClaimed]);
 
   return (
     <motion.div
@@ -72,10 +60,10 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
       style={{
         position: 'absolute',
         transform: 'translate(-50%, -50%)',
-        zIndex: isFocused || isSelected ? 100 : undefined,
+        zIndex: isSelected ? 100 : undefined,
       }}
     >
-      <PlacedToken id={id} onClick={onClick} />
+      <PlacedToken id={id} onClick={handleTokenClick} />
       <AnimatePresence>{isSelected && <TokenMenu id={id} />}</AnimatePresence>
     </motion.div>
   );

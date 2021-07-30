@@ -1,8 +1,7 @@
 import { createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { Point } from '../app/math';
 import { AppDispatch, Invoke, RootState } from '../app/store';
-import { originSuggested, pathStarted, pathStopped } from '../ruler/rulerSlice';
-import { selectClaimedGeneratorIds } from '../supply/generatorsSlice';
+import { pathStarted, pathStopped } from '../ruler/rulerSlice';
 import { selectMapId } from './mapSlice';
 
 export enum TokenAllegiance {
@@ -152,44 +151,13 @@ export const trashTokenRequested =
     invoke('updateToken', mapId, { id, deleted: true });
   };
 
-export const tokenEntered = (id: TokenID) => (dispatch: AppDispatch, getState: () => RootState, invoke: Invoke) => {
-  const { position } = selectTokenById(getState(), id)!;
-
-  dispatch(tokenActivated(id));
-  dispatch(originSuggested(position));
-};
-
-export const tokenLeft = (id: TokenID) => (dispatch: AppDispatch, getState: () => RootState, invoke: Invoke) => {
-  dispatch(tokenDeactivated());
-  dispatch(originSuggested(null));
-};
-
 export default slice.reducer;
 
-export const {
-  selectAll: selectAllTokens,
-  selectById: selectTokenById,
-  selectIds: selectTokenIds,
-} = adapter.getSelectors((state: RootState) => state.tokens);
+export const { selectAll: selectAllTokens, selectById: selectTokenById } = adapter.getSelectors((state: RootState) => state.tokens);
 
 export const selectStashedTokens = createSelector(selectAllTokens, (tokens) => tokens.filter((t) => !t.position && !t.deleted));
-
-export const selectActiveTokens = createSelector(selectAllTokens, selectClaimedGeneratorIds, (tokens, generators) =>
-  tokens.filter(
-    ({ position, visible = true, deleted = false, generator }) => visible || (generators.includes(generator) && !!position && !deleted)
-  )
-);
 
 export const selectIndexWithinGroup = createSelector(
   [selectAllTokens, (state: RootState, { id, generator }: { id: TokenID; generator: string }) => ({ id, generator })],
   (tokens, { id, generator }) => tokens.filter((t) => t.generator === generator).findIndex((t) => t.id === id)
-);
-
-export const selectPositions = createSelector(selectAllTokens, (tokens) => tokens.map(({ id, position }) => ({ id, position })));
-
-export const selectMapBaseSize = (state: RootState) => state.tokens.baseSize;
-
-export const selectMenuTokenId = createSelector(
-  [(state: RootState) => state.tokens.active, (state: RootState) => !!state.tokens.moving],
-  (active: TokenID | null, moving: boolean) => !moving && active
 );

@@ -1,47 +1,46 @@
-import { FigureToken } from '../doodads/FigureToken';
-import { Generator } from '../supply/Generator';
+import { Box } from '@material-ui/core';
+import { ReactNode } from 'react';
+import { ColorKey, TokenBase } from '../doodads/TokenBase';
+import { GeneratorID } from '../map/State';
 import { TokenAllegiance } from '../map/tokenSlice';
+import { Generator } from '../supply/Generator';
 
 export function GeneratorGroup({ groupKey, generators, selected, setSelected }: GeneratorGroupProps) {
   const allSelected = generators.every((id: string) => selected.includes(id));
 
   const selectedSet = new Set(selected);
 
-  const onAllSelect = function (isSelected: boolean) {
+  const onSelect = function (generators: GeneratorID[], isSelected: boolean) {
     if (isSelected) {
       generators.forEach((g: string) => selectedSet.add(g));
     } else {
       generators.forEach((g: string) => selectedSet.delete(g));
     }
 
-    setSelected(Array.from(selectedSet.values()));
-  };
-
-  const onOneSelect = function (isSelected: boolean, key: string) {
-    if (isSelected) {
-      selectedSet.add(key);
-    } else {
-      selectedSet.delete(key);
-    }
-
     setSelected(Array.from(selectedSet));
   };
 
   return (
-    <div className="generators__group">
-      <div className={`generators__select-all ${allSelected ? 'selected' : ''}`} onClick={() => onAllSelect(!allSelected)}>
-        <FigureToken prefix="All" label="All" allegiance={groupKey} index={0} isGroup={false} overlay={null} isTemplate />
-      </div>
-      {generators.map((id: string) => {
-        const oneSelected = selected.includes(id);
+    <Box display="flex">
+      <Box mr={1}>
+        <ToggleRing selected={allSelected} onChange={(value: boolean) => onSelect(generators, value)}>
+          <TokenBase title="All" color={toColor(groupKey)}>
+            All
+          </TokenBase>
+        </ToggleRing>
+      </Box>
+      <Box display="flex" flexWrap="wrap">
+        {generators.map((id: string) => {
+          const oneSelected = selected.includes(id);
 
-        return (
-          <div key={id} className={`generators__select-one ${oneSelected ? 'selected' : ''}`} onClick={() => onOneSelect(!oneSelected, id)}>
-            <Generator id={id} />
-          </div>
-        );
-      })}
-    </div>
+          return (
+            <ToggleRing key={id} selected={oneSelected} onChange={(value: boolean) => onSelect([id], value)}>
+              <Generator id={id} />
+            </ToggleRing>
+          );
+        })}
+      </Box>
+    </Box>
   );
 }
 
@@ -51,3 +50,26 @@ type GeneratorGroupProps = {
   selected: string[];
   setSelected: (items: string[]) => void;
 };
+
+export function ToggleRing({ children, selected, onChange }: ToggleRingProps) {
+  return (
+    <div className={`generators__select-one ${selected ? 'selected' : ''}`} onClick={() => onChange(!selected)}>
+      {children}
+    </div>
+  );
+}
+
+export type ToggleRingProps = {
+  children: ReactNode;
+  selected: boolean;
+  onChange: (value: boolean) => void;
+};
+
+function toColor(allegiance: TokenAllegiance): ColorKey {
+  return {
+    [TokenAllegiance.Enemy]: 'red',
+    [TokenAllegiance.Ally]: 'blue',
+    [TokenAllegiance.Target]: 'yellow',
+    [TokenAllegiance.Unknown]: 'green',
+  }[allegiance] as ColorKey;
+}
