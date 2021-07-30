@@ -38,8 +38,8 @@ export function Rulers({ isMoving }) {
 }
 
 export function ArcCircle({ origin, lastPoint, radius }) {
-  const negPosition = offsetAngle(origin, lastPoint, degToRad(-15));
-  const posPosition = offsetAngle(origin, lastPoint, degToRad(+15));
+  const negPosition = offsetAngle(origin, lastPoint, degToRad(-10));
+  const posPosition = offsetAngle(origin, lastPoint, degToRad(+10));
 
   const sprayShape = `M ${negPosition.x} ${negPosition.y} A ${radius} ${radius} 0 0 1 ${posPosition.x} ${posPosition.y} L ${origin.x} ${origin.y} Z`;
 
