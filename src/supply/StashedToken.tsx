@@ -3,10 +3,10 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useSelector } from 'react-redux';
 import { useRecoilValue } from 'recoil';
+import { generatorState, isControlledGeneratorState, isFigureGenerator } from '../app/mapState';
 import { RootState } from '../app/store';
 import { FigureToken } from '../doodads/FigureToken';
 import { ItemTypes } from '../ItemTypes';
-import { generatorState, isControlledGeneratorState, isFigureGenerator } from '../map/State';
 import { selectIndexWithinGroup, selectTokenById, TokenID } from '../map/tokenSlice';
 
 export function StashedToken({ id }: StashTokenProps) {

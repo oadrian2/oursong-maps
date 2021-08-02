@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
-import { mapImageState } from './State';
+import { mapImageState } from '../app/mapState';
 
 export function MapImage({ onClick = () => {} }: MapImageProps) {
   const handleClick = useCallback(

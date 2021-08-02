@@ -1,19 +1,16 @@
 import { useRecoilValue } from 'recoil';
-import { selectedTokenIdState, userListState } from '../map/State';
+import { userListState } from '../app/userState';
 import { Measurement } from './Measurement';
 import './Rulers.css';
 
-export const Rulers = ({ isMoving }: RulersProps) => {
-  const selectedTokenId = useRecoilValue(selectedTokenIdState);
+export const Rulers = () => {
   const userList = useRecoilValue(userListState);
 
   return (
     <>
       {userList.map((id) => (
-        <Measurement key={id} id={id} isMoving={isMoving} selectedTokenId={selectedTokenId} />
+        <Measurement key={id} id={id} />
       ))}
     </>
   );
 };
-
-type RulersProps = { isMoving: boolean };

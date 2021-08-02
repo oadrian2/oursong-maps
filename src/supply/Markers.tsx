@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import { markerGeneratorListState } from '../map/State';
+import { markerGeneratorListState } from '../app/mapState';
 import { Generator } from './Generator';
 
 export function Markers() {

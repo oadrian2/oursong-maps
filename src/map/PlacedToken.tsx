@@ -1,18 +1,19 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { generatorState } from '../app/mapState';
 import {
   centerToCenterCellDistance,
   centerToCenterNormalizedCellDistance,
   edgeToEdgeCellDistance,
   Placement,
-  tokenConnection,
+  tokenConnection
 } from '../app/math';
+import { MeasurementStrategy } from '../app/state';
 import { RootState } from '../app/store';
+import { fullTokenState, hoveredTokenIdState } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
-import { MeasurementStrategy } from '../ruler/movementSlice';
-import { fullTokenState, generatorState, hoveredTokenIdState } from './State';
 import { TokenFacing } from './TokenFacing';
 import { selectIndexWithinGroup, TokenID } from './tokenSlice';
 

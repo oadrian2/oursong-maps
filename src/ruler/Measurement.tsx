@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import { useRecoilValue } from 'recoil';
 import { Point } from '../app/math';
 import { PlacedToken } from '../map/PlacedToken';
-import { Ruler, rulerState } from '../map/State';
+import { Ruler, rulerState } from "../app/rulerState";
 import { ArcCircle } from './ArcCircle';
 import { LengthsDisplay } from './LengthsDisplay';
 
-export const Measurement = ({ id, isMoving, selectedTokenId }: MeasurementProps) => {
+export const Measurement = ({ id }: MeasurementProps) => {
   const ruler = useRecoilValue(rulerState(id));
 
   if (ruler.origin === null) return null;
@@ -29,9 +29,9 @@ export const Measurement = ({ id, isMoving, selectedTokenId }: MeasurementProps)
         <SpokePositioned scaledX={scaledX} scaledY={scaledY}>
           <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
         </SpokePositioned>
-        {isMoving && selectedTokenId && (
+        {ruler.attached && (
           <div style={{ position: 'absolute', top: 0, transform: `translate(-50%, -50%)` }}>
-            <PlacedToken id={selectedTokenId} />
+            <PlacedToken id={ruler.attached} />
           </div>
         )}
       </div>
@@ -39,7 +39,7 @@ export const Measurement = ({ id, isMoving, selectedTokenId }: MeasurementProps)
   );
 };
 
-type MeasurementProps = { id: string; isMoving: boolean; selectedTokenId: string | null };
+type MeasurementProps = { id: string };
 
 export const CenterPositioned = styled.div`
   position: absolute;

@@ -1,12 +1,10 @@
 import styled from '@emotion/styled';
 import React, { forwardRef, ReactNode, useImperativeHandle, useRef, useState } from 'react';
 import { XYCoord } from 'react-dnd';
-import { useDispatch } from 'react-redux';
-import { useRecoilState } from 'recoil';
-import { selectedTokenIdState } from '../map/State';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { hoveredTokenIdState, hoveredTokenPositionState, selectedTokenIdState } from '../app/tokenState';
 import { Rulers } from './Rulers';
-import { movedTo, pathCompleted, pathStarted, pathStopped, pointPopped, pointPushed } from './rulerSlice';
-import { useRuler } from './userRuler';
+import { useRuler } from './useRuler';
 
 function clientCoordinatesToMapCoordinates(element: HTMLElement, position: XYCoord) {
   const { x: clientX, y: clientY } = position;
@@ -19,16 +17,15 @@ function clientCoordinatesToMapCoordinates(element: HTMLElement, position: XYCoo
 export type RulerOverlayHandle = { clientCoordinatesToMapCoordinates: (position: XYCoord) => XYCoord };
 
 export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({ children }: RulerOverlayProps, ref) => {
-  const dispatch = useDispatch();
-
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [measuring, setMeasuring] = useState(false);
-  const [moving, setMoving] = useState(false);
 
-  const [selectedTokenId, setSelectedTokenId] = useRecoilState(selectedTokenIdState);
+  const [selectedTokenID, setSelectedTokenID] = useRecoilState(selectedTokenIdState);
+  const hoveredTokenID = useRecoilValue(hoveredTokenIdState);
+  const hoveredPosition = useRecoilValue(hoveredTokenPositionState);
 
-  const [, { start, stop, moveTo, pushWaypoint, popWaypoint }] = useRuler();
+  const [, { start, stop, complete, moveTo, pushWaypoint, popWaypoint }] = useRuler();
 
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }: XYCoord) => clientCoordinatesToMapCoordinates(containerRef.current!, { x, y }),
@@ -41,30 +38,17 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
 
     setMeasuring(true);
 
-    if (!!selectedTokenId) {
-      setMoving(true);
-    }
-
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
-    start(position);
-
-    dispatch(pathStarted(position));
+    start(position, hoveredPosition, selectedTokenID === hoveredTokenID ? hoveredTokenID : null);
   }
 
   function onMouseUp() {
     if (!measuring) return;
 
     setMeasuring(false);
-    setMoving(false);
 
-    if (moving) {
-      dispatch(pathCompleted(selectedTokenId));
-    }
-
-    stop();
-
-    dispatch(pathStopped());
+    complete();
   }
 
   function onMouseMove(event: React.MouseEvent) {
@@ -73,31 +57,25 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
     moveTo(position);
-
-    dispatch(movedTo(position));
   }
 
   function onKeyUp(event: React.KeyboardEvent) {
     if (event.code === 'Escape') {
-      setSelectedTokenId(null);
+      setSelectedTokenID(null);
 
       if (!measuring) return;
 
       setMeasuring(false);
-      setMoving(false);
 
       stop();
-      dispatch(pathStopped());
     }
 
     if (event.code === 'KeyW') {
       pushWaypoint();
-      dispatch(pointPushed());
     }
 
     if (event.code === 'KeyQ') {
       popWaypoint();
-      dispatch(pointPopped());
     }
   }
 
@@ -111,7 +89,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
       tabIndex={0}
     >
       {children}
-      <Rulers isMoving={moving} />
+      <Rulers />
     </RulerOverlayWrapper>
   );
 });

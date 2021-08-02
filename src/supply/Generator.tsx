@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
+import { generatorState } from '../app/mapState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { ItemTypes } from '../ItemTypes';
-import { generatorState } from '../map/State';
 
 export function Generator({ id }: GeneratorProps) {
   const generator = useRecoilValue(generatorState(id))!;

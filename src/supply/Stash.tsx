@@ -1,17 +1,17 @@
-import { useSelector } from 'react-redux';
-import { selectStashedTokens } from '../map/tokenSlice';
+import { useRecoilValue } from 'recoil';
+import { stashedTokenIDsState, TokenID } from '../app/tokenState';
 import { StashedToken } from './StashedToken';
 import './Supply.css';
 
 export function Stash() {
-  const tokens = useSelector(selectStashedTokens);
+  const stashedTokenIDs = useRecoilValue(stashedTokenIDsState);
 
   return (
     <div className="token-container">
-      {tokens.map(({ id }) => (
+      {stashedTokenIDs.map((id: TokenID) => (
         <StashedToken key={id} id={id} />
       ))}
-      {tokens.length === 0 && <div className="token-container-empty-label">Stash</div>}
+      {stashedTokenIDs.length === 0 && <div className="token-container-empty-label">Stash</div>}
     </div>
   );
 }

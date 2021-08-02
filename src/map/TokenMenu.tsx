@@ -6,15 +6,11 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { MouseEvent, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRecoilState } from 'recoil';
-import { RootState } from '../app/store';
+import { useToken } from '../doodads/useToken';
 import { ArcFab } from './ArcFab';
-import { tokenActive } from './State';
-import { selectTokenById, stashTokenRequested, toggleTokenVisibilityRequested, trashTokenRequested } from './tokenSlice';
 
 export function TokenMenu({ id }: TokenMenuProps) {
-  const dispatch = useDispatch();
+  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash }] = useToken(id);
 
   const movePosition = +0.5 * Math.PI;
   const visiblePosition = +0.25 * Math.PI;
@@ -22,18 +18,12 @@ export function TokenMenu({ id }: TokenMenuProps) {
   const trashPosition = -0.75 * Math.PI;
   const activePosition = 0 * Math.PI;
 
-  const { visible = true } = useSelector((state: RootState) => selectTokenById(state, id))!;
-
-  // const [visible, setVisible] = useRecoilState(tokenVisible(id));
-  const [active, setActive] = useRecoilState(tokenActive(id));
-
   const onActiveClick = useCallback(() => setActive(!active), [active, setActive]);
-  const onVisibleClick = useCallback(() => dispatch(toggleTokenVisibilityRequested({ id, visible: !visible })), [dispatch, visible, id]);
-  const onStashClick = useCallback(() => dispatch(stashTokenRequested({ id })), [dispatch, id]);
-  const onTrashClick = useCallback(() => dispatch(trashTokenRequested({ id })), [dispatch, id]);
+  const onVisibleClick = useCallback(() => setVisible(!visible), [visible, setVisible]);
+
   const onMoveClick = useCallback((event: MouseEvent) => {
     console.log(event);
-  }, [])
+  }, []);
 
   return (
     <>
@@ -46,10 +36,10 @@ export function TokenMenu({ id }: TokenMenuProps) {
       <ArcFab angle={movePosition} onClick={onMoveClick}>
         <TrendingUpIcon />
       </ArcFab>
-      <ArcFab angle={stashPosition} onClick={onStashClick}>
+      <ArcFab angle={stashPosition} onClick={stash}>
         <ArchiveIcon />
       </ArcFab>
-      <ArcFab angle={trashPosition} onClick={onTrashClick}>
+      <ArcFab angle={trashPosition} onClick={trash}>
         <DeleteIcon />
       </ArcFab>
     </>

@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import './App.css';
+import { mapId } from './app/mapState';
 import { LoadingMessage } from './layout/LoadingMessage';
 import { MapPage } from './map/MapPage';
-import { mapId } from './map/State';
 
 function App() {
   return (

@@ -1,6 +1,6 @@
 import { Box } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
-import { userIdState } from '../map/State';
+import { userIdState } from "../app/userState";
 
 
 export function ConnectionInfo() {

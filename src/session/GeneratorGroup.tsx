@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
 import { ReactNode } from 'react';
+import { GeneratorID } from '../app/mapState';
 import { ColorKey, TokenBase } from '../doodads/TokenBase';
-import { GeneratorID } from '../map/State';
 import { TokenAllegiance } from '../map/tokenSlice';
 import { Generator } from '../supply/Generator';
 

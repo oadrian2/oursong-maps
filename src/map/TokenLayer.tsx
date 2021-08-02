@@ -1,9 +1,10 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { isControlledGeneratorState } from '../app/mapState';
 import { Point } from '../app/math';
+import { activeTokenIDsState, selectedTokenIdState, tokenState } from "../app/tokenState";
 import { PlacedToken } from './PlacedToken';
-import { activeTokenIDsState, isControlledGeneratorState, selectedTokenIdState, tokenState } from './State';
 import { TokenMenu } from './TokenMenu';
 
 export function TokenLayer() {

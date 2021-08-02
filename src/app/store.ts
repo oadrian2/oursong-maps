@@ -3,9 +3,7 @@ import { HubConnection } from '@microsoft/signalr';
 import { configureStore } from '@reduxjs/toolkit';
 import { api } from '../api/ws';
 import map from '../map/mapSlice';
-import selection from '../map/selectionSlice';
 import tokens from '../map/tokenSlice';
-import ruler from '../ruler/rulerSlice';
 import { addListeners, signalRMiddleware } from './addListeners';
 
 // async function login() {
@@ -38,7 +36,7 @@ import { addListeners, signalRMiddleware } from './addListeners';
 const connection = api.connection;
 
 const store = configureStore({
-  reducer: { ruler, tokens, map, selection },
+  reducer: { tokens, map },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {

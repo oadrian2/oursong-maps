@@ -1,8 +1,11 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, shareReplay, Subject } from 'rxjs';
+import { MapID } from '../app/mapState';
 import { Point } from '../app/math';
-import { MapID, Ruler, UserID } from '../map/State';
-import { Token, TokenID } from '../map/tokenSlice';
+import { Ruler } from '../app/rulerState';
+import { PartitionedID } from '../app/state';
+import { Token, TokenID } from '../app/tokenState';
+import { UserID } from '../app/userState';
 
 type Handler = (...args: any[]) => void;
 
@@ -17,7 +20,7 @@ export class MapApi {
 
   readonly #userID = new Subject<UserID>();
   readonly #userList = new BehaviorSubject<UserID[]>([]);
-  readonly #tokenList = new BehaviorSubject<TokenID[]>([]);
+  readonly #tokenListChanges = new BehaviorSubject<TokenID[]>([]);
   readonly #rulerChanges = new Subject<[UserID, Ruler]>();
   readonly #tokenChanges = new Subject<[TokenID, Token]>();
   readonly #pingChanges = new Subject<[UserID, Point]>();
@@ -49,12 +52,7 @@ export class MapApi {
       if (!this.#mapMatches(mapId, this.mapId!)) return;
 
       this.#tokenChanges.next([token.id, token]);
-
-      console.info(this.#tokenList.value);
-
-      this.#tokenList.next([...new Set([...this.#tokenList.value, token.id])]);
-
-      console.info(this.#tokenList.value);
+      this.#tokenListChanges.next([...new Set([...this.#tokenListChanges.value, token.id])]);
     });
 
     this.connection.on('pingUpdated', (mapId, ping) => {
@@ -63,10 +61,10 @@ export class MapApi {
       this.#pingChanges.next([ping.id, ping]);
     });
 
-    this.connection.on('worldState', (worldState: { tokens: Token[] }) => {
+    this.connection.on('worldState', (worldState: { tokens: (Token & PartitionedID)[] }) => {
       const { tokens } = worldState;
 
-      this.#tokenList.next(tokens.map(({ id }) => id));
+      this.#tokenListChanges.next(tokens.map(({ id }) => id));
     });
 
     // this.connection.start();
@@ -78,11 +76,13 @@ export class MapApi {
 
   ///
 
-  readonly rulerChanges = this.#rulerChanges.asObservable();
+  readonly tokenListChanges = this.#tokenListChanges.pipe(shareReplay(1));
 
-  readonly tokenChanges = this.#tokenChanges.asObservable();
+  readonly rulerChanges = this.#rulerChanges.pipe(shareReplay(1));
 
-  readonly pingChanges = this.#pingChanges.asObservable();
+  readonly tokenChanges = this.#tokenChanges.pipe(shareReplay(1));
+
+  readonly pingChanges = this.#pingChanges.pipe(shareReplay(1));
 
   ///
 
@@ -93,9 +93,9 @@ export class MapApi {
   }
 
   async joinMap(game: string, id: string) {
-    await this.connection.invoke('joinMap', game, id);
-
     this.mapId = { game, id };
+
+    await this.connection.invoke('joinMap', game, id);
   }
 
   async leaveMap() {
@@ -115,13 +115,37 @@ export class MapApi {
   async updatePing(userID: UserID, ping: Point) {
     this.#mapJoinedGuard();
 
-    await this.connection.invoke('updatePing', this.mapId, { id: userID, ...ping }, new Date());
+    await this.connection.invoke('updatePing', this.mapId, { id: userID, ...ping });
   }
 
   async updateToken(tokenID: TokenID, token: Token) {
+    console.info(tokenID, token);
+
     this.#mapJoinedGuard();
 
-    await this.connection.invoke('updateToken', this.mapId, { /* id: tokenID, */ ...token }, new Date());
+    await this.connection.invoke('updateToken', this.mapId, { id: tokenID, ...token });
+  }
+
+  async getToken(tokenID: TokenID): Promise<any> {
+    this.#mapJoinedGuard();
+
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/token/${this.mapId!.game}/${tokenID}`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    return response.json();
+  }
+
+  async getTokens(): Promise<string[]> {
+    this.#mapJoinedGuard();
+
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/map/${this.mapId!.game}/${this.mapId!.id}/tokens`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const tokens = await response.json();
+
+    return tokens.map(({ id }: { id: string }) => id);
   }
 
   onConnected(handler: Handler) {

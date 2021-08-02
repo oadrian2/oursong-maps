@@ -4,10 +4,6 @@ import { RootState } from '../app/store';
 interface Map {
   id?: string;
   game?: string;
-  map?: { image: string; width: number; scale: number };
-  title?: string;
-  image?: string;
-  gameDate?: Date;
   connected: boolean;
   loaded: boolean;
   connectionId?: string;
@@ -21,14 +17,10 @@ const slice = createSlice({
   } as Map,
   reducers: {
     mapLoaded: (state, action) => {
-      const { id, game, title, image, map, gameDate } = action.payload;
+      const { id, game } = action.payload;
 
       state.id = id;
       state.game = game;
-      state.title = title;
-      state.image = image;
-      state.map = map;
-      state.gameDate = gameDate;
       state.loaded = true;
     },
     connecting: (state) => {

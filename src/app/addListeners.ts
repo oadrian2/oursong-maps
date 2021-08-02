@@ -2,7 +2,6 @@ import { HubConnection } from '@microsoft/signalr';
 import { MapApi } from '../api/ws';
 import { connected, connecting, mapLoaded, selectLoaded, selectMapId } from '../map/mapSlice';
 import { tokensUpdated, tokenUpsert } from '../map/tokenSlice';
-import { setSelf } from '../ruler/rulerSlice';
 
 export async function addListeners(api: MapApi, { dispatch, getState }: any) {
   api.connection.on('newMessage', (message) => {
@@ -16,10 +15,10 @@ export async function addListeners(api: MapApi, { dispatch, getState }: any) {
 
     if (isLoaded) return;
 
-    const { id, game, title, gameDate, image, map, tokens } = state;
+    const { id, game, tokens } = state;
 
     dispatch(tokensUpdated(tokens));
-    dispatch(mapLoaded({ id, game, title, gameDate, image, map }));
+    dispatch(mapLoaded({ id, game }));
   });
 
   api.connection.on('tokenUpdated', (mapId, token) => {
@@ -41,7 +40,6 @@ export async function addListeners(api: MapApi, { dispatch, getState }: any) {
   await api.connect();
 
   dispatch(connected(api.connection.connectionId));
-  dispatch(setSelf(api.connection.connectionId));
 }
 
 export const signalRMiddleware = (connection: HubConnection) => {
