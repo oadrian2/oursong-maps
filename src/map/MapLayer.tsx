@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Switch } from '@material-ui/core';
-import { nanoid } from '@reduxjs/toolkit';
+import { nanoid } from 'nanoid';
 import React, { useCallback, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useRecoilCallback, useRecoilState, useSetRecoilState } from 'recoil';
