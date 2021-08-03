@@ -17,6 +17,13 @@ export type Token = {
   color?: Color;
 };
 
+export enum TokenAllegiance {
+  Ally = 'ally',
+  Enemy = 'enemy',
+  Target = 'target',
+  Unknown = 'unknown',
+}
+
 type FullToken = Token & {
   shape: Generator['shape'];
   shapeType: Generator['shapeType'];
@@ -82,7 +89,6 @@ export const tokenIDsState = atom<TokenID[]>({
   ],
 });
 
-///
 export const tokenState = atomFamily<Token, TokenID>({
   key: 'TokenState',
   default: selectorFamily<Token, TokenID>({
@@ -100,6 +106,20 @@ export const tokenState = atomFamily<Token, TokenID>({
   ],
 });
 
+export const tokenIndex = selectorFamily<number, TokenID>({
+  key: 'TokenIndex',
+  get:
+    (selfID: TokenID) =>
+    ({ get }) => {
+      const { generator: selfGenerator } = get(tokenState(selfID));
+
+      return get(tokenIDsState)
+        .map((id: TokenID) => [id, get(tokenState(id))] as [TokenID, Token])
+        .filter(([id, { generator }]) => selfGenerator === generator)
+        .findIndex(([id]) => id === selfID);
+    },
+});
+
 export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
   key: 'FullToken',
   get:
@@ -109,7 +129,7 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
 
       const token = get(tokenState(id));
 
-      if (!token) return null;
+      if (!token) throw Error(`Invalid Token '${id}'`);
 
       const { shape, shapeType } = get(generatorState(token.generator))!;
 
@@ -137,18 +157,36 @@ export const stashedTokenIDsState = selector<TokenID[]>({
     }),
 });
 
+export const hoveredTokenState = selector<Token | null>({
+  key: 'HoveredToken',
+  get: ({ get }) => {
+    const hoveredTokenID = get(hoveredTokenIdState);
+
+    if (hoveredTokenID === null) return null;
+
+    return get(tokenState(hoveredTokenID));
+  },
+});
+
 export const hoveredTokenPositionState = selector<Point | null>({
   key: 'HoveredTokenPosition',
-  get: ({ get }) => { 
-    const id = get(hoveredTokenIdState);
+  get: ({ get }) => {
+    const hoveredToken = get(hoveredTokenState);
 
-    if (id === null) return null;
+    return hoveredToken && hoveredToken.position;
+  },
+});
 
-    const { position } = get(tokenState(id)); 
+export const hoveredTokenFullToken = selector<FullToken | null>({
+  key: 'HoveredFullToken',
+  get: ({ get }) => {
+    const hoveredTokenID = get(hoveredTokenIdState);
 
-    return position;
-  }
-})
+    if (hoveredTokenID === null) return null;
+
+    return get(fullTokenState(hoveredTokenID));
+  },
+});
 
 export const tokenPosition = selectorFamily<Point | null, TokenID>({
   key: 'TokenPosition',

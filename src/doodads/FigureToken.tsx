@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { TokenAllegiance } from '../map/tokenSlice';
+import { TokenAllegiance } from '../app/tokenState';
 import { Overlay } from './Overlay';
 import { ColorKey, TokenBase } from './TokenBase';
 

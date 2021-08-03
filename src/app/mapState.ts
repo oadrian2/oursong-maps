@@ -1,6 +1,6 @@
 import { atom, selector, selectorFamily } from 'recoil';
-import { TokenAllegiance } from '../map/tokenSlice';
-import { PartitionedID, Color } from './state';
+import { Color, PartitionedID } from './state';
+import { TokenAllegiance } from './tokenState';
 
 ///
 

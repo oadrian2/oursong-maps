@@ -1,34 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useSelector } from 'react-redux';
 import { api } from '../api/ws';
 import { CustomDragLayer } from '../app/CustomDragLayer';
 import { Header } from '../header/Header';
-import { LoadingMessage } from '../layout/LoadingMessage';
 import { ConnectionInfo } from '../session/ConnectionInfo';
 import { SessionDialog } from '../session/SessionDialog';
 import { Supply } from '../supply/Supply';
 import { MapLayer } from './MapLayer';
-import { selectConnected, selectLoaded } from './mapSlice';
 
 export function MapPage({ game, id }: { game: string; id: string }) {
-  const connected = useSelector(selectConnected);
-  const loaded = useSelector(selectLoaded);
-
-  const [loaded2, setLoaded2] = useState(false);
-
   useEffect(() => {
-    if (!connected) return;
+    const connect = async () => {
+      await api.connect();
 
-    api.connection.on('worldState', ({ tokens }) => {
-      setLoaded2(true);
-    });
+      api.joinMap(game, id);
+    };
 
-    api.joinMap(game, id);
-  }, [connected, game, id]);
+    const disconnect = () => {
+      api.connection.stop();
+    };
 
-  if (!loaded || !loaded2) return <LoadingMessage>Loading...</LoadingMessage>;
+    connect();
+
+    return () => disconnect();
+  }, [game, id]);
 
   return (
     <DndProvider backend={HTML5Backend}>

@@ -1,8 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import { useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { generatorsByAllegianceState, claimedFigureGeneratorListState } from '../app/mapState';
-import { TokenAllegiance } from '../map/tokenSlice';
+import { claimedFigureGeneratorListState, generatorsByAllegianceState } from '../app/mapState';
+import { TokenAllegiance } from '../app/tokenState';
 import { GeneratorGroup } from './GeneratorGroup';
 import './SessionDialog.css';
 

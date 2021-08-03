@@ -1,8 +1,8 @@
 import { Box } from '@material-ui/core';
 import { ReactNode } from 'react';
 import { GeneratorID } from '../app/mapState';
+import { TokenAllegiance } from '../app/tokenState';
 import { ColorKey, TokenBase } from '../doodads/TokenBase';
-import { TokenAllegiance } from '../map/tokenSlice';
 import { Generator } from '../supply/Generator';
 
 export function GeneratorGroup({ groupKey, generators, selected, setSelected }: GeneratorGroupProps) {

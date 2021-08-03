@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { generatorState } from '../app/mapState';
 import {
@@ -10,12 +9,10 @@ import {
   tokenConnection
 } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
-import { RootState } from '../app/store';
-import { fullTokenState, hoveredTokenIdState } from '../app/tokenState';
+import { fullTokenState, hoveredTokenIdState, TokenID, tokenIndex } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { TokenFacing } from './TokenFacing';
-import { selectIndexWithinGroup, TokenID } from './tokenSlice';
 
 export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
   const [activeId, setActiveId] = useRecoilState(hoveredTokenIdState);
@@ -35,7 +32,7 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
   } = useRecoilValue(fullTokenState(activeId)) || { shape: {} };
 
   const selfGenerator = useRecoilValue(generatorState(selfGeneratorId))!;
-  const index = useSelector((state: RootState) => selectIndexWithinGroup(state, { id, generator: selfGeneratorId }));
+  const index = useRecoilValue(tokenIndex(id));
 
   const selfScale = (selfBaseSize ?? 30) / 30;
   const activeScale = (activeBaseSize ?? 30) / 30;

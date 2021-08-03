@@ -1,20 +1,16 @@
 import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { useSelector } from 'react-redux';
 import { useRecoilValue } from 'recoil';
 import { generatorState, isControlledGeneratorState, isFigureGenerator } from '../app/mapState';
-import { RootState } from '../app/store';
+import { TokenID, tokenIndex, tokenState } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { ItemTypes } from '../ItemTypes';
-import { selectIndexWithinGroup, selectTokenById, TokenID } from '../map/tokenSlice';
 
 export function StashedToken({ id }: StashTokenProps) {
-  const { generator: generatorId } = useSelector((state: RootState) => selectTokenById(state, id)!);
+  const { generator: generatorId } = useRecoilValue(tokenState(id));
   const generator = useRecoilValue(generatorState(generatorId))!;
-
-  const index = useSelector((state: RootState) => selectIndexWithinGroup(state, { id, generator: generatorId }));
-
+  const index = useRecoilValue(tokenIndex(id));
   const isClaimed = useRecoilValue(isControlledGeneratorState(generatorId));
 
   const [, drag, preview] = useDrag({
