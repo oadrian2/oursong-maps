@@ -39,27 +39,31 @@ export function useRuler(): [Ruler, RulerCommands] {
     setRuler({ ...ruler, points: [...ruler.points.slice(0, -1)] });
   }, [ruler, setRuler]);
 
-  const complete = useRecoilCallback(({ snapshot, set }) => async () => {
-    const ruler = await snapshot.getPromise(selfRulerState);
-    const selectedID = await snapshot.getPromise(selectedTokenIdState);
+  const complete = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async () => {
+        const ruler = await snapshot.getPromise(selfRulerState);
+        const selectedID = await snapshot.getPromise(selectedTokenIdState);
 
-    if (ruler.attached && ruler.attached === selectedID) {
-      const token = await snapshot.getPromise(tokenState(ruler.attached));
+        if (ruler.attached && ruler.attached === selectedID) {
+          const token = await snapshot.getPromise(tokenState(ruler.attached));
 
-      const path: Point[] = [ruler.origin!, ...ruler.points];
-      const { x: startX, y: startY } = path[path.length - 2];
-      const { x: endX, y: endY } = path[path.length - 1];
+          const path: Point[] = [ruler.origin!, ...ruler.points];
+          const { x: startX, y: startY } = path[path.length - 2];
+          const { x: endX, y: endY } = path[path.length - 1];
 
-      const position = { x: endX, y: endY };
-      const facing = Math.atan2(endY - startY, endX - startX);
+          const position = { x: endX, y: endY };
+          const facing = Math.atan2(endY - startY, endX - startX);
 
-      console.log(position, facing, ruler.attached);
+          console.log(position, facing, ruler.attached);
 
-      set(tokenState(ruler.attached), { ...token, position, facing, path });
-    }
+          set(tokenState(ruler.attached), { ...token, position, facing, path });
+        }
 
-    set(selfRulerState, { ...ruler, origin: null, points: [], attached: null });
-  }, []);
+        set(selfRulerState, { ...ruler, origin: null, points: [], attached: null });
+      },
+    []
+  );
 
   ///
 

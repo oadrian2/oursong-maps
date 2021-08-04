@@ -43,14 +43,14 @@ export function centerToCenterNormalizedCellDistance(origin: Placement, target: 
 }
 
 export function tokenConnection(origin: Placement, target: Placement): [boolean, boolean] {
-  const { position: originPosition, scale: originFacing } = origin;
-  const { position: targetPosition, scale: targetFacing } = target;
+  const { position: originPosition, facing: originFacing } = origin;
+  const { position: targetPosition, facing: targetFacing } = target;
 
   const angleToTarget = Math.atan2(targetPosition.y - originPosition.y, targetPosition.x - originPosition.x);
   const angleToOrigin = Math.atan2(originPosition.y - targetPosition.y, originPosition.x - targetPosition.x);
 
-  const isOriginFacingTarget = Math.cos(angleToTarget - originFacing) >= 0;
-  const isTargetFacingOrigin = Math.cos(angleToOrigin - targetFacing) >= 0;
+  const isOriginFacingTarget = originFacing ? Math.cos(angleToTarget - originFacing) >= 0 : true;
+  const isTargetFacingOrigin = targetFacing ? Math.cos(angleToOrigin - targetFacing) >= 0 : true;
 
   return [isOriginFacingTarget, isTargetFacingOrigin];
 }

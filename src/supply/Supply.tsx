@@ -1,3 +1,4 @@
+import React from 'react';
 import { Figures } from './Figures';
 import { Markers } from './Markers';
 import { Stash } from './Stash';
@@ -15,7 +16,11 @@ export function Supply() {
       </div>
       <hr className="supply-rule" />
       <div className="supply-fluid-container">
-        <Stash />
+        <div className="token-container">
+          <React.Suspense fallback={<div className="token-container-empty-label">Stash</div>}>
+            <Stash />
+          </React.Suspense>
+        </div>
       </div>
     </div>
   );

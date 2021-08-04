@@ -1,6 +1,6 @@
 import { atom, atomFamily, DefaultValue, selector, selectorFamily } from 'recoil';
 import { api } from '../api/ws';
-import { Generator, GeneratorID, generatorState } from './mapState';
+import { controlledGeneratorListState, Generator, GeneratorID, generatorState } from './mapState';
 import { Point } from './math';
 import { Color } from './state';
 
@@ -142,8 +142,9 @@ export const activeTokenIDsState = selector<TokenID[]>({
   get: ({ get }) =>
     get(tokenIDsState).filter((id) => {
       const { position, deleted = false } = get(tokenState(id));
+      const isVisible = get(isTokenVisibleState(id));
 
-      return !!position && !deleted;
+      return !!position && !deleted && isVisible;
     }),
 });
 
@@ -186,6 +187,18 @@ export const hoveredTokenFullToken = selector<FullToken | null>({
 
     return get(fullTokenState(hoveredTokenID));
   },
+});
+
+export const isTokenVisibleState = selectorFamily<boolean, TokenID>({
+  key: 'IsTokenVisible',
+  get:
+    (tokenID: TokenID) =>
+    ({ get }) => {
+      const token = get(tokenState(tokenID));
+      const controlledGeneratorList = get(controlledGeneratorListState);
+
+      return !!token.visible || controlledGeneratorList.includes(token.generator);
+    },
 });
 
 export const tokenPosition = selectorFamily<Point | null, TokenID>({

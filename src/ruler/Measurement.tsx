@@ -2,12 +2,12 @@ import styled from '@emotion/styled';
 import { useRecoilValue } from 'recoil';
 import { Point } from '../app/math';
 import { PlacedToken } from '../map/PlacedToken';
-import { Ruler, rulerState } from "../app/rulerState";
+import { Ruler, rulerState, visibleRulerState } from "../app/rulerState";
 import { ArcCircle } from './ArcCircle';
 import { LengthsDisplay } from './LengthsDisplay';
 
 export const Measurement = ({ id }: MeasurementProps) => {
-  const ruler = useRecoilValue(rulerState(id));
+  const ruler = useRecoilValue(visibleRulerState(id));
 
   if (ruler.origin === null) return null;
 

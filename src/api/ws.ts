@@ -39,7 +39,9 @@ export class MapApi {
     this.connection.on('rulerUpdated', (mapId, { id }) => {
       if (!this.#mapMatches(mapId, this.mapId!)) return;
 
-      this.#onUserConnected(id);
+      if (id !== this.userId) {
+        this.#onUserConnected(id);
+      }
     });
 
     this.connection.on('rulerUpdated', (mapId, ruler) => {
@@ -88,6 +90,8 @@ export class MapApi {
 
   async connect() {
     await this.connection.start();
+
+    this.#onUserConnected(this.connection.connectionId!);
 
     this.#connectionHandlers.forEach((h) => h(this.connection.connectionId));
   }

@@ -1,9 +1,9 @@
 import { throttle } from 'lodash';
-import { AtomEffect, atomFamily, selector } from 'recoil';
+import { AtomEffect, atomFamily, selector, selectorFamily } from 'recoil';
 import { filter } from 'rxjs';
 import { api } from '../api/ws';
 import { Point } from './math';
-import { TokenID } from './tokenState';
+import { isTokenVisibleState, TokenID } from './tokenState';
 import { UserID, userIdState } from './userState';
 
 ///
@@ -47,4 +47,25 @@ export const selfRulerState = selector<Ruler>({
   cachePolicy_UNSTABLE: {
     eviction: 'most-recent',
   },
+});
+
+export const visibleRulerState = selectorFamily<Ruler, UserID>({
+  key: 'VisibleRulerState',
+  get:
+    (userID: UserID) =>
+    ({ get }) => {
+      const ruler = get(rulerState(userID));
+
+      if (!ruler.attached) {
+        return ruler;
+      }
+
+      const isTokenVisible = get(isTokenVisibleState(ruler.attached));
+
+      if (isTokenVisible) {
+        return ruler;
+      }
+
+      return { origin: null, points: [], attached: null };
+    },
 });

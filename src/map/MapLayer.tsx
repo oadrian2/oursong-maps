@@ -74,7 +74,9 @@ export function MapLayer() {
       <RulerOverlay ref={ref}>
         <div ref={drop}>
           <MapImage onClick={handleMapImageClick} />
-          <TokenLayer />
+          <React.Suspense fallback={<div style={{display: 'fixed', top: 300, left: 300, background: 'black' }}>Tokens!</div>}>
+            <TokenLayer />
+          </React.Suspense>
         </div>
       </RulerOverlay>
       <MapCommandConsole>
