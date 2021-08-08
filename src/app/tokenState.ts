@@ -195,9 +195,9 @@ export const isTokenVisibleState = selectorFamily<boolean, TokenID>({
   get:
     (tokenID: TokenID) =>
     ({ get }) => {
-      const token = get(tokenState(tokenID));
+      const { visible = true, generator } = get(tokenState(tokenID));
       const controlledGeneratorList = get(controlledGeneratorListState);
 
-      return !!token.visible || controlledGeneratorList.includes(token.generator);
+      return !!visible || controlledGeneratorList.includes(generator);
     },
 });
