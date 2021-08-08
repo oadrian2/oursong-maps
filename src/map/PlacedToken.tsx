@@ -6,12 +6,13 @@ import {
   centerToCenterNormalizedCellDistance,
   edgeToEdgeCellDistance,
   Placement,
-  tokenConnection
+  tokenConnection,
 } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
 import { fullTokenState, hoveredTokenIdState, TokenID, tokenIndex } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
+import { DeathMarker } from './DeathMarker';
 import { TokenFacing } from './TokenFacing';
 
 export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
@@ -23,6 +24,7 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
     shape: { baseSize: selfBaseSize },
     generator: selfGeneratorId,
     visible = true,
+    active = true,
   } = useRecoilValue(fullTokenState(id))!;
 
   const {
@@ -60,6 +62,7 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
     >
       {selfGenerator.shapeType === 'marker' && <MarkerToken {...selfGenerator.shape} effectRadius={2} />}
       {selfGenerator.shapeType === 'figure' && <FigureToken {...selfGenerator.shape} index={index} overlay={overlay} />}
+      {selfGenerator.shapeType === 'figure' && !active && <DeathMarker />}
       {selfGenerator.shapeType === 'figure' && !!selfFacing && <TokenFacing facing={selfFacing} />}
     </div>
   );

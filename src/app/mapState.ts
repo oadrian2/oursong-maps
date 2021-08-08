@@ -113,6 +113,12 @@ export const mapZoomState = atom<number>({
   default: 1.0,
 });
 
+
+export const viewInactiveState = atom<boolean>({
+  key: 'ViewInactiveState',
+  default: false,
+});
+
 export const generatorListState = selector<GeneratorID[]>({
   key: 'GeneratorList',
   get: ({ get }) => get(mapGeneratorsState).map((g) => g.id),

@@ -1,13 +1,13 @@
 import styled from '@emotion/styled';
-import { Switch } from '@material-ui/core';
+import { Box, Switch } from '@material-ui/core';
 import { nanoid } from 'nanoid';
 import React, { useCallback, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useRecoilCallback, useRecoilState, useSetRecoilState } from 'recoil';
-import { GeneratorID } from '../app/mapState';
+import { GeneratorID, viewInactiveState } from '../app/mapState';
 import { Point } from '../app/math';
-import { viewInactiveState } from '../app/state';
 import { selectedTokenIdState, TokenID, tokenIDsState, tokenState } from '../app/tokenState';
+import SkullIcon from '../icons/Skull';
 import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay, RulerOverlayHandle } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
@@ -74,13 +74,16 @@ export function MapLayer() {
       <RulerOverlay ref={ref}>
         <div ref={drop}>
           <MapImage onClick={handleMapImageClick} />
-          <React.Suspense fallback={<div style={{display: 'fixed', top: 300, left: 300, background: 'black' }}>Tokens!</div>}>
+          <React.Suspense fallback={<div style={{ display: 'fixed', top: 300, left: 300, background: 'black' }}>Tokens!</div>}>
             <TokenLayer />
           </React.Suspense>
         </div>
       </RulerOverlay>
       <MapCommandConsole>
-        <Switch checked={viewInactive} onChange={handleViewInactiveChange} />
+        <Box display="flex" alignItems="center">
+          <SkullIcon style={{ width: 40, height: 40 }} />
+          <Switch checked={viewInactive} onChange={handleViewInactiveChange} />
+        </Box>
       </MapCommandConsole>
     </>
   );

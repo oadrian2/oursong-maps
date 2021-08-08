@@ -1,6 +1,6 @@
-import { atom, atomFamily, DefaultValue, selector, selectorFamily } from 'recoil';
+import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { api } from '../api/ws';
-import { controlledGeneratorListState, Generator, GeneratorID, generatorState } from './mapState';
+import { controlledGeneratorListState, Generator, generatorState, viewInactiveState } from './mapState';
 import { Point } from './math';
 import { Color } from './state';
 
@@ -29,39 +29,39 @@ type FullToken = Token & {
   shapeType: Generator['shapeType'];
 };
 
-type CanDie = {
-  dead?: boolean;
-};
+// type CanDie = {
+//   dead?: boolean;
+// };
 
-type CanHide = {
-  hidden?: boolean;
-};
+// type CanHide = {
+//   hidden?: boolean;
+// };
 
-type CanColor = {
-  color?: Color;
-};
+// type CanColor = {
+//   color?: Color;
+// };
 
-type CanPlace = {
-  position: Point | null;
-  facing: number | null;
-};
+// type CanPlace = {
+//   position: Point | null;
+//   facing: number | null;
+// };
 
-type CanSize = {
-  scale: number;
-};
+// type CanSize = {
+//   scale: number;
+// };
 
-type CanSubordinateTo = {
-  subordinateTo?: GeneratorID;
-};
+// type CanSubordinateTo = {
+//   subordinateTo?: GeneratorID;
+// };
 
-type PlacedToken = Token & CanPlace;
+// type PlacedToken = Token & CanPlace;
 
 ///
-type TokenAura = { color: Color | null; radius: number };
-type CircleAura = { shape: 'circle'; radius: number };
-type RectangleAura = { shape: 'rectangle'; width: number; height: number };
-type SquareAura = { shape: 'square'; side: number };
-type Aura = CircleAura | RectangleAura | SquareAura;
+// type TokenAura = { color: Color | null; radius: number };
+// type CircleAura = { shape: 'circle'; radius: number };
+// type RectangleAura = { shape: 'rectangle'; width: number; height: number };
+// type SquareAura = { shape: 'square'; side: number };
+// type Aura = CircleAura | RectangleAura | SquareAura;
 ///
 
 export const selectedTokenIdState = atom<TokenID | null>({
@@ -141,10 +141,11 @@ export const activeTokenIDsState = selector<TokenID[]>({
   key: 'ActiveTokenIDs',
   get: ({ get }) =>
     get(tokenIDsState).filter((id) => {
-      const { position, deleted = false } = get(tokenState(id));
+      const { position, deleted = false, active = true } = get(tokenState(id));
       const isVisible = get(isTokenVisibleState(id));
+      const viewInactive = get(viewInactiveState);
 
-      return !!position && !deleted && isVisible;
+      return !!position && !deleted && isVisible && (active || viewInactive);
     }),
 });
 
@@ -198,29 +199,5 @@ export const isTokenVisibleState = selectorFamily<boolean, TokenID>({
       const controlledGeneratorList = get(controlledGeneratorListState);
 
       return !!token.visible || controlledGeneratorList.includes(token.generator);
-    },
-});
-
-export const tokenPosition = selectorFamily<Point | null, TokenID>({
-  key: 'TokenPosition',
-  get:
-    (id: TokenID) =>
-    ({ get }) => {
-      const token = get(tokenState(id));
-
-      if (token === null) return null;
-
-      return token.position;
-    },
-  set:
-    (id: TokenID) =>
-    ({ get, set }, newValue) => {
-      const token = get(tokenState(id));
-
-      if (token === null) return;
-
-      const position = newValue instanceof DefaultValue ? null : newValue;
-
-      set(tokenState(id), { ...token, position });
     },
 });
