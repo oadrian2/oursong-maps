@@ -10,12 +10,12 @@
 
 .back-stroke {
   stroke-width: 6px;
-  stroke: white;
+  stroke: #ffffffcc;
   fill: none;
 }
 
 .fore-stroke {
   stroke-width: 4px;
-  stroke: black;
+  stroke: #000000cc;
   fill: none;
 }
