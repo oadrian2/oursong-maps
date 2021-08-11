@@ -9,7 +9,7 @@ import {
   tokenConnection,
 } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
-import { fullTokenState, hoveredTokenIdState, TokenID, tokenIndex } from '../app/tokenState';
+import { fullTokenState, hoveredTokenIdState, selectedTokenIdState, TokenID, tokenIndex } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { DeathMarker } from './DeathMarker';
@@ -39,6 +39,9 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
   const selfScale = (selfBaseSize ?? 30) / 30;
   const activeScale = (activeBaseSize ?? 30) / 30;
 
+  const selectedTokenId = useRecoilValue(selectedTokenIdState);
+  const isSelected = selectedTokenId === id;
+
   const overlay =
     !!activeId &&
     activeId !== id &&
@@ -64,6 +67,7 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
       {selfGenerator.shapeType === 'figure' && <FigureToken {...selfGenerator.shape} index={index} overlay={overlay} />}
       {selfGenerator.shapeType === 'figure' && !active && <DeathMarker />}
       {selfGenerator.shapeType === 'figure' && !!selfFacing && <TokenFacing facing={selfFacing} />}
+      {selfGenerator.shapeType === 'figure' && isSelected && <TokenSelectionRing />}
     </div>
   );
 }
@@ -83,3 +87,7 @@ const measurementStrategy = {
   [MeasurementStrategy.edgeToEdge]: edgeToEdgeCellDistance,
   [MeasurementStrategy.centerToCenterNormalized]: centerToCenterNormalizedCellDistance,
 };
+
+export function TokenSelectionRing() {
+  return <div style={{position: 'absolute', inset: -2, border: '2px solid lightgreen', borderRadius: '50%' }}></div>
+}
