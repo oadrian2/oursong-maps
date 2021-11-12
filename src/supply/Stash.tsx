@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { stashedTokenIDsState, TokenID } from '../app/tokenState';
+import { TokenID } from '../api/types';
+import { stashedTokenIDsState } from '../app/tokenState';
 import { StashedToken } from './StashedToken';
 import './Supply.css';
 

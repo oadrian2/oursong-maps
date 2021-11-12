@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
-import { useRecoilState, useResetRecoilState } from 'recoil';
-import { Point } from '../app/math';
-import { selectedTokenIdState, Token, TokenID, tokenState } from '../app/tokenState';
+import { useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
+import { Point, TokenColor, TokenID } from '../api/types';
+import { FullToken, fullTokenState, selectedTokenIdState, tokenState } from '../app/tokenState';
 
-export function useToken(tokenID: TokenID): [Token, TokenCommands] {
-  const [token, setToken] = useRecoilState(tokenState(tokenID));
+export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
+  const token = useRecoilValue(fullTokenState(tokenID));
+  const setToken = useSetRecoilState(tokenState(tokenID));
   const resetSelectedTokenId = useResetRecoilState(selectedTokenIdState);
 
   if (!token) throw Error(`Token '${tokenID}' does not exist.`);
@@ -12,22 +13,27 @@ export function useToken(tokenID: TokenID): [Token, TokenCommands] {
   const stash = useCallback(() => {
     resetSelectedTokenId();
 
-    setToken({ ...token, position: null, path: null });
+    setToken({ ...token, position: null, path: [] });
   }, [token, setToken, resetSelectedTokenId]);
 
   const trash = useCallback(() => {
     resetSelectedTokenId();
 
-    setToken({ ...token, deleted: true, path: null });
+    setToken({ ...token, deleted: true, path: [] });
   }, [token, setToken, resetSelectedTokenId]);
 
-  const setVisible = useCallback((visible: boolean) => setToken({ ...token, visible, path: null }), [token, setToken]);
+  const setVisible = useCallback((visible: boolean) => setToken({ ...token, visible, path: [] }), [token, setToken]);
 
-  const setActive = useCallback((active: boolean) => setToken({ ...token, active, path: null }), [token, setToken]);
+  const setActive = useCallback((active: boolean) => setToken({ ...token, active, path: [] }), [token, setToken]);
 
-  const placeAt = useCallback((position: Point) => setToken({ ...token, position, path: null }), [token, setToken])
+  const placeAt = useCallback((position: Point) => setToken({ ...token, position, path: [] }), [token, setToken]);
 
-  return [token, { stash, trash, setVisible, setActive, placeAt }];
+  const setColor = useCallback(
+    (color: TokenColor) => setToken({ ...token, shape: { ...token.shape, color }, path: [] }),
+    [token, setToken]
+  );
+
+  return [token, { stash, trash, setVisible, setActive, placeAt, setColor }];
 }
 
 type TokenCommands = {
@@ -36,4 +42,5 @@ type TokenCommands = {
   setVisible: (visible: boolean) => void;
   setActive: (active: boolean) => void;
   placeAt: (position: Point) => void;
+  setColor: (color: TokenColor) => void;
 };

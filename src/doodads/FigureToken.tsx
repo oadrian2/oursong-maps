@@ -1,17 +1,10 @@
 import { forwardRef } from 'react';
-import { TokenAllegiance } from '../app/tokenState';
+import { TokenColor } from '../api/types';
 import { Overlay } from './Overlay';
-import { ColorKey, TokenBase } from './TokenBase';
+import { TokenBase } from './TokenBase';
 
 export const FigureToken = forwardRef<HTMLDivElement, FigureTokenProps>(
-  ({ isTemplate = false, index, prefix, label, allegiance, isGroup = false, overlay = null }, ref) => {
-    const color = {
-      [TokenAllegiance.Enemy]: 'red',
-      [TokenAllegiance.Ally]: 'blue',
-      [TokenAllegiance.Target]: 'yellow',
-      [TokenAllegiance.Unknown]: 'green',
-    }[allegiance] as ColorKey;
-
+  ({ isTemplate = false, index, prefix, label, color, isGroup = false, overlay = null }, ref) => {
     if (isTemplate) {
       const effectiveLabel = `${prefix}${isGroup ? '#' : ''}`;
       const effectiveTitle = label;
@@ -41,7 +34,7 @@ export type FigureTokenProps = {
   index: number;
   prefix: string;
   label: string;
-  allegiance: TokenAllegiance;
+  color: TokenColor;
   overlay?: string | false | null;
   isTemplate?: boolean;
   isGroup?: boolean;

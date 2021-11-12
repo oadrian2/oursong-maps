@@ -1,8 +1,7 @@
 import { Box } from '@material-ui/core';
 import { ReactNode } from 'react';
-import { GeneratorID } from '../app/mapState';
-import { TokenAllegiance } from '../app/tokenState';
-import { ColorKey, TokenBase } from '../doodads/TokenBase';
+import { GeneratorID, TokenColor } from '../api/types';
+import { TokenBase } from '../doodads/TokenBase';
 import { Generator } from '../supply/Generator';
 
 export function GeneratorGroup({ groupKey, generators, selected, setSelected }: GeneratorGroupProps) {
@@ -24,7 +23,7 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }: 
     <Box display="flex">
       <Box mr={1}>
         <ToggleRing selected={allSelected} onChange={(value: boolean) => onSelect(generators, value)}>
-          <TokenBase title="All" color={toColor(groupKey)}>
+          <TokenBase title="All" color={groupKey}>
             All
           </TokenBase>
         </ToggleRing>
@@ -45,7 +44,7 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }: 
 }
 
 type GeneratorGroupProps = {
-  groupKey: TokenAllegiance;
+  groupKey: TokenColor;
   generators: string[];
   selected: string[];
   setSelected: (items: string[]) => void;
@@ -64,12 +63,3 @@ export type ToggleRingProps = {
   selected: boolean;
   onChange: (value: boolean) => void;
 };
-
-function toColor(allegiance: TokenAllegiance): ColorKey {
-  return {
-    [TokenAllegiance.Enemy]: 'red',
-    [TokenAllegiance.Ally]: 'blue',
-    [TokenAllegiance.Target]: 'yellow',
-    [TokenAllegiance.Unknown]: 'green',
-  }[allegiance] as ColorKey;
-}

@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useRecoilCallback, useRecoilState } from 'recoil';
-import { Point } from '../app/math';
-import { Ruler, selfRulerState } from '../app/rulerState';
-import { selectedTokenIdState, TokenID, tokenState } from '../app/tokenState';
+import { Point, Ruler, TokenID } from '../api/types';
+import { selfRulerState } from '../app/rulerState';
+import { selectedTokenIdState, tokenState } from '../app/tokenState';
 
 export function useRuler(): [Ruler, RulerCommands] {
   const [ruler, setRuler] = useRecoilState(selfRulerState);

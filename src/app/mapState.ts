@@ -1,45 +1,17 @@
 import { atom, selector, selectorFamily } from 'recoil';
-import { Color, PartitionedID } from './state';
-import { TokenAllegiance } from './tokenState';
+import {
+  FigureGenerator,
+  Generator,
+  GeneratorID,
+  isFigureGenerator,
+  isMarkerGenerator,
+  MarkerGenerator,
+  PartitionedID,
+  TokenColor,
+} from '../api/types';
+import { api } from '../api/ws';
 
 ///
-
-export type GeneratorID = string;
-
-type FigureGenerator = {
-  id: GeneratorID;
-  // label: string;
-  shapeType: 'figure';
-  shape: {
-    prefix: string;
-    label: string; // TODO: move out
-    allegiance: TokenAllegiance;
-    color?: Color;
-    baseSize?: number;
-    isGroup?: boolean;
-  };
-};
-
-type MarkerGenerator = {
-  id: GeneratorID;
-  // label: string;
-  shapeType: 'marker';
-  shape: {
-    label: string; // TODO: move out
-    color: Color;
-    baseSize?: number; // @decprecated
-  };
-};
-
-export type Generator = FigureGenerator | MarkerGenerator;
-
-export function isFigureGenerator(g: Generator): g is FigureGenerator {
-  return g.shapeType === 'figure';
-}
-
-export function isMarkerGenerator(g: Generator): g is MarkerGenerator {
-  return g.shapeType === 'marker';
-}
 
 export type MapID = PartitionedID;
 
@@ -61,17 +33,12 @@ export const mapId = atom<PartitionedID | null>({
   default: null,
 });
 
-export const mapState = selector<Map>({
+export const mapState = atom<Map>({
   key: 'MapState',
-  get: async ({ get }) => {
-    const { game, id } = get(mapId)!;
-
-    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/maps/${game}/${id}`);
-
-    if (response.status !== 200) throw Error('Augh!');
-
-    return response.json();
-  },
+  default: selector<Map>({
+    key: 'MapState/Default',
+    get: async ({ get }) => await api.getMap(get(mapId)!),
+  }),
 });
 
 export const mapTitleState = selector<string>({
@@ -112,7 +79,6 @@ export const mapZoomState = atom<number>({
   key: 'MapZoom',
   default: 1.0,
 });
-
 
 export const viewInactiveState = atom<boolean>({
   key: 'ViewInactiveState',
@@ -166,16 +132,16 @@ export const generatorState = selectorFamily<Generator | null, GeneratorID>({
       get(mapGeneratorsState).find((g) => g.id === id),
 });
 
-export const generatorsByAllegianceState = selector<{ [key in TokenAllegiance]: GeneratorID[] }>({
-  key: 'GeneratorsByAllegiance',
+export const generatorsByColorState = selector<Record<TokenColor, GeneratorID[]>>({
+  key: 'GeneratorsByColor',
   get: ({ get }) => {
     const generators = get(mapGeneratorsState).filter(isFigureGenerator);
 
-    return generators.reduce((result, { id, shape: { allegiance } }) => {
-      result[allegiance] = [...(result[allegiance] || []), id];
+    return generators.reduce((result, { id, shape: { color } }) => {
+      result[color] = [...(result[color] || []), id];
 
       return result;
-    }, {} as { [key in TokenAllegiance]: GeneratorID[] });
+    }, {} as Record<TokenColor, GeneratorID[]>);
   },
 });
 
@@ -185,9 +151,9 @@ const sortComparer = (generatorA: Generator, generatorB: Generator) =>
   +(generatorA.shapeType === 'marker' && generatorB.shapeType === 'marker' && markerComparer(generatorA, generatorB));
 
 const figureComparer = (
-  { shape: { prefix: prefixA, allegiance: allegianceA, isGroup: isGroupA = false } }: FigureGenerator,
-  { shape: { prefix: prefixB, allegiance: allegianceB, isGroup: isGroupB = false } }: FigureGenerator
-) => allegianceA.localeCompare(allegianceB) || +isGroupA - +isGroupB || prefixA.localeCompare(prefixB);
+  { shape: { prefix: prefixA, color: colorA, isGroup: isGroupA = false } }: FigureGenerator,
+  { shape: { prefix: prefixB, color: colorB, isGroup: isGroupB = false } }: FigureGenerator
+) => colorA.localeCompare(colorB) || +isGroupA - +isGroupB || prefixA.localeCompare(prefixB);
 
 const markerComparer = ({ shape: { color: colorA } }: MarkerGenerator, { shape: { color: colorB } }: MarkerGenerator) =>
   colorA.localeCompare(colorB);
@@ -198,24 +164,27 @@ const markerGenerators: MarkerGenerator[] = [
     id: 'marker:red',
     shapeType: 'marker',
     shape: {
-      label: 'Red',
-      color: 'red',
+      label: 'Marker',
+      color: TokenColor.red,
+      scale: 1.0,
     },
   },
   {
     id: 'marker:blue',
     shapeType: 'marker',
     shape: {
-      label: 'Blue',
-      color: 'blue',
+      label: 'Marker',
+      color: TokenColor.blue,
+      scale: 1.0,
     },
   },
   {
     id: 'marker:green',
     shapeType: 'marker',
     shape: {
-      label: 'Green',
-      color: 'green',
+      label: 'Marker',
+      color: TokenColor.green,
+      scale: 1.0,
     },
   },
 ];

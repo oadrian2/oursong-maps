@@ -1,8 +1,9 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { Point } from '../api/types';
 import { isControlledGeneratorState } from '../app/mapState';
-import { Point } from '../app/math';
+import { isSelfMovingState } from '../app/rulerState';
 import { activeTokenIDsState, selectedTokenIdState, tokenState } from "../app/tokenState";
 import { PlacedToken } from './PlacedToken';
 import { TokenMenu } from './TokenMenu';
@@ -36,10 +37,12 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
 
   const controls = useAnimation();
 
+  const isMoving = useRecoilValue(isSelfMovingState);
+
   useEffect(() => {
     if (!position) return;
 
-    const segments = targetPath || [position, position];
+    const segments = targetPath && targetPath.length !== 0 ? targetPath : [position, position];
 
     const xCoords = segments.map(({ x }: Point) => x);
     const yCoords = segments.map(({ y }: Point) => y);
@@ -65,7 +68,7 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
       }}
     >
       <PlacedToken id={id} onClick={handleTokenClick} />
-      <AnimatePresence>{isSelected && <TokenMenu id={id} />}</AnimatePresence>
+      <AnimatePresence>{isSelected && !isMoving && <TokenMenu id={id} />}</AnimatePresence>
     </motion.div>
   );
 }

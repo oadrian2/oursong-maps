@@ -1,4 +1,5 @@
-import { CELL_DIAMETER, CELL_RADIUS, degToRad, Facing, offsetAngle } from '../app/math';
+import { Facing } from '../api/types';
+import { CELL_DIAMETER, CELL_RADIUS, degToRad, offsetAngle } from '../app/math';
 
 export type TokenFacingProps = { facing: Facing };
 

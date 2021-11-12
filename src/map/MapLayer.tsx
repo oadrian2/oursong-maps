@@ -4,11 +4,10 @@ import { nanoid } from 'nanoid';
 import React, { useCallback, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { useRecoilCallback, useRecoilState, useSetRecoilState } from 'recoil';
-import { GeneratorID, viewInactiveState } from '../app/mapState';
-import { Point } from '../app/math';
-import { selectedTokenIdState, TokenID, tokenIDsState, tokenState } from '../app/tokenState';
+import { GeneratorID, ItemTypes, Point, TokenID } from '../api/types';
+import { viewInactiveState } from '../app/mapState';
+import { selectedTokenIdState, tokenIDsState, tokenState } from '../app/tokenState';
 import SkullIcon from '../icons/Skull';
-import { ItemTypes } from '../ItemTypes';
 import { RulerOverlay, RulerOverlayHandle } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
 import { TokenLayer } from './TokenLayer';
@@ -30,7 +29,7 @@ export function MapLayer() {
 
         const token = await snapshot.getPromise(tokenState(id));
 
-        set(tokenState(id), { ...token, position: midpointPosition, path: null, facing: null });
+        set(tokenState(id), { ...token, position: midpointPosition, path: [], facing: null });
       },
     []
   );
@@ -42,7 +41,7 @@ export function MapLayer() {
 
         const tokenIDs = await snapshot.getPromise(tokenIDsState);
 
-        set(tokenState(id), { position: midpointPosition, generator });
+        set(tokenState(id), { position: midpointPosition, facing: null, generator, deleted: false, active: true, visible: true, path: [] });
         set(tokenIDsState, [...tokenIDs, id]);
       }
   );

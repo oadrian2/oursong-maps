@@ -1,9 +1,9 @@
 import { atom, AtomEffect } from 'recoil';
+import { UserID } from '../api/types';
 import { api } from '../api/ws';
 
 ///
 
-export type UserID = string;
 const userListSyncEffect: AtomEffect<UserID[]> = ({ setSelf }) => {
   const setUserList = (ids: UserID[]) => {
     return setSelf(ids);

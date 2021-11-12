@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useMemo } from 'react';
 import { useDragLayer, XYCoord } from 'react-dnd';
-import { ItemTypes } from '../ItemTypes';
+import { ItemTypes } from '../api/types';
 import { PlacedToken } from '../map/PlacedToken';
 import { Generator } from '../supply/Generator';
 import { StashedToken } from '../supply/StashedToken';

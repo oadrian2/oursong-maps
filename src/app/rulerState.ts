@@ -1,29 +1,34 @@
 import { throttle } from 'lodash';
 import { AtomEffect, atomFamily, selector, selectorFamily } from 'recoil';
-import { filter } from 'rxjs';
+import { filter, map, pairwise, startWith } from 'rxjs';
+import { Ruler, UserID } from '../api/types';
 import { api } from '../api/ws';
-import { Point } from './math';
-import { isTokenVisibleState, TokenID } from './tokenState';
-import { UserID, userIdState } from './userState';
+import { isTokenVisibleState } from './tokenState';
+import { userIdState } from './userState';
 
 ///
 
-export type Ruler = {
-  origin: Point | null;
-  points: Point[];
-  attached: TokenID | null;
+const DEFAULT_RULER: Ruler = {
+  origin: null,
+  points: [],
+  attached: null,
+  when: new Date(0),
 };
-
-///
 
 const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
   (userID: string) =>
   ({ setSelf, onSet }: any) => {
     const subscription = api.rulerChanges
-      .pipe(filter(([incomingUserID]) => userID === incomingUserID))
-      .subscribe(([_, ruler]) => setSelf(ruler));
+      .pipe(
+        filter(([incomingUserID]) => userID === incomingUserID),
+        startWith([userID, DEFAULT_RULER] as [UserID, Ruler]),
+        pairwise(),
+        filter(([[_, { when: whenFirst }], [__, { when: whenSecond }]]) => whenSecond > whenFirst),
+        map(([_, [__, ruler]]) => ruler)
+      )
+      .subscribe(setSelf);
 
-    onSet(throttle((ruler: Ruler) => api.updateRuler(userID, ruler), 200));
+    onSet(throttle((ruler: Ruler) => api.updateRuler(userID, { ...ruler, when: new Date() }), 200));
 
     return () => subscription.unsubscribe();
   };
@@ -32,11 +37,7 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
 
 export const rulerState = atomFamily<Ruler, UserID>({
   key: 'RulerState',
-  default: {
-    origin: null,
-    points: [],
-    attached: null,
-  },
+  default: DEFAULT_RULER,
   effects_UNSTABLE: (userID) => [rulerSyncEffect(userID)],
 });
 
@@ -66,6 +67,11 @@ export const visibleRulerState = selectorFamily<Ruler, UserID>({
         return ruler;
       }
 
-      return { origin: null, points: [], attached: null };
+      return DEFAULT_RULER;
     },
+});
+
+export const isSelfMovingState = selector<boolean>({
+  key: 'IsSelfMovingState',
+  get: ({ get }) => !!get(selfRulerState).attached,
 });

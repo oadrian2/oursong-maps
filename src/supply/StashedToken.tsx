@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
-import { generatorState, isControlledGeneratorState, isFigureGenerator } from '../app/mapState';
-import { TokenID, tokenIndex, tokenState } from '../app/tokenState';
+import { isFigureGenerator, ItemTypes, TokenID } from '../api/types';
+import { generatorState, isControlledGeneratorState } from '../app/mapState';
+import { tokenIndex, tokenState } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
-import { ItemTypes } from '../ItemTypes';
 
 export function StashedToken({ id }: StashTokenProps) {
   const { generator: generatorId } = useRecoilValue(tokenState(id));

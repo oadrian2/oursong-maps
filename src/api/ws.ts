@@ -1,11 +1,7 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { BehaviorSubject, shareReplay, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, Subject } from 'rxjs';
 import { MapID } from '../app/mapState';
-import { Point } from '../app/math';
-import { Ruler } from '../app/rulerState';
-import { PartitionedID } from '../app/state';
-import { Token, TokenID } from '../app/tokenState';
-import { UserID } from '../app/userState';
+import { Generator, Map, PartitionedID, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
 
 type Handler = (...args: any[]) => void;
 
@@ -78,13 +74,13 @@ export class MapApi {
 
   ///
 
-  readonly tokenListChanges = this.#tokenListChanges.pipe(shareReplay(1));
+  readonly tokenListChanges: Observable<TokenID[]> = this.#tokenListChanges.pipe(shareReplay(1));
 
-  readonly rulerChanges = this.#rulerChanges.pipe(shareReplay(1));
+  readonly rulerChanges: Observable<[UserID, Ruler]> = this.#rulerChanges.pipe(shareReplay(1));
 
-  readonly tokenChanges = this.#tokenChanges.pipe(shareReplay(1));
+  readonly tokenChanges: Observable<[TokenID, Token]> = this.#tokenChanges.pipe(shareReplay(1));
 
-  readonly pingChanges = this.#pingChanges.pipe(shareReplay(1));
+  readonly pingChanges: Observable<[UserID, Point]> = this.#pingChanges.pipe(shareReplay(1));
 
   ///
 
@@ -110,10 +106,10 @@ export class MapApi {
     this.mapId = null;
   }
 
-  async updateRuler(userID: UserID, ruler: Ruler) {
+  updateRuler(userID: UserID, ruler: Ruler) {
     this.#mapJoinedGuard();
 
-    await this.connection.invoke('updateRuler', this.mapId, { id: userID, ...ruler }, new Date());
+    this.connection.invoke('updateRuler', this.mapId, { id: userID, ...ruler }, new Date());
   }
 
   async updatePing(userID: UserID, ping: Point) {
@@ -127,20 +123,24 @@ export class MapApi {
 
     this.#mapJoinedGuard();
 
-    await this.connection.invoke('updateToken', this.mapId, { id: tokenID, ...token });
+    const storageToken: StorageToken = { id: tokenID, map: this.mapId!.id, game: this.mapId!.game, ...mapTokenToStorageToken(token) };
+
+    await this.connection.invoke('updateToken', this.mapId, { ...storageToken });
   }
 
-  async getToken(tokenID: TokenID): Promise<any> {
+  async getToken(tokenID: TokenID): Promise<Token> {
     this.#mapJoinedGuard();
 
     const response = await fetch(`${process.env.REACT_APP_HUB_URL}/token/${this.mapId!.game}/${tokenID}`);
 
     if (response.status !== 200) throw Error('Augh!');
 
-    return response.json();
+    const storageToken: StorageToken = await response.json();
+
+    return mapStorageTokenToToken(storageToken);
   }
 
-  async getTokens(): Promise<string[]> {
+  async getTokens(): Promise<TokenID[]> {
     this.#mapJoinedGuard();
 
     const response = await fetch(`${process.env.REACT_APP_HUB_URL}/map/${this.mapId!.game}/${this.mapId!.id}/tokens`);
@@ -149,7 +149,19 @@ export class MapApi {
 
     const tokens = await response.json();
 
-    return tokens.map(({ id }: { id: string }) => id);
+    return tokens.map(({ id }: { id: TokenID }) => id);
+  }
+
+  async getMap(mapId: MapID): Promise<Map> {
+    // this.#mapJoinedGuard();
+
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/maps/${mapId!.game}/${mapId!.id}`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const storageMap = await response.json();
+
+    return mapStorageMapToMap(storageMap);
   }
 
   onConnected(handler: Handler) {
@@ -193,4 +205,142 @@ export class MapApi {
   }
 }
 
+function mapTokenToStorageToken(token: Token): Omit<StorageToken, 'id' | 'game' | 'map'> {
+  const { generator, position, deleted, visible, active, facing, path, shape } = token;
+
+  return {
+    generator,
+    position,
+    deleted,
+    visible,
+    active,
+    facing,
+    path,
+    shape,
+  };
+}
+
+function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>): Token {
+  const { generator, position = null, deleted = false, visible = true, active = true, facing = null, path = [], shape } = token;
+
+  return {
+    generator,
+    position,
+    deleted,
+    visible,
+    active,
+    facing,
+    path,
+    shape: { color: parseColor(shape?.color) },
+  };
+}
+
+function mapStorageMapToMap(map: StorageMap): Map {
+  const { generators, ...restMap } = map;
+
+  return {
+    ...restMap,
+    generators: generators.map(mapStorageGeneratorToGenerator),
+  };
+}
+
+function mapStorageGeneratorToGenerator(generator: StorageGenerator): Generator {
+  const {
+    shape: { allegiance, baseSize = 30.0, ...restShape },
+    ...restGenerator
+  } = generator;
+
+  return {
+    ...restGenerator,
+    shape: {
+      ...restShape,
+      color: toColor(allegiance), // replaces allegiance
+      scale: baseSize / 30.0, // replaces baseSize
+    },
+  };
+}
+
 export const api = new MapApi(process.env.REACT_APP_HUB_URL!);
+
+type StorageToken = {
+  id: string;
+  generator: string;
+  position?: {
+    x: number;
+    y: number;
+  } | null;
+  game: string;
+  map: string;
+  path?: { x: number; y: number }[];
+  facing?: number | null;
+  active?: boolean;
+  deleted?: boolean;
+  visible?: boolean;
+  shape?: {
+    color?: StorageColor;
+  };
+};
+
+type StorageFigureGenerator = {
+  id: string;
+  shapeType: 'figure';
+  shape: {
+    prefix: string;
+    label: string; // TODO: move out
+    allegiance: StorageAllegiance;
+    isGroup?: boolean;
+    baseSize?: number;
+  };
+};
+
+type StorageGenerator = StorageFigureGenerator;
+
+type StorageMap = {
+  id: string;
+  game: string;
+  map: {
+    image: string;
+    scale: number;
+    width: number;
+    height: number;
+  };
+  title: string;
+  generators: StorageGenerator[];
+};
+
+type StorageAllegiance = 'ally' | 'enemy' | 'target' | 'unknown';
+
+type StorageColor = keyof typeof TokenColor;
+
+function toColor(allegiance: StorageAllegiance): TokenColor {
+  switch (allegiance) {
+    case 'enemy':
+      return TokenColor.red;
+    case 'ally':
+      return TokenColor.blue;
+    case 'target':
+      return TokenColor.yellow;
+    case 'unknown':
+      return TokenColor.green;
+  }
+}
+
+function parseColor(color?: keyof typeof TokenColor) {
+  switch (color) {
+    case 'red':
+      return TokenColor.red;
+    case 'yellow':
+      return TokenColor.yellow;
+    case 'green':
+      return TokenColor.green;
+    case 'cyan':
+      return TokenColor.cyan;
+    case 'blue':
+      return TokenColor.blue;
+    case 'magenta':
+      return TokenColor.magenta;
+  
+    default:
+      return undefined;
+  }
+}

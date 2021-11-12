@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useRecoilValue } from 'recoil';
-import { Point } from '../app/math';
-import { Ruler, visibleRulerState } from '../app/rulerState';
+import { Point, Ruler } from '../api/types';
+import { visibleRulerState } from '../app/rulerState';
 import { PlacedToken } from '../map/PlacedToken';
 import { ArcCircle } from './ArcCircle';
 import { LengthsDisplay } from './LengthsDisplay';

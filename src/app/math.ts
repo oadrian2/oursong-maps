@@ -1,9 +1,4 @@
-export type Point = { x: number; y: number };
-export type Scale = number;
-export type Facing = number;
-export type Angle = number;
-
-export type Placement = { position: Point, scale: Scale, facing?: Facing };
+import { Angle, Placement, Point } from "../api/types";
 
 export const CELL_DIAMETER = 48.0;
 export const CELL_RADIUS = CELL_DIAMETER / 2.0;

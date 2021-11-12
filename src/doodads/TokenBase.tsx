@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { forwardRef, ReactNode } from 'react';
+import { TokenColor } from '../api/types';
 
 export const TokenBase = forwardRef<HTMLDivElement, TokenBaseProps>(({ title, color, children }, ref) => {
   return (
@@ -9,18 +10,18 @@ export const TokenBase = forwardRef<HTMLDivElement, TokenBaseProps>(({ title, co
   );
 });
 
-type TokenBaseProps = { title: string; color: ColorKey; children: ReactNode };
+type TokenBaseProps = { title: string; color: TokenColor; children: ReactNode };
 
 TokenBase.displayName = 'TokenBase';
 
-const colorMap = {
+const colorMap: { [key in TokenColor]: string } = {
   red: '#d32f2f',
+  green: '#00796b',
   blue: '#1976d2',
   yellow: '#ffeb3b',
-  green: '#00796b',
+  cyan: '#3bf8ff',
+  magenta: '#ff3bf8',
 };
-
-export type ColorKey = keyof typeof colorMap;
 
 export const TokenShape = styled.div`
   display: grid;
@@ -32,7 +33,7 @@ export const TokenShape = styled.div`
   position: relative;
   overflow: hidden;
 
-  border: 2px solid ${({ color }: { color: ColorKey }) => colorMap[color]};
+  border: 4px solid ${({ color }: { color: TokenColor }) => colorMap[color]};
   border-radius: 50%;
 
   background: black;

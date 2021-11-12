@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
-import { degToRad, offsetAngle, Point } from '../app/math';
+import { Point } from '../api/types';
+import { degToRad, offsetAngle } from '../app/math';
 
 export const ArcCircle = ({ origin, target }: ArcCircleProps) => {
   const radius = Math.hypot(target.x - origin.x, target.y - origin.y);

@@ -1,15 +1,18 @@
 import styled from '@emotion/styled';
 import { forwardRef } from 'react';
+import { TokenColor } from '../api/types';
 
 const CELL_SIZE = 48.0;
 
 export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(
-  ({ color = 'green', effectRadius = 0, label, isTemplate = false }, ref) => {
+  ({ color = 'green', effectRadius = 0, label }, ref) => {
     const hue = {
       red: 0,
+      yellow: 60,
       green: 120,
+      cyan: 180,
       blue: 240,
-      yellow: 120,
+      magenta: 300,
     }[color];
 
     const radius = CELL_SIZE * effectRadius;
@@ -26,9 +29,9 @@ export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(
 
 MarkerToken.displayName = 'MarkerToken';
 
-export type MarkerColor = 'red' | 'green' | 'blue' | 'yellow';
+export type MarkerColor = keyof typeof TokenColor;
 
-export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; label: string; isTemplate?: boolean };
+export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; label: string };
 
 export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
   display: flex;

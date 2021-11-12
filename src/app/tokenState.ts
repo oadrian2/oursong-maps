@@ -1,30 +1,9 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
+import { Generator, Point, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
-import { controlledGeneratorListState, Generator, generatorState, viewInactiveState } from './mapState';
-import { Point } from './math';
-import { Color } from './state';
+import { controlledGeneratorListState, generatorState, viewInactiveState } from './mapState';
 
-export type TokenID = string;
-
-export type Token = {
-  generator: string;
-  position: Point | null;
-  deleted?: boolean;
-  visible?: boolean;
-  active?: boolean;
-  facing?: number | null;
-  path?: Point[] | null;
-  color?: Color;
-};
-
-export enum TokenAllegiance {
-  Ally = 'ally',
-  Enemy = 'enemy',
-  Target = 'target',
-  Unknown = 'unknown',
-}
-
-type FullToken = Token & {
+export type FullToken = Token & {
   shape: Generator['shape'];
   shapeType: Generator['shapeType'];
 };
@@ -34,11 +13,11 @@ type FullToken = Token & {
 // };
 
 // type CanHide = {
-//   hidden?: boolean;
+//   hidden: boolean;
 // };
 
 // type CanColor = {
-//   color?: Color;
+//   color: Color;
 // };
 
 // type CanPlace = {
@@ -93,7 +72,7 @@ export const tokenState = atomFamily<Token, TokenID>({
   key: 'TokenState',
   default: selectorFamily<Token, TokenID>({
     key: 'TokenState/Default',
-    get: (id: TokenID) => () => api.getToken(id),
+    get: (id: TokenID) => async () => api.getToken(id),
   }),
   effects_UNSTABLE: (id) => [
     ({ onSet, setSelf }) => {
@@ -115,7 +94,7 @@ export const tokenIndex = selectorFamily<number, TokenID>({
 
       return get(tokenIDsState)
         .map((id: TokenID) => [id, get(tokenState(id))] as [TokenID, Token])
-        .filter(([id, { generator }]) => selfGenerator === generator)
+        .filter(([_, { generator }]) => selfGenerator === generator)
         .findIndex(([id]) => id === selfID);
     },
 });
@@ -133,7 +112,9 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
 
       const { shape, shapeType } = get(generatorState(token.generator))!;
 
-      return { ...token, shape, shapeType };
+      const { visible = true, deleted = false, active = true, shape: tokenShape = {}, ...restToken } = token;
+
+      return { ...restToken, shapeType, shape: { ...shape, ...tokenShape }, visible, deleted, active };
     },
 });
 
