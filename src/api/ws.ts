@@ -223,6 +223,8 @@ function mapTokenToStorageToken(token: Token): Omit<StorageToken, 'id' | 'game' 
 function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>): Token {
   const { generator, position = null, deleted = false, visible = true, active = true, facing = null, path = [], shape } = token;
 
+  const parsedColor = parseColor(shape?.color);
+
   return {
     generator,
     position,
@@ -231,7 +233,7 @@ function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>
     active,
     facing,
     path,
-    shape: { color: parseColor(shape?.color) },
+    shape: { ...(parsedColor && { color: parsedColor }) },
   };
 }
 
@@ -339,7 +341,7 @@ function parseColor(color?: keyof typeof TokenColor) {
       return TokenColor.blue;
     case 'magenta':
       return TokenColor.magenta;
-  
+
     default:
       return undefined;
   }
