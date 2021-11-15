@@ -1,82 +1,41 @@
-import ArchiveIcon from '@material-ui/icons/Archive';
-import DeleteIcon from '@material-ui/icons/Delete';
-import PaletteIcon from '@material-ui/icons/Palette';
-import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-import { MouseEvent, useCallback } from 'react';
-import { TokenColor } from '../api/types';
+import { AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 import { useToken } from '../doodads/useToken';
-import HeartPulseIcon from '../icons/HeartPulse';
-import SkullIcon from '../icons/Skull';
-import { ArcFab } from './ArcFab';
+import { TokenColorMenu } from './TokenColorMenu';
+import { TokenMainMenu } from './TokenMainMenu';
+import { TokenSizeMenu } from './TokenSizeMenu';
 
-export function TokenMenu({ id }: TokenMenuProps) {
-  const [
-    {
-      active = true,
-      visible = true,
-      shape: { color },
-    },
-    { setVisible, setActive, stash, trash, setColor },
-  ] = useToken(id);
+export function TokenMenu({ id, showMenu }: TokenMenuProps) {
+  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor }] = useToken(id);
 
-  const moveActionPosition = +0.5 * Math.PI;
-  const visibleActionPosition = +0.25 * Math.PI;
-  const stashActionPosition = +0.75 * Math.PI;
-  const trashActionPosition = -0.75 * Math.PI;
-  const activeActionPosition = 0 * Math.PI;
-  const colorActionPosition = -0.25 * Math.PI;
-
-  const onActiveClick = useCallback(() => setActive(!active), [active, setActive]);
-  const onVisibleClick = useCallback(() => setVisible(!visible), [visible, setVisible]);
-
-  const onColorClick = useCallback(() => setColor(nextColor(color)), [color, setColor]);
-
-  const onMoveClick = useCallback((event: MouseEvent) => {
-    console.log(event);
-  }, []);
+  const [activeMenu, setActiveMenu] = useState(MenuType.main);
 
   return (
-    <>
-      <ArcFab angle={visibleActionPosition} onClick={onVisibleClick}>
-        {visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-      </ArcFab>
-      <ArcFab angle={activeActionPosition} onClick={onActiveClick}>
-        {active ? <HeartPulseIcon /> : <SkullIcon />}
-      </ArcFab>
-      <ArcFab angle={colorActionPosition} onClick={onColorClick}>
-        <PaletteIcon />
-      </ArcFab>
-      <ArcFab angle={moveActionPosition} onClick={onMoveClick}>
-        <TrendingUpIcon />
-      </ArcFab>
-      <ArcFab angle={stashActionPosition} onClick={stash}>
-        <ArchiveIcon />
-      </ArcFab>
-      <ArcFab angle={trashActionPosition} onClick={trash}>
-        <DeleteIcon />
-      </ArcFab>
-    </>
+    <AnimatePresence>
+      {showMenu && activeMenu === MenuType.main && (
+        <TokenMainMenu
+          isVisible={visible}
+          isActive={active}
+          openColorMenu={() => setActiveMenu(MenuType.color)}
+          openSizeMenu={() => setActiveMenu(MenuType.size)}
+          setActive={setActive}
+          setVisible={setVisible}
+          stashToken={stash}
+          trashToken={trash}
+        />
+      )}
+      {showMenu && activeMenu === MenuType.color && (
+        <TokenColorMenu onCloseMenu={() => setActiveMenu(MenuType.main)} onSetColor={setColor} />
+      )}
+      {showMenu && activeMenu === MenuType.size && <TokenSizeMenu onCloseMenu={() => setActiveMenu(MenuType.main)} onSetSize={() => {}} />}
+    </AnimatePresence>
   );
 }
 
-type TokenMenuProps = { id: string };
+const MenuType = {
+  main: 'main',
+  color: 'color',
+  size: 'size',
+};
 
-function nextColor(color: TokenColor) {
-  // rygcbv
-  switch (color) {
-    case TokenColor.red:
-      return TokenColor.yellow;
-    case TokenColor.yellow:
-      return TokenColor.green;
-    case TokenColor.green:
-      return TokenColor.cyan;
-    case TokenColor.cyan:
-      return TokenColor.blue;
-    case TokenColor.blue:
-      return TokenColor.magenta;
-      case TokenColor.magenta:
-        return TokenColor.red;
-    }
-}
+type TokenMenuProps = { id: string; showMenu: boolean };

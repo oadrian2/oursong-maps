@@ -4,7 +4,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { Point } from '../api/types';
 import { isControlledGeneratorState } from '../app/mapState';
 import { isSelfMovingState } from '../app/rulerState';
-import { activeTokenIDsState, selectedTokenIdState, tokenState } from "../app/tokenState";
+import { activeTokenIDsState, selectedTokenIdState, tokenState } from '../app/tokenState';
 import { PlacedToken } from './PlacedToken';
 import { TokenMenu } from './TokenMenu';
 
@@ -68,7 +68,7 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
       }}
     >
       <PlacedToken id={id} onClick={handleTokenClick} />
-      <AnimatePresence>{isSelected && !isMoving && <TokenMenu id={id} />}</AnimatePresence>
+      <TokenMenu id={id} showMenu={isSelected && !isMoving} />
     </motion.div>
   );
 }
