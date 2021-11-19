@@ -28,9 +28,9 @@ type MapImage = {
   height: number;
 };
 
-export const mapId = atom<PartitionedID | null>({
+export const mapId = atom<PartitionedID>({
   key: 'MapID',
-  default: null,
+  default: new Promise(() => {}), // block until set
 });
 
 export const mapState = atom<Map>({
