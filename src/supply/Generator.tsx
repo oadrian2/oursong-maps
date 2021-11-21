@@ -11,7 +11,8 @@ export function Generator({ id }: GeneratorProps) {
   const generator = useRecoilValue(generatorState(id))!;
 
   const [, drag, preview] = useDrag({
-    item: { type: ItemTypes.GENERATOR, id },
+    type: ItemTypes.GENERATOR,
+    item: { id, type: ItemTypes.GENERATOR },
     collect: () => ({}),
   });
 

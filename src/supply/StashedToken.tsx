@@ -14,7 +14,8 @@ export function StashedToken({ id }: StashTokenProps) {
   const isClaimed = useRecoilValue(isControlledGeneratorState(generatorId));
 
   const [, drag, preview] = useDrag({
-    item: { type: ItemTypes.STASHED_TOKEN, id },
+    type: ItemTypes.STASHED_TOKEN,
+    item: { id, type: ItemTypes.STASHED_TOKEN },
     canDrag: () => isClaimed,
   });
 
