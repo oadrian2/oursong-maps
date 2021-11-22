@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { ReactNode } from 'react';
 import { GeneratorID, TokenColor } from '../api/types';
 import { TokenBase } from '../doodads/TokenBase';

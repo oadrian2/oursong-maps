@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { Fab } from '@material-ui/core';
+import { Fab } from '@mui/material';
 import { motion } from 'framer-motion';
 import React, { ReactNode } from 'react';
 

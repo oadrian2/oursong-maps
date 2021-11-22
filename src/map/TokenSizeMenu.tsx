@@ -1,4 +1,4 @@
-import PaletteIcon from '@material-ui/icons/Palette';
+import PaletteIcon from '@mui/icons-material/Palette';
 import { Scale } from '../api/types';
 import { ArcFab } from './ArcFab';
 

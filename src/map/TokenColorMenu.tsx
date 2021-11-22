@@ -1,4 +1,4 @@
-import ClearIcon from '@material-ui/icons/Clear';
+import ClearIcon from '@mui/icons-material/Clear';
 import { TokenColor } from '../api/types';
 import LetterBIcon from '../icons/LetterB';
 import LetterCIcon from '../icons/LetterC';

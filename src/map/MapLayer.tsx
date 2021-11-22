@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Switch } from '@material-ui/core';
+import { Box, Switch } from '@mui/material';
 import { nanoid } from 'nanoid';
 import React, { useCallback, useRef } from 'react';
 import { useDrop } from 'react-dnd';
