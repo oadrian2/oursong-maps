@@ -15,7 +15,7 @@ export const Measurement = ({ id }: MeasurementProps) => {
 
   return (
     <>
-      <svg className="measurement-layer">
+      <MeasurementLayer>
         <defs>
           <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
             <polygon points="0 0, 5 1.25, 0 2.5" />
@@ -24,7 +24,7 @@ export const Measurement = ({ id }: MeasurementProps) => {
         <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
         <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
         {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
-      </svg>
+      </MeasurementLayer>
       <div style={{ position: 'absolute', top: 0, transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
         <SpokePositioned scaledX={scaledX} scaledY={scaledY}>
           <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
@@ -40,6 +40,16 @@ export const Measurement = ({ id }: MeasurementProps) => {
 };
 
 type MeasurementProps = { id: string };
+
+const MeasurementLayer = styled.svg`
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  stroke-linejoin: 'round';
+  stroke-linecap: 'round';
+  pointer-events: none;
+`;
 
 export const CenterPositioned = styled.div`
   position: absolute;
@@ -126,3 +136,4 @@ export function calcMetrics({ origin, points }: Ruler): RulerData {
 }
 
 const toPercent = (number: number) => (number * 100).toFixed(4) + '%';
+

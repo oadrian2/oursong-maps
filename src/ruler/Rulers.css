@@ -1,13 +1,3 @@
-.measurement-layer {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  stroke-linejoin: 'round';
-  stroke-linecap: 'round';
-  pointer-events: none;
-}
-
 .back-stroke {
   stroke-width: 6px;
   stroke: #ffffffcc;
