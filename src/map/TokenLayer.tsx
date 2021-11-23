@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Point } from '../api/types';
 import { isControlledGeneratorState } from '../app/mapState';

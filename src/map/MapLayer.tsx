@@ -73,7 +73,13 @@ export function MapLayer() {
       <RulerOverlay ref={ref}>
         <div ref={drop}>
           <MapImage onClick={handleMapImageClick} />
-          <React.Suspense fallback={<div style={{ display: 'fixed', top: 300, left: 300, background: 'black' }}>Tokens!</div>}>
+          <React.Suspense
+            fallback={
+              <Box sx={{ boxShadow: 3, m: 1, position: 'fixed' }} style={{ top: '50%', left: '50%', background: 'white' }}>
+                Loading...
+              </Box>
+            }
+          >
             <TokenLayer />
           </React.Suspense>
         </div>

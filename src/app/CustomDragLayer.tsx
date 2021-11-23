@@ -2,15 +2,12 @@ import styled from '@emotion/styled';
 import { useMemo } from 'react';
 import { useDragLayer, XYCoord } from 'react-dnd';
 import { ItemTypes } from '../api/types';
-import { PlacedToken } from '../map/PlacedToken';
 import { Generator } from '../supply/Generator';
 import { StashedToken } from '../supply/StashedToken';
 
 function getItemStyles(initialOffset: XYCoord | null, currentOffset: XYCoord | null) {
   if (!initialOffset || !currentOffset) {
-    return {
-      display: 'none',
-    };
+    return { display: 'none' };
   }
 
   const { x, y } = currentOffset;
@@ -29,8 +26,6 @@ export function CustomDragLayer() {
 
   const renderedItem = useMemo(() => {
     switch (itemType) {
-      case ItemTypes.PLACED_TOKEN:
-        return <PlacedToken id={item.id} />;
       case ItemTypes.STASHED_TOKEN:
         return <StashedToken id={item.id} />;
       case ItemTypes.GENERATOR:
