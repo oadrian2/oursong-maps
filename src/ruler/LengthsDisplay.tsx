@@ -14,7 +14,7 @@ export function LengthsDisplay({ lastLength, totalLength }: LengthsDisplayProps)
 export type LengthsDisplayProps = { lastLength: number; totalLength: number };
 
 export const MeasurementCircle = styled.div`
-  transform: translate(-50%, -50%);
+  /* transform: translate(-50%, -50%); */
 
   display: grid;
   grid-template: auto / auto auto;

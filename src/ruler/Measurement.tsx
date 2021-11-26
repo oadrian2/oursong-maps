@@ -1,7 +1,7 @@
-import styled from '@emotion/styled';
 import { useRecoilValue } from 'recoil';
 import { Point, Ruler } from '../api/types';
 import { visibleRulerState } from '../app/rulerState';
+import { Layer, Positioned } from '../map/Layer';
 import { PlacedToken } from '../map/PlacedToken';
 import { ArcCircle } from './ArcCircle';
 import { LengthsDisplay } from './LengthsDisplay';
@@ -15,59 +15,35 @@ export const Measurement = ({ id }: MeasurementProps) => {
 
   return (
     <>
-      <MeasurementLayer>
-        <defs>
-          <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
-            <polygon points="0 0, 5 1.25, 0 2.5" />
-          </marker>
-        </defs>
-        <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
-        <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
-        {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
-      </MeasurementLayer>
-      <div style={{ position: 'absolute', top: 0, transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
-        <SpokePositioned scaledX={scaledX} scaledY={scaledY}>
+      <Layer>
+        <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%">
+          <defs>
+            <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
+              <polygon points="0 0, 5 1.25, 0 2.5" />
+            </marker>
+          </defs>
+          <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
+          <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
+          {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
+        </svg>
+      </Layer>
+      <Positioned style={{ transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
+        <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
           <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
-        </SpokePositioned>
+        </Positioned>
         {ruler.attached && (
-          <div style={{ position: 'absolute', top: 0, transform: `translate(-50%, -50%)` }}>
+          <div style={{ position: 'absolute' }}>
             <PlacedToken id={ruler.attached} />
           </div>
         )}
-      </div>
+      </Positioned>
     </>
   );
 };
 
 type MeasurementProps = { id: string };
 
-const MeasurementLayer = styled.svg`
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  stroke-linejoin: 'round';
-  stroke-linecap: 'round';
-  pointer-events: none;
-`;
-
-export const CenterPositioned = styled.div`
-  position: absolute;
-  top: 0;
-  transform: translate(-50%, -50%);
-`;
-
-CenterPositioned.displayName = 'CenterPositioned';
-
-export const SpokePositioned = styled.div<{ scaledX: string; scaledY: string }>`
-  position: absolute;
-  top: 0;
-  transform: translate(calc(${({ scaledX }) => scaledX} * 1.25), calc(${({ scaledY }) => scaledY} * 1.25));
-`;
-
-SpokePositioned.displayName = 'SpokePositioned';
-
-type Vector = { start: Point; end: Point; hypot: number; scaledX: string; scaledY: string };
+type Vector = { start: Point; end: Point; hypot: number; scaledX: number; scaledY: number };
 
 type PathData = {
   vectors: Vector[];
@@ -75,8 +51,8 @@ type PathData = {
   lastLength: number;
   totalLength: number;
   lastAngle: number;
-  scaledX: string;
-  scaledY: string;
+  scaledX: number;
+  scaledY: number;
 };
 
 type RulerData = {
@@ -86,8 +62,8 @@ type RulerData = {
   lastPoint: Point;
   lastLength: number;
   totalLength: number;
-  scaledX: string;
-  scaledY: string;
+  scaledX: number;
+  scaledY: number;
 };
 
 export function calcMetrics({ origin, points }: Ruler): RulerData {
@@ -100,8 +76,8 @@ export function calcMetrics({ origin, points }: Ruler): RulerData {
       const width = end.x - start.x;
       const height = end.y - start.y;
       const hypot = Math.hypot(width, height);
-      const scaledX = toPercent(width / hypot);
-      const scaledY = toPercent(height / hypot);
+      const scaledX = width / hypot;
+      const scaledY = height / hypot;
       const angle = Math.atan2(width, height);
 
       return {
@@ -136,4 +112,3 @@ export function calcMetrics({ origin, points }: Ruler): RulerData {
 }
 
 const toPercent = (number: number) => (number * 100).toFixed(4) + '%';
-
