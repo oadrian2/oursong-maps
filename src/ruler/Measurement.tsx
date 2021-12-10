@@ -5,7 +5,7 @@ import { visibleRulerState } from '../app/rulerState';
 import { Layer, Positioned } from '../map/Layer';
 import { PlacedToken } from '../map/PlacedToken';
 import { ArcCircle } from './ArcCircle';
-import { LengthsDisplay, OverlayCircle } from './LengthsDisplay';
+import { LengthsDisplay, OverlayCircle, OverlayRectangle } from './LengthsDisplay';
 
 export const Measurement = ({ id }: MeasurementProps) => {
   const ruler = useRecoilValue(visibleRulerState(id));
@@ -13,6 +13,8 @@ export const Measurement = ({ id }: MeasurementProps) => {
   if (ruler.origin === null) return null;
 
   const { isSingle, origin, path, lastPoint, lastLength, totalLength, scaledX, scaledY } = calcMetrics(ruler);
+
+  const overlayInBounds = lastPoint.x + scaledX * 1.25 * 16 * 8 >= 0 && lastPoint.y + scaledY * 1.25 * 16 * 8 >= 0;
 
   return (
     <>
@@ -30,11 +32,13 @@ export const Measurement = ({ id }: MeasurementProps) => {
       </Layer>
       <Layer>
         <Positioned style={{ transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
-          <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
-            <OverlayCircle>
-              <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
-            </OverlayCircle>
-          </Positioned>
+          {overlayInBounds && (
+            <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
+              <OverlayCircle>
+                <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
+              </OverlayCircle>
+            </Positioned>
+          )}
           {ruler.attached && (
             <Box position="absolute">
               <PlacedToken id={ruler.attached} />
@@ -42,6 +46,13 @@ export const Measurement = ({ id }: MeasurementProps) => {
           )}
         </Positioned>
       </Layer>
+      {!overlayInBounds && (
+        <Box position="fixed" bottom={32} right={32}>
+          <OverlayRectangle>
+            <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
+          </OverlayRectangle>
+        </Box>
+      )}
     </>
   );
 };
