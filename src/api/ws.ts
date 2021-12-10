@@ -64,8 +64,6 @@ export class MapApi {
 
       this.#tokenListChanges.next(tokens.map(({ id }) => id));
     });
-
-    // this.connection.start();
   }
 
   #mapMatches(a: MapID, b: MapID) {
