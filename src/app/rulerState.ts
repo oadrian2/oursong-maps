@@ -1,6 +1,6 @@
 import { throttle } from 'lodash';
 import { AtomEffect, atomFamily, selector, selectorFamily } from 'recoil';
-import { filter, map, pairwise, startWith } from 'rxjs';
+import { combineLatest, filter, map, pairwise, startWith } from 'rxjs';
 import { Ruler, UserID } from '../api/types';
 import { api } from '../api/ws';
 import { isTokenVisibleState } from './tokenState';
@@ -17,16 +17,19 @@ const DEFAULT_RULER: Ruler = {
 
 const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
   (userID: string) =>
-  ({ setSelf, onSet }: any) => {
-    const subscription = api.rulerChanges
+  ({ setSelf, onSet, getPromise }) => {
+    const subscription = combineLatest([api.rulerChanges, getPromise(userIdState)])
       .pipe(
-        filter(([incomingUserID]) => userID === incomingUserID),
+        filter(([[incomingUserID], selfID]) => userID !== selfID && userID === incomingUserID),
+        map(([ruler, _]) => ruler),
         startWith([userID, DEFAULT_RULER] as [UserID, Ruler]),
         pairwise(),
         filter(([[_, { when: whenFirst }], [__, { when: whenSecond }]]) => whenSecond > whenFirst),
         map(([_, [__, ruler]]) => ruler)
       )
-      .subscribe(setSelf);
+      .subscribe(function (value) {
+        setSelf(value);
+      });
 
     onSet(throttle((ruler: Ruler) => api.updateRuler(userID, { ...ruler, when: new Date() }), 200));
 
