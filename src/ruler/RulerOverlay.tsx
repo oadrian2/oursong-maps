@@ -103,10 +103,7 @@ export const RulerOverlayWrapper = styled.div`
 
   border: 2px solid black;
 
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem auto;
 
   width: min-content;
 
