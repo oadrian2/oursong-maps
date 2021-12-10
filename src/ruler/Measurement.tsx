@@ -1,10 +1,11 @@
+import Box from '@mui/system/Box';
 import { useRecoilValue } from 'recoil';
 import { Point, Ruler } from '../api/types';
 import { visibleRulerState } from '../app/rulerState';
 import { Layer, Positioned } from '../map/Layer';
 import { PlacedToken } from '../map/PlacedToken';
 import { ArcCircle } from './ArcCircle';
-import { LengthsDisplay } from './LengthsDisplay';
+import { LengthsDisplay, OverlayCircle } from './LengthsDisplay';
 
 export const Measurement = ({ id }: MeasurementProps) => {
   const ruler = useRecoilValue(visibleRulerState(id));
@@ -15,7 +16,7 @@ export const Measurement = ({ id }: MeasurementProps) => {
 
   return (
     <>
-      <Layer>
+      <Layer style={{ pointerEvents: 'all' }}>
         <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%">
           <defs>
             <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
@@ -27,16 +28,20 @@ export const Measurement = ({ id }: MeasurementProps) => {
           {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
         </svg>
       </Layer>
-      <Positioned style={{ transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
-        <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
-          <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
+      <Layer>
+        <Positioned style={{ transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
+          <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
+            <OverlayCircle>
+              <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
+            </OverlayCircle>
+          </Positioned>
+          {ruler.attached && (
+            <Box position="absolute">
+              <PlacedToken id={ruler.attached} />
+            </Box>
+          )}
         </Positioned>
-        {ruler.attached && (
-          <div style={{ position: 'absolute' }}>
-            <PlacedToken id={ruler.attached} />
-          </div>
-        )}
-      </Positioned>
+      </Layer>
     </>
   );
 };

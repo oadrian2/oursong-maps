@@ -8,7 +8,7 @@ import LetterRIcon from '../icons/LetterR';
 import LetterYIcon from '../icons/LetterY';
 import { ArcFab } from './ArcFab';
 
-export function TokenColorMenu({ onSetColor, onCloseMenu }: TokenColorMenuProps) {
+export function TokenColorMenu({ setColor: onSetColor, closeMenu: onCloseMenu }: TokenColorMenuProps) {
   const setRedActionPosition = +0.25 * Math.PI;
   const setGreenActionPosition = +0.0 * Math.PI;
   const setBlueActionPosition = -0.25 * Math.PI;
@@ -48,6 +48,6 @@ export function TokenColorMenu({ onSetColor, onCloseMenu }: TokenColorMenuProps)
 }
 
 type TokenColorMenuProps = {
-  onSetColor: (color: TokenColor) => void;
-  onCloseMenu: () => void;
+  setColor: (color: TokenColor) => void;
+  closeMenu: () => void;
 };

@@ -1,5 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToken } from '../doodads/useToken';
 import { TokenColorMenu } from './TokenColorMenu';
 import { TokenMainMenu } from './TokenMainMenu';
@@ -9,6 +9,10 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
   const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor }] = useToken(id);
 
   const [activeMenu, setActiveMenu] = useState(MenuType.main);
+
+  useEffect(() => {
+    setActiveMenu(MenuType.main);
+  }, [setActiveMenu, showMenu]);
 
   return (
     <AnimatePresence>
@@ -25,9 +29,9 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
         />
       )}
       {showMenu && activeMenu === MenuType.color && (
-        <TokenColorMenu onCloseMenu={() => setActiveMenu(MenuType.main)} onSetColor={setColor} />
+        <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />
       )}
-      {showMenu && activeMenu === MenuType.size && <TokenSizeMenu onCloseMenu={() => setActiveMenu(MenuType.main)} onSetSize={() => {}} />}
+      {showMenu && activeMenu === MenuType.size && <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} setSize={() => {}} />}
     </AnimatePresence>
   );
 }

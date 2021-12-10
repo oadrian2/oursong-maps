@@ -15,10 +15,9 @@ Layer.displayName = 'Layer';
 export const Positioned = styled.div<{ at?: Point }>`
   position: absolute;
 
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template: 1 fr / 1 fr;
+  place-items: center;
 
   ${(({ at }) => !!at && `transform: translate(${at.x}px, ${at.y}px)`)};
 `;

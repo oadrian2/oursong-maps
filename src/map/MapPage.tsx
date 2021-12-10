@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -29,19 +30,53 @@ export function MapPage({ game, id }: { game: string; id: string }) {
   return (
     <DndProvider backend={HTML5Backend}>
       <CustomDragLayer />
-      <div className="grid-container">
-        <div className="header">
+      <MapLayout>
+        <MapHeader>
           <Header />
-        </div>
-        <div className="sidebar">
+        </MapHeader>
+        <MapSidebar>
           <Supply />
-        </div>
-        <div className="content">
+        </MapSidebar>
+        <MapContent>
           <MapLayer />
-        </div>
-      </div>
+        </MapContent>
+      </MapLayout>
       <SessionDialog />
       <ConnectionInfo />
     </DndProvider>
   );
 }
+
+export const MapLayout = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  grid-template-rows: 4rem 1fr;
+  gap: 0;
+  grid-template-areas:
+    'header header'
+    'sidebar content';
+  background-color: black;
+  color: white;
+`;
+
+export const MapHeader = styled.div`
+  grid-area: header;
+
+  display: flex;
+  align-items: center;
+
+  padding-left: 1rem;
+`;
+
+export const MapSidebar = styled.div`
+  grid-area: sidebar;
+`;
+
+export const MapContent = styled.div`
+  grid-area: content;
+  overflow: scroll;
+  background-color: white;
+  color: black;
+`;

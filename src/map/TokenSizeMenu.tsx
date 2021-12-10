@@ -2,7 +2,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import { Scale } from '../api/types';
 import { ArcFab } from './ArcFab';
 
-export function TokenSizeMenu({ onCloseMenu, onSetSize }: TokenSizeMenuProps) {
+export function TokenSizeMenu({ closeMenu: onCloseMenu, setSize: onSetSize }: TokenSizeMenuProps) {
   const setRedActionPosition = +0.25 * Math.PI;
   const setGreenActionPosition = +0.0 * Math.PI;
   const setBlueActionPosition = -0.25 * Math.PI;
@@ -32,6 +32,6 @@ export function TokenSizeMenu({ onCloseMenu, onSetSize }: TokenSizeMenuProps) {
 }
 
 type TokenSizeMenuProps = {
-  onSetSize: (scale: Scale) => void;
-  onCloseMenu: () => void;
+  setSize: (scale: Scale) => void;
+  closeMenu: () => void;
 };

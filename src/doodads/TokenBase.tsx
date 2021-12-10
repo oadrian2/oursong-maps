@@ -27,8 +27,8 @@ export const TokenShape = styled.div`
   display: grid;
   place-content: center;
 
-  width: 3rem;
-  height: 3rem;
+  width: var(--tokenSize);
+  height: var(--tokenSize);
 
   position: relative;
   overflow: hidden;

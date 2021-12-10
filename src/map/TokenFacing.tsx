@@ -1,5 +1,6 @@
 import { Facing } from '../api/types';
 import { CELL_DIAMETER, CELL_RADIUS, degToRad, offsetAngle } from '../app/math';
+import { Layer } from './Layer';
 
 const INDICATOR_ARC = 20.0;
 const INDICATOR_DEPTH = 8.0;
@@ -16,13 +17,11 @@ const FACING_PATH = `M ${BOT.x} ${BOT.y} A ${CELL_RADIUS} ${CELL_RADIUS} 0 0 1 $
 
 export function TokenFacing({ facing }: TokenFacingProps) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={`-${CELL_RADIUS} -${CELL_RADIUS} ${CELL_DIAMETER} ${CELL_DIAMETER}`}
-      style={{ position: 'absolute', top: 0, transform: `rotate(${facing}rad)`, pointerEvents: 'none', width: '100%', height: '100%' }}
-    >
-      <path d={FACING_PATH} fill="white" opacity={0.87} />
-    </svg>
+    <Layer style={{ transform: `rotate(${facing}rad)` }}>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox={`-${CELL_RADIUS} -${CELL_RADIUS} ${CELL_DIAMETER} ${CELL_DIAMETER}`}>
+        <path d={FACING_PATH} fill="white" opacity={0.87} />
+      </svg>
+    </Layer>
   );
 }
 

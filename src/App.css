@@ -1,5 +1,5 @@
 :root {
-  --tokenSize: 3rem;
+  --tokenSize: 48px;
 }
 
 *,
@@ -7,33 +7,3 @@
 *::after {
   box-sizing: border-box;
 }
-
-.grid-container {
-  width: 100vw;
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 4rem 1fr;
-  grid-template-rows: 4rem 1fr;
-  gap: 0px 0px;
-  grid-template-areas:
-    'header header'
-    'sidebar content';
-}
-
-.header {
-  grid-area: header;
-  background-color: black;
-  display: flex;
-  align-items: center;
-  padding-left: 1rem;
-}
-
-.sidebar {
-  grid-area: sidebar;
-  background-color: black;
-}
-
-.content {
-  grid-area: content;
-  overflow: scroll;
-} 

@@ -13,7 +13,6 @@ export function Header() {
 
 export const Title = styled.span`
   font-size: 2.5rem;
-  color: white;
 `;
 
 Title.displayName = 'Title';
