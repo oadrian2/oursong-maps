@@ -3,7 +3,7 @@ import { Badge, Box, Dialog, DialogContent, DialogTitle, Typography } from '@mui
 import React from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { GeneratorID, isMarkerShape } from '../api/types';
-import { campaignState } from '../app/campaignState';
+import { baseDefaultState, campaignState } from '../app/campaignState';
 import { claimedFigureGeneratorListState, figureGeneratorListState, generatorState } from '../app/mapState';
 import { isGMState } from '../app/userState';
 import { TokenBase } from '../doodads/TokenBase';
@@ -78,12 +78,13 @@ type PlayerSeatProps = { name: string; generators: string[] };
 
 const FigureLine = ({ id }: FigureLineProps) => {
   const generator = useRecoilValue(generatorState(id));
+  const baseDefault = useRecoilValue(baseDefaultState);
 
   if (!generator || isMarkerShape(generator.shape)) throw new Error('Augh!');
 
   const {
     label,
-    shape: { prefix, color, baseSize },
+    shape: { prefix, color, baseSize = baseDefault },
   } = generator;
 
   return (
@@ -92,7 +93,7 @@ const FigureLine = ({ id }: FigureLineProps) => {
         {prefix}
       </TokenBase>
       <Typography variant="body1">{label}</Typography>
-      <Badge sx={{ marginLeft: 'auto', marginRight: '0.5rem' }} color="secondary" badgeContent={baseSize ?? 0} />
+      <Badge sx={{ marginLeft: 'auto', marginRight: '0.5rem' }} color="secondary" badgeContent={baseSize === baseDefault ? 0 : baseSize} />
     </Box>
   );
 };
