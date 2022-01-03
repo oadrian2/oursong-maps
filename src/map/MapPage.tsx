@@ -6,7 +6,7 @@ import { api } from '../api/ws';
 import { CustomDragLayer } from '../app/CustomDragLayer';
 import { Header } from '../header/Header';
 import { ConnectionInfo } from '../session/ConnectionInfo';
-import { SessionDialog } from '../session/SessionDialog';
+import SeatDialog from '../session/SeatDialog';
 import { Supply } from '../supply/Supply';
 import { MapLayer } from './MapLayer';
 
@@ -41,7 +41,8 @@ export function MapPage({ game, id }: { game: string; id: string }) {
           <MapLayer />
         </MapContent>
       </MapLayout>
-      <SessionDialog />
+      {/* <SessionDialog /> */}
+      <SeatDialog />
       <ConnectionInfo />
     </DndProvider>
   );

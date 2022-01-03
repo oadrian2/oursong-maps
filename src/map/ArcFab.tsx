@@ -51,18 +51,15 @@ export function ArcFab({ children, angle, onClick = () => {} }: ArcFabProps) {
         z-index: 100;
       `}
     >
-      <Fab
-        color="primary"
-        size="small"
-        onClick={onClick}
-        component="button"
-        onMouseDown={stopPropogation}
-        onMouseUp={stopPropogation}
-      >
+      <Fab color="primary" size="small" onClick={onClick} component="button" onMouseDown={stopPropogation} onMouseUp={stopPropogation}>
         {children}
       </Fab>
     </motion.div>
   );
 }
 
-export type ArcFabProps = { children: NonNullable<ReactNode>; angle: number; onClick: React.EventHandler<React.SyntheticEvent> };
+export type ArcFabProps = {
+  children: NonNullable<ReactNode>;
+  angle: number;
+  onClick: React.EventHandler<React.SyntheticEvent>;
+};

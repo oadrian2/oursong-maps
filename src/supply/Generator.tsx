@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
-import { ItemTypes } from '../api/types';
+import { isFigureShape, isMarkerShape, ItemTypes } from '../api/types';
 import { generatorState } from '../app/mapState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
@@ -22,8 +22,8 @@ export function Generator({ id }: GeneratorProps) {
 
   return (
     <>
-      {generator.shapeType === 'figure' && <FigureToken ref={drag} {...generator.shape} isTemplate={true} index={0} />}
-      {generator.shapeType === 'marker' && <MarkerToken ref={drag} {...generator.shape} effectRadius={0} />}
+      {isFigureShape(generator.shape) && <FigureToken ref={drag} name={generator.label} {...generator.shape} isTemplate={true} index={0} />}
+      {isMarkerShape(generator.shape) && <MarkerToken ref={drag} name={generator.label} {...generator.shape} effectRadius={0} />}
     </>
   );
 }

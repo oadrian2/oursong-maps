@@ -1,7 +1,7 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { BehaviorSubject, Observable, shareReplay, Subject } from 'rxjs';
 import { MapID } from '../app/mapState';
-import { Generator, Map, PartitionedID, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
+import { Campaign, CampaignID, Generator, Map, PartitionedID, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
 
 type Handler = (...args: any[]) => void;
 
@@ -80,6 +80,8 @@ export class MapApi {
 
   readonly pingChanges: Observable<[UserID, Point]> = this.#pingChanges.pipe(shareReplay(1));
 
+  readonly userListChanges: Observable<UserID[]> = this.#userList.pipe(shareReplay(1));
+
   ///
 
   async connect() {
@@ -97,39 +99,37 @@ export class MapApi {
   }
 
   async leaveMap() {
-    this.#mapJoinedGuard();
+    if (this.mapId === null) throw new MapNotJoinedError();
 
     await this.connection.invoke('leaveMap', this.mapId);
 
     this.mapId = null;
   }
 
-  updateRuler(userID: UserID, ruler: Ruler) {
-    this.#mapJoinedGuard();
+  updateRuler(ruler: Ruler) {
+    if (this.mapId === null) throw new MapNotJoinedError();
 
-    this.connection.invoke('updateRuler', this.mapId, { id: userID, ...ruler }, new Date());
+    this.connection.invoke('updateRuler', this.mapId, { id: this.userId, ...ruler }, new Date());
   }
 
-  async updatePing(userID: UserID, ping: Point) {
-    this.#mapJoinedGuard();
+  updatePing(ping: Point) {
+    if (this.mapId === null) throw new MapNotJoinedError();
 
-    await this.connection.invoke('updatePing', this.mapId, { id: userID, ...ping });
+    this.connection.invoke('updatePing', this.mapId, { id: this.userId, ...ping });
   }
 
   async updateToken(tokenID: TokenID, token: Token) {
-    console.info(tokenID, token);
+    if (this.mapId === null) throw new MapNotJoinedError();
 
-    this.#mapJoinedGuard();
-
-    const storageToken: StorageToken = { id: tokenID, map: this.mapId!.id, game: this.mapId!.game, ...mapTokenToStorageToken(token) };
+    const storageToken: StorageToken = { id: tokenID, map: this.mapId.id, game: this.mapId.game, ...mapTokenToStorageToken(token) };
 
     await this.connection.invoke('updateToken', this.mapId, { ...storageToken });
   }
 
   async getToken(tokenID: TokenID): Promise<Token> {
-    this.#mapJoinedGuard();
+    if (this.mapId === null) throw new MapNotJoinedError();
 
-    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/token/${this.mapId!.game}/${tokenID}`);
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/token/${this.mapId.game}/${tokenID}`);
 
     if (response.status !== 200) throw Error('Augh!');
 
@@ -139,9 +139,9 @@ export class MapApi {
   }
 
   async getTokens(): Promise<TokenID[]> {
-    this.#mapJoinedGuard();
+    if (this.mapId === null) throw new MapNotJoinedError();
 
-    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/map/${this.mapId!.game}/${this.mapId!.id}/tokens`);
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/map/${this.mapId.game}/${this.mapId.id}/tokens`);
 
     if (response.status !== 200) throw Error('Augh!');
 
@@ -151,7 +151,8 @@ export class MapApi {
   }
 
   async getMap(mapId: MapID): Promise<Map> {
-    // this.#mapJoinedGuard();
+    // TODO: Fix the eary request
+    // if (this.mapId === null) throw new MapJoinError();
 
     const response = await fetch(`${process.env.REACT_APP_HUB_URL}/maps/${mapId!.game}/${mapId!.id}`);
 
@@ -160,6 +161,16 @@ export class MapApi {
     const storageMap = await response.json();
 
     return mapStorageMapToMap(storageMap);
+  }
+
+  async getCampaign(campaignId: CampaignID): Promise<Campaign> {
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${campaignId}`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const storageCampaign = await response.json();
+
+    return storageCampaign;
   }
 
   onConnected(handler: Handler) {
@@ -197,9 +208,14 @@ export class MapApi {
   get userId(): string | null {
     return this.connection.connectionId;
   }
+}
 
-  #mapJoinedGuard() {
-    if (!this.mapId) throw new Error('Must join a map before interacting with map data.');
+class MapNotJoinedError extends Error {
+  /**
+   *
+   */
+  constructor() {
+    super('Must join a map before interacting with map data.');
   }
 }
 
@@ -221,7 +237,7 @@ function mapTokenToStorageToken(token: Token): Omit<StorageToken, 'id' | 'game' 
 function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>): Token {
   const { generator, position = null, deleted = false, visible = true, active = true, facing = null, path = [], shape } = token;
 
-  const parsedColor = parseColor(shape?.color);
+  const parsedColor = fromColorToColor(shape?.color);
 
   return {
     generator,
@@ -246,16 +262,19 @@ function mapStorageMapToMap(map: StorageMap): Map {
 
 function mapStorageGeneratorToGenerator(generator: StorageGenerator): Generator {
   const {
-    shape: { allegiance, baseSize = 30.0, ...restShape },
+    shapeType: type,
+    shape: { allegiance, color, baseSize = 30.0, label, ...restShape },
     ...restGenerator
   } = generator;
 
   return {
     ...restGenerator,
+    label,
     shape: {
       ...restShape,
-      color: toColor(allegiance), // replaces allegiance
-      scale: baseSize / 30.0, // replaces baseSize
+      type,
+      color: fromColorToColor(color) || fromAllegianceToColor(allegiance), // replaces allegiance
+      baseSize: baseSize!,
     },
   };
 }
@@ -288,6 +307,7 @@ type StorageFigureGenerator = {
     prefix: string;
     label: string; // TODO: move out
     allegiance: StorageAllegiance;
+    color?: StorageColor;
     isGroup?: boolean;
     baseSize?: number;
   };
@@ -312,7 +332,7 @@ type StorageAllegiance = 'ally' | 'enemy' | 'target' | 'unknown';
 
 type StorageColor = keyof typeof TokenColor;
 
-function toColor(allegiance: StorageAllegiance): TokenColor {
+function fromAllegianceToColor(allegiance: StorageAllegiance): TokenColor {
   switch (allegiance) {
     case 'enemy':
       return TokenColor.red;
@@ -325,7 +345,7 @@ function toColor(allegiance: StorageAllegiance): TokenColor {
   }
 }
 
-function parseColor(color?: keyof typeof TokenColor) {
+function fromColorToColor(color?: StorageColor): TokenColor | undefined {
   switch (color) {
     case 'red':
       return TokenColor.red;
@@ -339,7 +359,6 @@ function parseColor(color?: keyof typeof TokenColor) {
       return TokenColor.blue;
     case 'magenta':
       return TokenColor.magenta;
-
     default:
       return undefined;
   }

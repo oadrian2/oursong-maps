@@ -16,7 +16,7 @@ export type Facing = number;
 
 export type Angle = number;
 
-export type Placement = { position: Point; scale: Scale; facing?: Facing };
+export type Placement = { position: Point; scale: Scale; facing: Facing | null };
 
 ///
 
@@ -28,7 +28,7 @@ export enum TokenColor {
   green = 'green',
   cyan = 'cyan',
   blue = 'blue',
-  magenta = 'magenta'
+  magenta = 'magenta',
 }
 
 export type Token = {
@@ -39,7 +39,7 @@ export type Token = {
   active: boolean;
   facing: number | null;
   path: Point[];
-  shape?: Partial<Generator['shape']>
+  shape?: Omit<Partial<FigureShape | MarkerShape>, 'type'>; // override properties
 };
 
 ///
@@ -63,57 +63,34 @@ export type Map = MapID & {
 
 export type GeneratorID = string;
 
-export type FigureGenerator = {
-  id: GeneratorID;
-  // label: string;
-  shapeType: 'figure';
-  shape: {
-    prefix: string;
-    label: string; // TODO: move out
-    color: TokenColor;
-    isGroup?: boolean;
-    scale: number;
-  };
+export type FigureShape = {
+  type: 'figure';
+  color: TokenColor;
+  prefix: string;
+  isGroup?: boolean;
+  baseSize: number;
 };
 
-export type MarkerGenerator = {
-  id: GeneratorID;
-  // label: string;
-  shapeType: 'marker';
-  shape: {
-    label: string; // TODO: move out
-    color: TokenColor;
-    scale: number;
-  };
+export type MarkerShape = {
+  type: 'marker';
+  color: TokenColor;
 };
 
-export type Generator = FigureGenerator | MarkerGenerator;
+export type Generator = {
+  id: GeneratorID;
+  label: string;
+  shape: FigureShape | MarkerShape;
+};
 
-export function isFigureGenerator(g: Generator): g is FigureGenerator {
-  return g.shapeType === 'figure';
-}
+export const isFigureShape = (s: FigureShape | MarkerShape): s is FigureShape => s.type === 'figure';
 
-export function isMarkerGenerator(g: Generator): g is MarkerGenerator {
-  return g.shapeType === 'marker';
-}
+export const isMarkerShape = (s: FigureShape | MarkerShape): s is MarkerShape => s.type === 'marker';
 
 //
 
-export type FigureShape = { 
-  label: string;
-  color: TokenColor;
-  scale: number;
-}
-
-export type MarkerShape = {
-  color: TokenColor;
-}
-
-// 
-
 export type ShapeAura = {
   radius: Scale; // not sure this is right; not sure it should be radius
-}
+};
 
 ///
 
@@ -138,4 +115,23 @@ export type Player = {
 export const ItemTypes = {
   GENERATOR: 'generator',
   STASHED_TOKEN: 'stashed-token',
+};
+
+///
+
+export type CampaignID = string;
+
+export type Campaign = {
+  metrics: {
+    style: 'centerToCenterNormalized';
+    hasFacing: boolean;
+    baseDefault: number;
+    baseOptions: number[];
+    cellSize: string;
+  };
+  generators: Generator[];
+  groups: {
+    name: string;
+    generators: GeneratorID[];
+  }[];
 };

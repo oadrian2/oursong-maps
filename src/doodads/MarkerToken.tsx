@@ -5,7 +5,7 @@ import { TokenColor } from '../api/types';
 const CELL_SIZE = 48.0;
 
 export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(
-  ({ color = 'green', effectRadius = 0, label }, ref) => {
+  ({ color = 'green', effectRadius = 0, name }, ref) => {
     const hue = {
       red: 0,
       yellow: 60,
@@ -18,10 +18,10 @@ export const MarkerToken = forwardRef<HTMLDivElement, MarkerTokenProps>(
     const radius = CELL_SIZE * effectRadius;
 
     return (
-      <MarkerTokenShape ref={ref} title={label} hue={hue} radius={radius}>
+      <MarkerTokenShape ref={ref} title={name} hue={hue} radius={radius}>
         {!!radius && <MarkerTokenAura />}
         <MarkerTokenPlacemat />
-        <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={label} />
+        <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={name} />
       </MarkerTokenShape>
     );
   }
@@ -31,7 +31,7 @@ MarkerToken.displayName = 'MarkerToken';
 
 export type MarkerColor = keyof typeof TokenColor;
 
-export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; label: string };
+export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; name: string };
 
 export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
   display: flex;

@@ -1,11 +1,15 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
-import { Generator, Point, Token, TokenID } from '../api/types';
+import { FigureShape, isFigureShape, isMarkerShape, MarkerShape, Placement, Point, Scale, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
+import { baseDefaultState } from './campaignState';
 import { controlledGeneratorListState, generatorState, viewInactiveState } from './mapState';
+import { centerToCenterNormalizedCellDistance, tokenConnection } from './math';
+import { isGMState } from './userState';
 
 export type FullToken = Token & {
-  shape: Generator['shape'];
-  shapeType: Generator['shapeType'];
+  name: string;
+  shape: FigureShape | MarkerShape;
+  scale: Scale;
 };
 
 // type CanDie = {
@@ -85,7 +89,7 @@ export const tokenState = atomFamily<Token, TokenID>({
   ],
 });
 
-export const tokenIndex = selectorFamily<number, TokenID>({
+export const tokenIndexState = selectorFamily<number, TokenID>({
   key: 'TokenIndex',
   get:
     (selfID: TokenID) =>
@@ -110,12 +114,95 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
 
       if (!token) throw Error(`Invalid Token '${id}'`);
 
-      const { shape, shapeType } = get(generatorState(token.generator))!;
+      const baseDefault = get(baseDefaultState);
+      const { label: name, shape } = get(generatorState(token.generator))!;
 
-      const { visible = true, deleted = false, active = true, shape: tokenShape = {}, ...restToken } = token;
+      const scale = ('baseSize' in shape ? shape.baseSize : baseDefault) / baseDefault;
 
-      return { ...restToken, shapeType, shape: { ...shape, ...tokenShape }, visible, deleted, active };
+      const { visible = true, deleted = false, active = true, shape: shapeOverrides = {}, ...restToken } = token;
+
+      return { ...restToken, name, shape: { ...shape, ...shapeOverrides }, visible, deleted, active, scale };
     },
+});
+
+export type TokenCapabilities = {
+  canMove: boolean;
+  canTrash: boolean;
+  canStash: boolean;
+  canColor: boolean;
+  canSize: boolean;
+  canKill: boolean;
+  canHide: boolean;
+};
+
+export const tokenCapabilityState = selectorFamily<TokenCapabilities, TokenID>({
+  key: 'TokenCapability',
+  get:
+    (id: TokenID) =>
+    ({ get }) => {
+      const token = get(fullTokenState(id));
+      const isGM = get(isGMState);
+
+      if (!token) throw new Error('Augh!');
+
+      if (isFigureShape(token.shape)) {
+        return {
+          canMove: true,
+          canTrash: isGM,
+          canStash: true,
+          canColor: true,
+          canSize: true,
+          canKill: true,
+          canHide: true,
+        };
+      }
+
+      if (isMarkerShape(token.shape)) {
+        return {
+          canMove: true,
+          canTrash: isGM,
+          canStash: false,
+          canColor: isGM,
+          canSize: false,
+          canKill: false,
+          canHide: isGM,
+        };
+      }
+
+      throw new Error('Augh!');
+    },
+});
+
+export const tokenPlacementsState = selector<[TokenID, Placement][]>({
+  key: 'TokenPlacements',
+  get: ({ get }) =>
+    get(tokenIDsState)
+      .map((id) => [id, get(tokenState(id))] as [TokenID, Token])
+      .filter(([_, token]) => token.position !== null)
+      .map(([id, { position, facing }]) => [id, { position, facing, scale: 1.0 } as Placement]),
+});
+
+export const tokenMeasurementsState = selector<
+  Record<TokenID, Record<TokenID, { distance: number; canSeeTarget: boolean; canSeeOrigin: boolean }>>
+>({
+  key: 'TokenMeasurements',
+  get: ({ get }) => {
+    const placements = get(tokenPlacementsState);
+
+    const mapTo = (origin: Placement, target: Placement) => {
+      const distance = centerToCenterNormalizedCellDistance(origin, target);
+      const [canSeeTarget, canSeeOrigin] = tokenConnection(origin, target);
+
+      return { distance, canSeeTarget, canSeeOrigin };
+    };
+
+    return Object.fromEntries(
+      placements.map(([originID, originPlacement]) => [
+        originID,
+        Object.fromEntries(placements.map(([targetID, targetPlacement]) => [targetID, mapTo(originPlacement, targetPlacement)])),
+      ])
+    );
+  },
 });
 
 export const activeTokenIDsState = selector<TokenID[]>({

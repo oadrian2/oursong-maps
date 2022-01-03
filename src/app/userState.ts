@@ -5,13 +5,9 @@ import { api } from '../api/ws';
 ///
 
 const userListSyncEffect: AtomEffect<UserID[]> = ({ setSelf }) => {
-  const setUserList = (ids: UserID[]) => {
-    return setSelf(ids);
-  };
+  api.onUserListUpdated(setSelf);
 
-  api.onUserListUpdated(setUserList);
-
-  return () => api.offUserListUpdated(setUserList);
+  return () => api.offUserListUpdated(setSelf);
 };
 
 export const userListState = atom<UserID[]>({
@@ -21,14 +17,21 @@ export const userListState = atom<UserID[]>({
 });
 const userSyncEffect: AtomEffect<UserID> = ({ trigger, setSelf }) => {
   if (trigger === 'get') {
-    setSelf(api.connection.connectionId!);
+    setSelf(api.userId!);
   }
 
-  api.onConnected((userID) => setSelf(userID));
+  api.onConnected(setSelf);
+
+  return () => api.offConnected(setSelf);
 };
 
 export const userIdState = atom<UserID>({
   key: 'UserId',
   default: api.userId!,
   effects_UNSTABLE: [userSyncEffect],
+});
+
+export const isGMState = atom<boolean>({
+  key: 'IsGM',
+  default: false,
 });

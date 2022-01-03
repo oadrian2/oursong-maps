@@ -1,15 +1,7 @@
 import { atom, selector, selectorFamily } from 'recoil';
-import {
-  FigureGenerator,
-  Generator,
-  GeneratorID,
-  isFigureGenerator,
-  isMarkerGenerator,
-  MarkerGenerator,
-  PartitionedID,
-  TokenColor,
-} from '../api/types';
+import { FigureShape, Generator, GeneratorID, isFigureShape, isMarkerShape, MarkerShape, PartitionedID, TokenColor } from '../api/types';
 import { api } from '../api/ws';
+import { campaignState } from './campaignState';
 
 ///
 
@@ -28,7 +20,7 @@ type MapImage = {
   height: number;
 };
 
-export const mapId = atom<PartitionedID>({
+export const mapIdState = atom<PartitionedID>({
   key: 'MapID',
   default: new Promise(() => {}), // block until set
 });
@@ -37,7 +29,7 @@ export const mapState = atom<Map>({
   key: 'MapState',
   default: selector<Map>({
     key: 'MapState/Default',
-    get: async ({ get }) => await api.getMap(get(mapId)!),
+    get: async ({ get }) => await api.getMap(get(mapIdState)!),
   }),
 });
 
@@ -50,27 +42,35 @@ export const mapTitleState = selector<string>({
   },
 });
 
+export const createUniqueComparitor =
+  <T, P>(selector: (x: T) => P) =>
+  (value: T, index: number, self: T[]) =>
+    self.findIndex((item) => selector(item) === selector(value)) === index;
+
 export const mapGeneratorsState = selector<any[]>({
   key: 'MapGenerators',
   get: ({ get }) => {
+    const { generators: campaignGenerators } = get(campaignState);
     const { generators } = get(mapState);
 
-    return [...generators, ...markerGenerators].sort(sortComparer);
+    return [...generators, ...campaignGenerators, ...markerGenerators].filter(createUniqueComparitor((x) => x.id)).sort(sortComparer);
   },
 });
 
-export const mapImageState = selector<{ src: string; width: number }>({
+export const mapImageState = selector<{ src: string; width: number; height: number }>({
   key: 'MapImage',
   get: ({ get }) => {
     const {
       game,
       id,
-      map: { image, width, scale },
+      map: { image, width, height, scale },
     } = get(mapState);
 
     return {
       src: new URL(`/maps/${game}/${id}/${image}`, process.env.REACT_APP_STORAGE_URL).href,
       width: width * scale,
+      height: height * scale,
+      scale,
     };
   },
 });
@@ -94,7 +94,7 @@ export const figureGeneratorListState = selector<GeneratorID[]>({
   key: 'FigureGeneratorList',
   get: ({ get }) =>
     get(mapGeneratorsState)
-      .filter(isFigureGenerator)
+      .filter((g) => isFigureShape(g.shape))
       .map((g) => g.id),
 });
 
@@ -102,7 +102,7 @@ export const markerGeneratorListState = selector<GeneratorID[]>({
   key: 'MarkerGeneratorList',
   get: ({ get }) =>
     get(mapGeneratorsState)
-      .filter(isMarkerGenerator)
+      .filter((g) => isMarkerShape(g.shape))
       .map((g) => g.id),
 });
 
@@ -135,7 +135,7 @@ export const generatorState = selectorFamily<Generator | null, GeneratorID>({
 export const generatorsByColorState = selector<Record<TokenColor, GeneratorID[]>>({
   key: 'GeneratorsByColor',
   get: ({ get }) => {
-    const generators = get(mapGeneratorsState).filter(isFigureGenerator);
+    const generators = get(mapGeneratorsState).filter((g) => isFigureShape(g.shape));
 
     return generators.reduce((result, { id, shape: { color } }) => {
       result[color] = [...(result[color] || []), id];
@@ -146,45 +146,41 @@ export const generatorsByColorState = selector<Record<TokenColor, GeneratorID[]>
 });
 
 const sortComparer = (generatorA: Generator, generatorB: Generator) =>
-  generatorA.shapeType.localeCompare(generatorB.shapeType) ||
-  +(generatorA.shapeType === 'figure' && generatorB.shapeType === 'figure' && figureComparer(generatorA, generatorB)) ||
-  +(generatorA.shapeType === 'marker' && generatorB.shapeType === 'marker' && markerComparer(generatorA, generatorB));
+  generatorA.shape.type.localeCompare(generatorB.shape.type) ||
+  +(isFigureShape(generatorA.shape) && isFigureShape(generatorB.shape) && figureComparer(generatorA.shape, generatorB.shape)) ||
+  +(isMarkerShape(generatorA.shape) && isMarkerShape(generatorB.shape) && markerComparer(generatorA.shape, generatorB.shape));
 
 const figureComparer = (
-  { shape: { prefix: prefixA, color: colorA, isGroup: isGroupA = false } }: FigureGenerator,
-  { shape: { prefix: prefixB, color: colorB, isGroup: isGroupB = false } }: FigureGenerator
+  { prefix: prefixA, color: colorA, isGroup: isGroupA = false }: FigureShape,
+  { prefix: prefixB, color: colorB, isGroup: isGroupB = false }: FigureShape
 ) => colorA.localeCompare(colorB) || +isGroupA - +isGroupB || prefixA.localeCompare(prefixB);
 
-const markerComparer = ({ shape: { color: colorA } }: MarkerGenerator, { shape: { color: colorB } }: MarkerGenerator) =>
-  colorA.localeCompare(colorB);
+const markerComparer = ({ color: colorA }: MarkerShape, { color: colorB }: MarkerShape) => colorA.localeCompare(colorB);
 
 // TODO: find a better solution
-const markerGenerators: MarkerGenerator[] = [
+const markerGenerators: Generator[] = [
   {
     id: 'marker:red',
-    shapeType: 'marker',
+    label: 'Marker',
     shape: {
-      label: 'Marker',
+      type: 'marker',
       color: TokenColor.red,
-      scale: 1.0,
     },
   },
   {
     id: 'marker:blue',
-    shapeType: 'marker',
+    label: 'Marker',
     shape: {
-      label: 'Marker',
+      type: 'marker',
       color: TokenColor.blue,
-      scale: 1.0,
     },
   },
   {
     id: 'marker:green',
-    shapeType: 'marker',
+    label: 'Marker',
     shape: {
-      label: 'Marker',
+      type: 'marker',
       color: TokenColor.green,
-      scale: 1.0,
     },
   },
 ];

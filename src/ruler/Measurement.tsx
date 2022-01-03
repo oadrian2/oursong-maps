@@ -1,25 +1,35 @@
 import Box from '@mui/system/Box';
 import { useRecoilValue } from 'recoil';
 import { Point, Ruler } from '../api/types';
+import { mapImageState } from '../app/mapState';
 import { visibleRulerState } from '../app/rulerState';
 import { Layer, Positioned } from '../map/Layer';
 import { PlacedToken } from '../map/PlacedToken';
 import { ArcCircle } from './ArcCircle';
 import { LengthsDisplay, OverlayCircle, OverlayRectangle } from './LengthsDisplay';
 
+const CIRCLE_SIZE = 16 * 8.5;
+
 export const Measurement = ({ id }: MeasurementProps) => {
   const ruler = useRecoilValue(visibleRulerState(id));
+  const { width, height } = useRecoilValue(mapImageState);
 
   if (ruler.origin === null) return null;
 
   const { isSingle, origin, path, lastPoint, lastLength, totalLength, scaledX, scaledY } = calcMetrics(ruler);
 
-  const overlayInBounds = lastPoint.x + scaledX * 1.25 * 16 * 8 >= 0 && lastPoint.y + scaledY * 1.25 * 16 * 8 >= 0;
+  const offsetX = scaledX * 1.25;
+  const offsetY = scaledY * 1.25;
+
+  const overlayInBounds = inBounds(
+    { x: lastPoint.x + offsetX * CIRCLE_SIZE, y: lastPoint.y + offsetY * CIRCLE_SIZE },
+    { width, height }
+  );
 
   return (
     <>
-      <Layer style={{ pointerEvents: 'all' }}>
-        <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%">
+      <Layer style={{ pointerEvents: 'all' }} onMouseMoveCapture={console.log}>
+        <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%" style={{pointerEvents: 'none'}}>
           <defs>
             <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
               <polygon points="0 0, 5 1.25, 0 2.5" />
@@ -30,10 +40,10 @@ export const Measurement = ({ id }: MeasurementProps) => {
           {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
         </svg>
       </Layer>
-      <Layer>
+      <Layer style={{pointerEvents: 'none'}}>
         <Positioned style={{ transform: `translate(${lastPoint.x}px, ${lastPoint.y}px)` }}>
           {overlayInBounds && (
-            <Positioned style={{ transform: `translate(${toPercent(scaledX * 1.25)}, ${toPercent(scaledY * 1.25)})` }}>
+            <Positioned style={{ transform: `translate(${toPercent(offsetX)}, ${toPercent(offsetY)})` }}>
               <OverlayCircle>
                 <LengthsDisplay lastLength={lastLength} totalLength={totalLength} />
               </OverlayCircle>
@@ -81,6 +91,10 @@ type RulerData = {
   scaledX: number;
   scaledY: number;
 };
+
+function inBounds(point: { x: number; y: number }, rect: { width: number; height: number }) {
+  return point.x > 0 && point.x < rect.width && point.y > 0 && point.y < rect.height;
+}
 
 export function calcMetrics({ origin, points }: Ruler): RulerData {
   if (!origin) throw Error(`Parameter 'origin' is required.`);

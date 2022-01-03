@@ -5,36 +5,30 @@ import { Placement, TokenID } from '../api/types';
 import { generatorState } from '../app/mapState';
 import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, edgeToEdgeCellDistance, tokenConnection } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
-import { fullTokenState, hoveredTokenIdState, selectedTokenIdState, tokenIndex } from '../app/tokenState';
+import { fullTokenState, hoveredTokenIdState, tokenIndexState } from '../app/tokenState';
 import { FigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 import { DeathMarker } from './DeathMarker';
 import { TokenFacing } from './TokenFacing';
 
-export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
+export function PlacedToken({ id, isSelected = false, onClick = () => {} }: PlacedTokenProps) {
   const [activeId, setActiveId] = useRecoilState(hoveredTokenIdState);
 
   const {
     position: selfPosition,
     facing: selfFacing,
-    shape: selfShape,
-    shape: { scale: selfScale },
+    scale: selfScale,
     generator: selfGeneratorId,
-    visible = true,
-    active = true,
+    visible,
+    active,
   } = useRecoilValue(fullTokenState(id))!;
 
-  const {
-    position: activePosition,
-    facing: activeFacing,
-    shape: { scale: activeScale },
-  } = useRecoilValue(fullTokenState(activeId)) || { shape: {} };
+  console.log('PlacedToken render');
+
+  const { position: activePosition, facing: activeFacing, scale: activeScale } = useRecoilValue(fullTokenState(activeId)) || { shape: {} };
 
   const selfGenerator = useRecoilValue(generatorState(selfGeneratorId))!;
-  const index = useRecoilValue(tokenIndex(id));
-
-  const selectedTokenId = useRecoilValue(selectedTokenIdState);
-  const isSelected = selectedTokenId === id;
+  const index = useRecoilValue(tokenIndexState(id));
 
   const overlay =
     !!activeId &&
@@ -57,16 +51,16 @@ export function PlacedToken({ id, onClick = () => {} }: PlacedTokenProps) {
       style={{ transform: `scale(${selfScale})`, opacity: visible ? 1 : 0.5, transition: 'opacity 0.3s' }}
       onClick={onClick}
     >
-      {selfGenerator.shapeType === 'figure' && <TokenSelectionRing selected={isSelected} />}
-      {selfGenerator.shapeType === 'marker' && <MarkerToken {...(selfShape as any)} effectRadius={2} />}
-      {selfGenerator.shapeType === 'figure' && <FigureToken {...(selfShape as any)} index={index} overlay={overlay} />}
-      {selfGenerator.shapeType === 'figure' && !active && <DeathMarker />}
-      {selfGenerator.shapeType === 'figure' && typeof selfFacing === 'number' && <TokenFacing facing={selfFacing} />}
+      {selfGenerator.shape.type === 'figure' && <TokenSelectionRing selected={isSelected} />}
+      {selfGenerator.shape.type === 'marker' && <MarkerToken name={selfGenerator.label} {...selfGenerator.shape} effectRadius={2} />}
+      {selfGenerator.shape.type === 'figure' && <FigureToken name={selfGenerator.label} {...selfGenerator.shape} index={index} overlay={overlay} />}
+      {selfGenerator.shape.type === 'figure' && !active && <DeathMarker />}
+      {selfGenerator.shape.type === 'figure' && typeof selfFacing === 'number' && <TokenFacing facing={selfFacing} />}
     </div>
   );
 }
 
-type PlacedTokenProps = { id: TokenID; onClick?: React.EventHandler<React.SyntheticEvent> };
+type PlacedTokenProps = { id: TokenID; isSelected?: boolean; onClick?: React.EventHandler<React.SyntheticEvent> };
 
 function overlayText(origin: Placement, target: Placement, strategy: (origin: Placement, target: Placement) => number) {
   const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(origin, target);

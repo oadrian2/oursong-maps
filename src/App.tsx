@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import './App.css';
-import { mapId } from './app/mapState';
+import { mapIdState } from './app/mapState';
 import { LoadingMessage } from './layout/LoadingMessage';
 import { MapPage } from './map/MapPage';
 
@@ -33,7 +33,7 @@ function IDs() {
 function LoadingMapPage() {
   const { game, id } = useParams();
 
-  const setMap = useSetRecoilState(mapId);
+  const setMap = useSetRecoilState(mapIdState);
 
   useEffect(() => {
     game && id && setMap({ game, id });

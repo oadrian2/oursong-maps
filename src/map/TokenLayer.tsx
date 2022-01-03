@@ -67,7 +67,7 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
         zIndex: isSelected ? 100 : undefined,
       }}
     >
-      <PlacedToken id={id} onClick={handleTokenClick} />
+      <PlacedToken id={id} onClick={handleTokenClick} isSelected={isSelected} />
       <TokenMenu id={id} showMenu={isSelected && !isMoving} />
     </motion.div>
   );

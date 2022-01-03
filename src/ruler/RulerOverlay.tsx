@@ -8,10 +8,9 @@ import { useRuler } from './useRuler';
 
 function clientCoordinatesToMapCoordinates(element: HTMLElement, position: XYCoord) {
   const { x: clientX, y: clientY } = position;
-  const { scrollLeft, scrollTop } = element;
   const { left: containerLeft, top: containerTop } = element.getBoundingClientRect();
 
-  return { x: clientX - containerLeft + scrollLeft, y: clientY - containerTop + scrollTop };
+  return { x: clientX - containerLeft, y: clientY - containerTop };
 }
 
 export type RulerOverlayHandle = { clientCoordinatesToMapCoordinates: (position: XYCoord) => XYCoord };

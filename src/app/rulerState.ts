@@ -31,7 +31,7 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
         setSelf(value);
       });
 
-    onSet(throttle((ruler: Ruler) => api.updateRuler(userID, { ...ruler, when: new Date() }), 200));
+    onSet(throttle((ruler: Ruler) => api.updateRuler({ ...ruler, when: new Date() }), 200));
 
     return () => subscription.unsubscribe();
   };

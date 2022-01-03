@@ -3,6 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PaletteIcon from '@mui/icons-material/Palette';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { TokenCapabilities } from '../app/tokenState';
 import HeartPulseIcon from '../icons/HeartPulse';
 import SkullIcon from '../icons/Skull';
 import { ArcFab } from './ArcFab';
@@ -10,12 +11,13 @@ import { ArcFab } from './ArcFab';
 export function TokenMainMenu({
   isActive,
   isVisible,
-  setActive,
-  setVisible,
-  stashToken,
-  trashToken,
-  openColorMenu,
-  openSizeMenu,
+  onSetActiveClicked,
+  onSetVisibleClicked,
+  onStashTokenClicked,
+  onTrashTokenClicked,
+  onOpenColorMenu,
+  onOpenSizeMenu,
+  capabilities,
 }: TokenMainMenuProps) {
   const visibleActionPosition = +0.25 * Math.PI;
   const stashActionPosition = +0.75 * Math.PI;
@@ -23,23 +25,35 @@ export function TokenMainMenu({
   const activeActionPosition = 0 * Math.PI;
   const colorActionPosition = -0.25 * Math.PI;
 
+  const { canHide, canKill, canColor, canStash, canTrash } = capabilities;
+
   return (
     <>
-      <ArcFab key="visible" angle={visibleActionPosition} onClick={() => setVisible(!isVisible)}>
-        {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-      </ArcFab>
-      <ArcFab key="active" angle={activeActionPosition} onClick={() => setActive(!isActive)}>
-        {isActive ? <HeartPulseIcon /> : <SkullIcon />}
-      </ArcFab>
-      <ArcFab key="color-menu" angle={colorActionPosition} onClick={openColorMenu}>
-        <PaletteIcon />
-      </ArcFab>
-      <ArcFab key="stash" angle={stashActionPosition} onClick={stashToken}>
-        <ArchiveIcon />
-      </ArcFab>
-      <ArcFab key="trash" angle={trashActionPosition} onClick={trashToken}>
-        <DeleteIcon />
-      </ArcFab>
+      {canHide && (
+        <ArcFab key="visible" angle={visibleActionPosition} onClick={() => onSetVisibleClicked(!isVisible)}>
+          {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+        </ArcFab>
+      )}
+      {canKill && (
+        <ArcFab key="active" angle={activeActionPosition} onClick={() => onSetActiveClicked(!isActive)}>
+          {isActive ? <HeartPulseIcon /> : <SkullIcon />}
+        </ArcFab>
+      )}
+      {canColor && (
+        <ArcFab key="color-menu" angle={colorActionPosition} onClick={onOpenColorMenu}>
+          <PaletteIcon />
+        </ArcFab>
+      )}
+      {canStash && (
+        <ArcFab key="stash" angle={stashActionPosition} onClick={onStashTokenClicked}>
+          <ArchiveIcon />
+        </ArcFab>
+      )}
+      {canTrash && (
+        <ArcFab key="trash" angle={trashActionPosition} onClick={onTrashTokenClicked}>
+          <DeleteIcon />
+        </ArcFab>
+      )}
     </>
   );
 }
@@ -47,10 +61,11 @@ export function TokenMainMenu({
 type TokenMainMenuProps = {
   isActive: boolean;
   isVisible: boolean;
-  setActive: (active: boolean) => void;
-  setVisible: (visible: boolean) => void;
-  stashToken: () => void;
-  trashToken: () => void;
-  openColorMenu: () => void;
-  openSizeMenu: () => void;
+  onSetActiveClicked: (active: boolean) => void;
+  onSetVisibleClicked: (visible: boolean) => void;
+  onStashTokenClicked: () => void;
+  onTrashTokenClicked: () => void;
+  onOpenColorMenu: () => void;
+  onOpenSizeMenu: () => void;
+  capabilities: TokenCapabilities;
 };
