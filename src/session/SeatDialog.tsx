@@ -6,7 +6,10 @@ import { GeneratorID, isMarkerShape } from '../api/types';
 import { baseDefaultState, campaignState } from '../app/campaignState';
 import { claimedFigureGeneratorListState, figureGeneratorListState, generatorState } from '../app/mapState';
 import { isGMState } from '../app/userState';
-import { TokenBase } from '../doodads/TokenBase';
+import { BorderLayer } from '../doodads/BorderLayer';
+import { FigureBase } from '../doodads/TokenBase';
+import { ContentLayer } from '../map/PlacedToken';
+import { ScalingBox } from '../map/ScalingBox';
 import { Seat } from './Seat';
 
 const SeatDialog = () => {
@@ -83,17 +86,26 @@ const FigureLine = ({ id }: FigureLineProps) => {
   if (!generator || isMarkerShape(generator.shape)) throw new Error('Augh!');
 
   const {
-    label,
-    shape: { prefix, color, baseSize = baseDefault },
+    name,
+    shape: { label, color, baseSize = baseDefault },
   } = generator;
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <TokenBase title={label} color={color} size="small">
-        {prefix}
-      </TokenBase>
-      <Typography variant="body1">{label}</Typography>
-      <Badge sx={{ marginLeft: 'auto', marginRight: '0.5rem' }} color="secondary" badgeContent={baseSize === baseDefault ? 0 : baseSize} />
+      <Badge
+        color="secondary"
+        badgeContent={baseSize === baseDefault ? 0 : baseSize}
+        overlap="circular"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <ScalingBox scale={1}>
+          <FigureBase title={name}>
+            <BorderLayer color={color} />
+            <ContentLayer>{label}</ContentLayer>
+          </FigureBase>
+        </ScalingBox>
+      </Badge>
+      <Typography variant="body1">{name}</Typography>
     </Box>
   );
 };

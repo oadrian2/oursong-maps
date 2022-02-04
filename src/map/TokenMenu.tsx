@@ -1,8 +1,9 @@
 import { AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { tokenCapabilityState } from '../app/tokenState';
+import { fullTokenState, selectedTokenIdState, tokenCapabilityState } from '../app/tokenState';
 import { useToken } from '../doodads/useToken';
+import { useRuler } from '../ruler/useRuler';
 import { TokenColorMenu } from './TokenColorMenu';
 import { TokenMainMenu } from './TokenMainMenu';
 import { TokenSizeMenu } from './TokenSizeMenu';
@@ -17,6 +18,15 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
     setActiveMenu(MenuType.main);
   }, [setActiveMenu, showMenu]);
 
+  const [, { start }] = useRuler();
+
+  const selectedTokenId = useRecoilValue(selectedTokenIdState);
+  const { position } = useRecoilValue(fullTokenState(selectedTokenId!)) || { position: null };
+
+  function handleMove() {
+    start({ x: position!.x, y: position!.y - 48 * 1.5 }, position!, selectedTokenId);
+  }
+
   return (
     <AnimatePresence>
       {showMenu && activeMenu === MenuType.main && (
@@ -29,12 +39,11 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
           onSetVisibleClicked={setVisible}
           onStashTokenClicked={stash}
           onTrashTokenClicked={trash}
+          onMoveClicked={handleMove}
           capabilities={capabilities}
         />
       )}
-      {showMenu && activeMenu === MenuType.color && (
-        <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />
-      )}
+      {showMenu && activeMenu === MenuType.color && <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />}
       {showMenu && activeMenu === MenuType.size && <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} setSize={() => {}} />}
     </AnimatePresence>
   );

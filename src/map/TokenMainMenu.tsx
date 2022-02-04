@@ -1,5 +1,6 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import PaletteIcon from '@mui/icons-material/Palette';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -17,6 +18,7 @@ export function TokenMainMenu({
   onTrashTokenClicked,
   onOpenColorMenu,
   onOpenSizeMenu,
+  onMoveClicked,
   capabilities,
 }: TokenMainMenuProps) {
   const visibleActionPosition = +0.25 * Math.PI;
@@ -29,6 +31,9 @@ export function TokenMainMenu({
 
   return (
     <>
+      <ArcFab key="move" angle={0.5 * Math.PI} onClick={() => onMoveClicked()}>
+        <DirectionsRunIcon />
+      </ArcFab>
       {canHide && (
         <ArcFab key="visible" angle={visibleActionPosition} onClick={() => onSetVisibleClicked(!isVisible)}>
           {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
@@ -67,5 +72,6 @@ type TokenMainMenuProps = {
   onTrashTokenClicked: () => void;
   onOpenColorMenu: () => void;
   onOpenSizeMenu: () => void;
+  onMoveClicked: () => void;
   capabilities: TokenCapabilities;
 };

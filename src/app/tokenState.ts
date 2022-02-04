@@ -1,7 +1,7 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
-import { FigureShape, isFigureShape, isMarkerShape, MarkerShape, Placement, Point, Scale, Token, TokenID } from '../api/types';
+import { FigureShape, isFigureShape, isMarkerShape, MarkerShape, Placement, Scale, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
-import { baseDefaultState } from './campaignState';
+import { baseDefaultState, hasFacingState } from './campaignState';
 import { controlledGeneratorListState, generatorState, viewInactiveState } from './mapState';
 import { centerToCenterNormalizedCellDistance, tokenConnection } from './math';
 import { isGMState } from './userState';
@@ -10,6 +10,7 @@ export type FullToken = Token & {
   name: string;
   shape: FigureShape | MarkerShape;
   scale: Scale;
+  label: string;
 };
 
 // type CanDie = {
@@ -110,18 +111,34 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
     ({ get }) => {
       if (!id) return null;
 
+      const hasFacing = get(hasFacingState);
+
       const token = get(tokenState(id));
 
       if (!token) throw Error(`Invalid Token '${id}'`);
 
+      const index = get(tokenIndexState(id));
+
       const baseDefault = get(baseDefaultState);
-      const { label: name, shape } = get(generatorState(token.generator))!;
+      const { name, shape } = get(generatorState(token.generator))!;
 
       const scale = ('baseSize' in shape ? shape.baseSize : baseDefault) / baseDefault;
 
-      const { visible = true, deleted = false, active = true, shape: shapeOverrides = {}, ...restToken } = token;
+      const label = shape.type === 'figure' ? `${shape.label}${shape.isGroup ? index + 1 : index || ''}` : '';
 
-      return { ...restToken, name, shape: { ...shape, ...shapeOverrides }, visible, deleted, active, scale };
+      const { visible = true, deleted = false, active = true, facing, shape: shapeOverrides = {}, ...restToken } = token;
+
+      return {
+        ...restToken,
+        name,
+        label,
+        facing: hasFacing ? facing : null,
+        shape: { ...shape, ...shapeOverrides },
+        visible,
+        deleted,
+        active,
+        scale,
+      };
     },
 });
 
@@ -225,37 +242,6 @@ export const stashedTokenIDsState = selector<TokenID[]>({
 
       return !position && !deleted;
     }),
-});
-
-export const hoveredTokenState = selector<Token | null>({
-  key: 'HoveredToken',
-  get: ({ get }) => {
-    const hoveredTokenID = get(hoveredTokenIdState);
-
-    if (hoveredTokenID === null) return null;
-
-    return get(tokenState(hoveredTokenID));
-  },
-});
-
-export const hoveredTokenPositionState = selector<Point | null>({
-  key: 'HoveredTokenPosition',
-  get: ({ get }) => {
-    const hoveredToken = get(hoveredTokenState);
-
-    return hoveredToken && hoveredToken.position;
-  },
-});
-
-export const hoveredTokenFullToken = selector<FullToken | null>({
-  key: 'HoveredFullToken',
-  get: ({ get }) => {
-    const hoveredTokenID = get(hoveredTokenIdState);
-
-    if (hoveredTokenID === null) return null;
-
-    return get(fullTokenState(hoveredTokenID));
-  },
 });
 
 export const isTokenVisibleState = selectorFamily<boolean, TokenID>({

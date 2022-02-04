@@ -1,6 +1,7 @@
 import Box from '@mui/system/Box';
 import { useRecoilValue } from 'recoil';
 import { Point, Ruler } from '../api/types';
+import { arcDegreesState } from '../app/campaignState';
 import { mapImageState } from '../app/mapState';
 import { visibleRulerState } from '../app/rulerState';
 import { Layer, Positioned } from '../map/Layer';
@@ -13,6 +14,7 @@ const CIRCLE_SIZE = 16 * 8.5;
 export const Measurement = ({ id }: MeasurementProps) => {
   const ruler = useRecoilValue(visibleRulerState(id));
   const { width, height } = useRecoilValue(mapImageState);
+  const arcDegrees = useRecoilValue(arcDegreesState);
 
   if (ruler.origin === null) return null;
 
@@ -28,8 +30,8 @@ export const Measurement = ({ id }: MeasurementProps) => {
 
   return (
     <>
-      <Layer style={{ pointerEvents: 'all' }} onMouseMoveCapture={console.log}>
-        <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%" style={{pointerEvents: 'none'}}>
+      <Layer>
+        <svg strokeLinejoin="round" strokeLinecap="round" height="100%" width="100%">
           <defs>
             <marker id="arrowhead" markerUnits="strokeWidth" markerWidth="5" markerHeight="2.5" refX="5" refY="1.25" orient="auto">
               <polygon points="0 0, 5 1.25, 0 2.5" />
@@ -37,7 +39,7 @@ export const Measurement = ({ id }: MeasurementProps) => {
           </defs>
           <path d={path} className="back-stroke" markerEnd="url(#arrowhead)" />
           <path d={path} className="fore-stroke" markerEnd="url(#arrowhead)" />
-          {isSingle && <ArcCircle origin={origin} target={lastPoint} />}
+          {isSingle && <ArcCircle origin={origin} target={lastPoint} arcDegrees={arcDegrees} />}
         </svg>
       </Layer>
       <Layer style={{pointerEvents: 'none'}}>

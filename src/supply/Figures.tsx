@@ -3,7 +3,7 @@ import { claimedFigureGeneratorListState } from '../app/mapState';
 import { Generator } from './Generator';
 
 export function Figures() {
-const claimedGenereratorIds = useRecoilValue(claimedFigureGeneratorListState);
+  const claimedGenereratorIds = useRecoilValue(claimedFigureGeneratorListState);
 
   return (
     <div className="token-container">

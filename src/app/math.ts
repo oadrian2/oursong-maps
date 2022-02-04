@@ -56,3 +56,9 @@ export function offsetAngle(origin: Point, point: Point, angle: Angle): Point {
     y: origin.y + (point.x - origin.x) * Math.sin(angle) + (point.y - origin.y) * Math.cos(angle),
   };
 }
+
+export function roundToStep(value: number, step: number) {
+  const inv = 1.0 / step;
+
+  return Math.round(value * inv) / inv;
+}

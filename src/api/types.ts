@@ -66,8 +66,8 @@ export type GeneratorID = string;
 export type FigureShape = {
   type: 'figure';
   color: TokenColor;
-  prefix: string;
-  isGroup?: boolean;
+  label: string;
+  isGroup: boolean;
   baseSize: number;
 };
 
@@ -78,7 +78,7 @@ export type MarkerShape = {
 
 export type Generator = {
   id: GeneratorID;
-  label: string;
+  name: string;
   shape: FigureShape | MarkerShape;
 };
 
@@ -128,6 +128,7 @@ export type Campaign = {
     baseDefault: number;
     baseOptions: number[];
     cellSize: string;
+    arcDegrees: number;
   };
   generators: Generator[];
   groups: {

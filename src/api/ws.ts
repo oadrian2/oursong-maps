@@ -262,19 +262,20 @@ function mapStorageMapToMap(map: StorageMap): Map {
 
 function mapStorageGeneratorToGenerator(generator: StorageGenerator): Generator {
   const {
-    shapeType: type,
-    shape: { allegiance, color, baseSize = 30.0, label, ...restShape },
+    name,
+    shape: { label, color, baseSize, isGroup },
     ...restGenerator
   } = generator;
 
   return {
     ...restGenerator,
-    label,
+    name,
     shape: {
-      ...restShape,
-      type,
-      color: fromColorToColor(color) || fromAllegianceToColor(allegiance), // replaces allegiance
-      baseSize: baseSize!,
+      type: 'figure',
+      label,
+      color: fromColorToColor(color),
+      isGroup,
+      baseSize,
     },
   };
 }
@@ -302,14 +303,13 @@ type StorageToken = {
 
 type StorageFigureGenerator = {
   id: string;
-  shapeType: 'figure';
+  name: string;
   shape: {
-    prefix: string;
-    label: string; // TODO: move out
-    allegiance: StorageAllegiance;
-    color?: StorageColor;
-    isGroup?: boolean;
-    baseSize?: number;
+    type: 'figure';
+    label: string;
+    color: StorageColor;
+    isGroup: boolean;
+    baseSize: number;
   };
 };
 
@@ -328,24 +328,11 @@ type StorageMap = {
   generators: StorageGenerator[];
 };
 
-type StorageAllegiance = 'ally' | 'enemy' | 'target' | 'unknown';
-
 type StorageColor = keyof typeof TokenColor;
 
-function fromAllegianceToColor(allegiance: StorageAllegiance): TokenColor {
-  switch (allegiance) {
-    case 'enemy':
-      return TokenColor.red;
-    case 'ally':
-      return TokenColor.blue;
-    case 'target':
-      return TokenColor.yellow;
-    case 'unknown':
-      return TokenColor.green;
-  }
-}
-
-function fromColorToColor(color?: StorageColor): TokenColor | undefined {
+function fromColorToColor(color: StorageColor): TokenColor;
+function fromColorToColor(color: StorageColor | undefined): TokenColor | undefined;
+function fromColorToColor(color: StorageColor | undefined): TokenColor | undefined {
   switch (color) {
     case 'red':
       return TokenColor.red;

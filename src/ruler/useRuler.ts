@@ -12,7 +12,7 @@ export function useRuler(): [Ruler, RulerCommands] {
     [ruler, setRuler]
   );
 
-  const stop = useCallback(() => setRuler({ ...ruler, origin: null, points: [] }), [ruler, setRuler]);
+  const stop = useCallback(() => setRuler({ ...ruler, origin: null, points: [], attached: null }), [ruler, setRuler]);
 
   const moveTo = useCallback(
     (to: Point) => {

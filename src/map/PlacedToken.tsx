@@ -2,72 +2,142 @@ import styled from '@emotion/styled';
 import React, { useCallback } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Placement, TokenID } from '../api/types';
-import { generatorState } from '../app/mapState';
-import { centerToCenterCellDistance, centerToCenterNormalizedCellDistance, edgeToEdgeCellDistance, tokenConnection } from '../app/math';
+import { cellSizeState, hasFacingState } from '../app/campaignState';
+import { trackedPositionState } from '../app/mapState';
+import {
+  centerToCenterCellDistance,
+  centerToCenterNormalizedCellDistance,
+  edgeToEdgeCellDistance,
+  roundToStep,
+  tokenConnection
+} from '../app/math';
 import { MeasurementStrategy } from '../app/state';
-import { fullTokenState, hoveredTokenIdState, tokenIndexState } from '../app/tokenState';
-import { FigureToken } from '../doodads/FigureToken';
+import { fullTokenState, hoveredTokenIdState } from '../app/tokenState';
+import { BorderLayer } from '../doodads/BorderLayer';
 import { MarkerToken } from '../doodads/MarkerToken';
+import { Overlay } from '../doodads/Overlay';
+import { FigureBase } from '../doodads/TokenBase';
 import { DeathMarker } from './DeathMarker';
+import { ScalingBox } from './ScalingBox';
 import { TokenFacing } from './TokenFacing';
 
 export function PlacedToken({ id, isSelected = false, onClick = () => {} }: PlacedTokenProps) {
   const [activeId, setActiveId] = useRecoilState(hoveredTokenIdState);
+  const { amount: cellSize } = useRecoilValue(cellSizeState);
+  const hasFacing = useRecoilValue(hasFacingState);
+
+  const [trackedPlacement, setTrackedPlacement] = useRecoilState(trackedPositionState);
 
   const {
-    position: selfPosition,
-    facing: selfFacing,
-    scale: selfScale,
-    generator: selfGeneratorId,
+    position,
+    facing,
+    scale,
     visible,
     active,
+    label,
+    name,
+    shape: { color, type },
   } = useRecoilValue(fullTokenState(id))!;
 
-  console.log('PlacedToken render');
+  // console.log('PlacedToken render');
 
-  const { position: activePosition, facing: activeFacing, scale: activeScale } = useRecoilValue(fullTokenState(activeId)) || { shape: {} };
-
-  const selfGenerator = useRecoilValue(generatorState(selfGeneratorId))!;
-  const index = useRecoilValue(tokenIndexState(id));
+  const selfPlacement = { position: position!, facing, scale };
 
   const overlay =
     !!activeId &&
-    activeId !== id &&
-    !!activePosition &&
-    !!selfPosition &&
-    overlayText(
-      { position: activePosition!, facing: activeFacing!, scale: activeScale! },
-      { position: selfPosition!, facing: selfFacing!, scale: selfScale! },
-      measurementStrategy[MeasurementStrategy.centerToCenterNormalized]
-    );
+    trackedPlacement &&
+    position?.x !== trackedPlacement.position.x &&
+    position?.y !== trackedPlacement.position.y &&
+    distance(trackedPlacement, selfPlacement, measurementStrategy[MeasurementStrategy.centerToCenterNormalized], cellSize) +
+      orientation(trackedPlacement, selfPlacement, hasFacing);
 
-  const handleMouseEnter = useCallback(() => setActiveId(id), [id, setActiveId]);
-  const handleMouseLeave = useCallback(() => setActiveId(null), [setActiveId]);
+  const handleMouseEnter = useCallback(() => {
+    setActiveId(id);
+    setTrackedPlacement(position && { position, facing, scale });
+  }, [id, setActiveId, position, facing, scale, setTrackedPlacement]);
+
+  const handleMouseLeave = useCallback(() => {
+    setActiveId(null);
+    setTrackedPlacement(null);
+  }, [setActiveId, setTrackedPlacement]);
 
   return (
     <div
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{ transform: `scale(${selfScale})`, opacity: visible ? 1 : 0.5, transition: 'opacity 0.3s' }}
+      style={{ opacity: visible ? 1 : 0.5, transition: 'opacity 0.3s' }}
       onClick={onClick}
     >
-      {selfGenerator.shape.type === 'figure' && <TokenSelectionRing selected={isSelected} />}
-      {selfGenerator.shape.type === 'marker' && <MarkerToken name={selfGenerator.label} {...selfGenerator.shape} effectRadius={2} />}
-      {selfGenerator.shape.type === 'figure' && <FigureToken name={selfGenerator.label} {...selfGenerator.shape} index={index} overlay={overlay} />}
-      {selfGenerator.shape.type === 'figure' && !active && <DeathMarker />}
-      {selfGenerator.shape.type === 'figure' && typeof selfFacing === 'number' && <TokenFacing facing={selfFacing} />}
+      {type === 'marker' && <MarkerToken name={name} color={color} effectRadius={2} />}
+      {type === 'figure' && (
+        <ScalingBox scale={scale}>
+          <FigureBase title={name}>
+            <BorderLayer color={color} />
+            <ContentLayer>{label}</ContentLayer>
+            {!active && <DeathMarker />}
+            {typeof overlay === 'string' && <Overlay>{overlay}</Overlay>}
+            {typeof facing === 'number' && <TokenFacing facing={facing} />}
+            <TokenSelectionRing selected={isSelected} />
+          </FigureBase>
+        </ScalingBox>
+      )}
     </div>
   );
 }
 
+export const ContentLayer = styled.div`
+  position: absolute;
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: white;
+`;
+
 type PlacedTokenProps = { id: TokenID; isSelected?: boolean; onClick?: React.EventHandler<React.SyntheticEvent> };
 
-function overlayText(origin: Placement, target: Placement, strategy: (origin: Placement, target: Placement) => number) {
+// export function StorageFigureToken({ name, color, active, selected, scale, position }) {}
+
+// export function PlacedFigureToken({ name, color, active, selected, scale, position, facing, label }: PlacedFigureTokenProps) {
+//   return (
+//     <>
+//       <TokenSelectionRing selected={selected} />
+//       <FigureToken name={name} color={color} label={label} />
+//       {!active && <DeathMarker />}
+//       {typeof facing === 'number' && <TokenFacing facing={facing} />}
+//     </>
+//   );
+// }
+
+// export type PlacedFigureTokenProps = { name: string };
+
+// export function PlacedMarkerToken({ name }: PlacedMarkerTokenProps) {}
+
+// export type PlacedMarkerTokenProps = { name: string };
+
+// type Sizeable = { scale: number };
+// type Selectable = { selected: boolean };
+// type Placeable = { position: Point | null };
+// type Faceable = { facing: Angle | null };
+
+// type Marker = Sizeable & Placeable & Faceable;
+
+function distance(
+  origin: Placement,
+  target: Placement,
+  strategy: (origin: Placement, target: Placement) => number,
+  multiplier: number
+): number {
+  return roundToStep(multiplier * strategy(origin, target)!, multiplier / 10);
+}
+
+function orientation(origin: Placement, target: Placement, hasFacing: boolean): string {
+  if (!hasFacing) return '';
+
   const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(origin, target);
 
-  const range = strategy(origin, target)!;
-
-  return range.toFixed(1) + (!isOriginFacingTarget ? 'X' : isTargetFacingOrigin ? 'F' : 'B');
+  return !isOriginFacingTarget ? 'X' : isTargetFacingOrigin ? 'F' : 'B';
 }
 
 const measurementStrategy = {
@@ -81,9 +151,11 @@ export const TokenSelectionRing = styled.div(({ selected }: TokenSelectionRingPr
   inset: -4,
   borderWidth: 4,
   borderStyle: 'solid',
-  borderColor: selected ? 'lightgreen' : 'transparent',
+  borderColor: 'lightgreen',
   borderRadius: '50%',
-  transition: 'border-color 0.2s ease-all',
+  transition: 'opacity 0.2s ease-in-out',
+  opacity: selected ? 1.0 : 0.0,
+  pointerEvents: 'none',
 }));
 
 TokenSelectionRing.displayName = 'TokenSelectionRing';

@@ -80,4 +80,5 @@ export const MapContent = styled.div`
   overflow: scroll;
   background-color: white;
   color: black;
+  padding: 4rem;
 `;

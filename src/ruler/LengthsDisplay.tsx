@@ -1,12 +1,24 @@
 import styled from '@emotion/styled';
+import { useRecoilValue } from 'recoil';
+import { cellSizeState } from '../app/campaignState';
+import { roundToStep } from '../app/math';
 
 export function LengthsDisplay({ lastLength, totalLength }: LengthsDisplayProps) {
+  const { amount, unit } = useRecoilValue(cellSizeState);
+
+  const lastLengthToStep = roundToStep(amount * lastLength, amount / 10);
+  const totalLengthToStep = roundToStep(amount * totalLength, amount / 10);
+
   return (
     <MeasurementText>
       <strong>C:</strong>
-      <span>{lastLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
+      <span>
+        {lastLengthToStep.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit })}
+      </span>
       <strong>T:</strong>
-      <span>{totalLength.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} yd.</span>
+      <span>
+        {totalLengthToStep.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit })}
+      </span>
     </MeasurementText>
   );
 }

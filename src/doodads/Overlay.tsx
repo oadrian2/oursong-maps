@@ -19,11 +19,10 @@ export function Overlay({ children }: OverlayProps) {
           width: 100%;
           height: 100%;
 
-          position: absolute;
-          top: 0;
-          left: 0;
+          border: 4px solid transparent;
+          border-radius: 50%;
 
-          color: white;
+          position: absolute;
 
           font-size: 16px;
           font-weight: 500;

@@ -21,10 +21,10 @@ export function Generator({ id }: GeneratorProps) {
   }, [preview]);
 
   return (
-    <>
-      {isFigureShape(generator.shape) && <FigureToken ref={drag} name={generator.label} {...generator.shape} isTemplate={true} index={0} />}
-      {isMarkerShape(generator.shape) && <MarkerToken ref={drag} name={generator.label} {...generator.shape} effectRadius={0} />}
-    </>
+    <div ref={drag}>
+      {isFigureShape(generator.shape) && <FigureToken name={generator.name} {...generator.shape} />}
+      {isMarkerShape(generator.shape) && <MarkerToken name={generator.name} {...generator.shape} effectRadius={0} />}
+    </div>
   );
 }
 

@@ -1,7 +1,8 @@
 import { Box } from '@mui/material';
 import { ReactNode } from 'react';
 import { GeneratorID, TokenColor } from '../api/types';
-import { TokenBase } from '../doodads/TokenBase';
+import { BorderLayer } from '../doodads/BorderLayer';
+import { FigureBase } from '../doodads/TokenBase';
 import { Generator } from '../supply/Generator';
 
 export function GeneratorGroup({ groupKey, generators, selected, setSelected }: GeneratorGroupProps) {
@@ -23,9 +24,10 @@ export function GeneratorGroup({ groupKey, generators, selected, setSelected }: 
     <Box display="flex">
       <Box mr={1}>
         <ToggleRing selected={allSelected} onChange={(value: boolean) => onSelect(generators, value)}>
-          <TokenBase title="All" color={groupKey}>
+          <FigureBase title="All">
             All
-          </TokenBase>
+            <BorderLayer color={groupKey} />
+          </FigureBase>
         </ToggleRing>
       </Box>
       <Box display="flex" flexWrap="wrap">

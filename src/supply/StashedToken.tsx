@@ -4,13 +4,18 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
 import { isFigureShape, ItemTypes, TokenID } from '../api/types';
 import { generatorState, isControlledGeneratorState } from '../app/mapState';
-import { tokenIndexState, tokenState } from '../app/tokenState';
-import { FigureToken } from '../doodads/FigureToken';
+import { fullTokenState } from '../app/tokenState';
+import { SupplyFigure } from './SupplyFigure';
 
 export function StashedToken({ id }: StashTokenProps) {
-  const { generator: generatorId } = useRecoilValue(tokenState(id));
+  const {
+    generator: generatorId,
+    name,
+    label,
+    shape: { color },
+  } = useRecoilValue(fullTokenState(id))!;
+
   const generator = useRecoilValue(generatorState(generatorId))!;
-  const index = useRecoilValue(tokenIndexState(id));
   const isClaimed = useRecoilValue(isControlledGeneratorState(generatorId));
 
   const [, drag, preview] = useDrag({
@@ -23,7 +28,13 @@ export function StashedToken({ id }: StashTokenProps) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  if (isFigureShape(generator.shape)) return <FigureToken ref={drag} name={generator.label} {...generator.shape} index={index} />;
+  if (isFigureShape(generator.shape)) {
+    return (
+      <div ref={drag}>
+        <SupplyFigure name={name} label={label} color={color} baseSize={generator.shape.baseSize} />
+      </div>
+    );
+  }
 
   return null;
 }

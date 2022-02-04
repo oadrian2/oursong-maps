@@ -1,41 +1,55 @@
-import { forwardRef } from 'react';
+import { Box } from '@mui/material';
 import { TokenColor } from '../api/types';
+import { DeathMarker } from '../map/DeathMarker';
+import { ContentLayer } from '../map/PlacedToken';
+import { TokenFacing } from '../map/TokenFacing';
+import { BorderLayer } from './BorderLayer';
 import { Overlay } from './Overlay';
-import { TokenBase } from './TokenBase';
+import { FigureBase } from './TokenBase';
 
-export const FigureToken = forwardRef<HTMLDivElement, FigureTokenProps>(
-  ({ isTemplate = false, index, prefix, name, color, isGroup = false, overlay = null }, ref) => {
-    if (isTemplate) {
-      const effectiveLabel = `${prefix}${isGroup ? '#' : ''}`;
-      const effectiveTitle = name;
+export function FigureToken({ label, name, color, isGroup }: FigureTokenProps) {
+  const effectiveLabel = `${label}${isGroup ? '#' : ''}`;
+  const effectiveTitle = name;
 
-      return (
-        <TokenBase ref={ref} title={effectiveTitle} color={color}>
-          {effectiveLabel}
-        </TokenBase>
-      );
-    } else {
-      // Group tokens present as Ab1, Ab2, Ab3, etc.
-      // Leader (non-group) tokens present as Ab, Ab1, Ab2, etc where Ab1, Ab2 are subordinates.
-      const effectiveLabel = `${prefix}${isGroup ? index + 1 : index || ''}`;
-      const effectiveTitle = `${name} ${isGroup ? index + 1 : index || ''}`;
-
-      return (
-        <TokenBase ref={ref} title={effectiveTitle} color={color}>
-          {effectiveLabel}
-          {overlay && <Overlay>{overlay}</Overlay>}
-        </TokenBase>
-      );
-    }
-  }
-);
+  return (
+    <Box sx={{ width: '48px', height: '48px' }}>
+      <FigureBase title={effectiveTitle}>
+        <BorderLayer color={color} />
+        <ContentLayer>{effectiveLabel}</ContentLayer>
+      </FigureBase>
+    </Box>
+  );
+}
 
 export type FigureTokenProps = {
-  index: number;
-  prefix: string;
+  label: string;
   name: string;
   color: TokenColor;
-  overlay?: string | false | null;
-  isTemplate?: boolean;
-  isGroup?: boolean;
+  isGroup: boolean;
+};
+
+export function PlacedFigureToken({ label, name, color, baseSize, facing, overlay, active }: PlacedFigureTokenProps) {
+  return (
+    <Box sx={{ width: '48px', height: '48px' }}>
+      <Box sx={{ width: '100%', height: '100%', transform: `scale(${baseSize / 30.0})` }}>
+        <FigureBase title={name}>
+          <BorderLayer color={color} />
+          <ContentLayer>{label}</ContentLayer>
+          {typeof facing === 'number' && <TokenFacing facing={facing} />}
+          {!active && <DeathMarker />}
+          {typeof overlay === 'string' && <Overlay>{overlay}</Overlay>}
+        </FigureBase>
+      </Box>
+    </Box>
+  );
+}
+
+export type PlacedFigureTokenProps = {
+  label: string;
+  name: string;
+  color: TokenColor;
+  baseSize: number;
+  facing?: number;
+  active: boolean;
+  overlay?: string;
 };

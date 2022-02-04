@@ -2,11 +2,11 @@ import styled from '@emotion/styled';
 import { Point } from '../api/types';
 import { degToRad, offsetAngle } from '../app/math';
 
-export const ArcCircle = ({ origin, target }: ArcCircleProps) => {
+export const ArcCircle = ({ origin, target, arcDegrees }: ArcCircleProps) => {
   const radius = Math.hypot(target.x - origin.x, target.y - origin.y);
 
-  const negPosition = offsetAngle(origin, target, degToRad(-10));
-  const posPosition = offsetAngle(origin, target, degToRad(+10));
+  const negPosition = offsetAngle(origin, target, degToRad(-arcDegrees / 2));
+  const posPosition = offsetAngle(origin, target, degToRad(+arcDegrees / 2));
 
   const sprayShape = `M ${negPosition.x} ${negPosition.y} A ${radius} ${radius} 0 0 1 ${posPosition.x} ${posPosition.y} L ${origin.x} ${origin.y} Z`;
 
@@ -19,7 +19,7 @@ export const ArcCircle = ({ origin, target }: ArcCircleProps) => {
   );
 };
 
-type ArcCircleProps = { origin: Point; target: Point };
+type ArcCircleProps = { origin: Point; target: Point; arcDegrees: number };
 
 export const OverlayShape = styled.path`
   fill: hsla(0, 0%, 80%, 0.25);

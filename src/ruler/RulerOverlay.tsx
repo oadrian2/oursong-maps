@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
-import React, { forwardRef, ReactNode, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, ReactNode, useCallback, useImperativeHandle, useRef } from 'react';
 import { XYCoord } from 'react-dnd';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { hoveredTokenIdState, hoveredTokenPositionState, selectedTokenIdState } from '../app/tokenState';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { trackedPositionState } from '../app/mapState';
+import { isMeasuringState } from '../app/rulerState';
+import { selectedTokenIdState } from '../app/tokenState';
 import { Rulers } from './Rulers';
 import { useRuler } from './useRuler';
 
@@ -18,45 +20,67 @@ export type RulerOverlayHandle = { clientCoordinatesToMapCoordinates: (position:
 export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({ children }: RulerOverlayProps, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [measuring, setMeasuring] = useState(false);
+  // const [measuring, setMeasuring] = useState(false);
 
-  const [selectedTokenID, setSelectedTokenID] = useRecoilState(selectedTokenIdState);
-  const hoveredTokenID = useRecoilValue(hoveredTokenIdState);
-  const hoveredPosition = useRecoilValue(hoveredTokenPositionState);
+  // const [selectedTokenID, setSelectedTokenID] = useRecoilState(selectedTokenIdState);
+  // const hoveredTokenID = useRecoilValue(hoveredTokenIdState);
+  const setSelectedTokenID = useSetRecoilState(selectedTokenIdState);
+
+  const { position: hoveredPosition } = useRecoilValue(trackedPositionState) ?? { position: null };
 
   const [, { start, stop, complete, moveTo, pushWaypoint, popWaypoint }] = useRuler();
+
+  const measuring = useRecoilValue(isMeasuringState);
 
   useImperativeHandle(ref, () => ({
     clientCoordinatesToMapCoordinates: ({ x, y }: XYCoord) => clientCoordinatesToMapCoordinates(containerRef.current!, { x, y }),
   }));
 
   function onMouseDown(event: React.MouseEvent) {
-    if (event.button !== 2) return;
+    if (measuring && event.button === 0) {
+      complete();
 
-    if (measuring) return;
+      return;
+    }
 
-    setMeasuring(true);
+    if (measuring && event.button === 2) {
+      pushWaypoint();
 
-    const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
+      return;
+    }
 
-    start(position, hoveredPosition, selectedTokenID === hoveredTokenID ? hoveredTokenID : null);
+    if (!measuring && event.button === 2) {
+      const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
+
+      start(position, hoveredPosition, null);
+    }
+
+    // if (event.button !== 2) return;
+
+    // if (measuring) return;
+
+    // setMeasuring(true);
+
+    // const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
+
+    // start(position, hoveredPosition, selectedTokenID === hoveredTokenID ? selectedTokenID : null);
   }
 
   function onMouseUp() {
     if (!measuring) return;
 
-    setMeasuring(false);
+    // setMeasuring(false);
 
-    complete();
+    // complete();
   }
 
-  function onMouseMove(event: React.MouseEvent) {
+  const onMouseMove = useCallback(function onMouseMove(event: React.MouseEvent) {
     if (!measuring) return;
 
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
     moveTo(position);
-  }
+  }, [measuring, containerRef, moveTo]);
 
   function onKeyUp(event: React.KeyboardEvent) {
     if (event.code === 'Escape') {
@@ -64,7 +88,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
 
       if (!measuring) return;
 
-      setMeasuring(false);
+      // setMeasuring(false);
 
       stop();
     }
@@ -102,7 +126,7 @@ export const RulerOverlayWrapper = styled.div`
 
   border: 2px solid black;
 
-  margin: 1rem auto;
+  margin-inline: auto;
 
   width: min-content;
 
