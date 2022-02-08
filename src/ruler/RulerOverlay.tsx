@@ -32,7 +32,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     clientCoordinatesToMapCoordinates: ({ x, y }: XYCoord) => clientCoordinatesToMapCoordinates(containerRef.current!, { x, y }),
   }));
 
-  function onMouseDown(event: React.MouseEvent) {
+  function handleMouseDown(event: React.MouseEvent) {
     if (measuring && event.button === 0) {
       complete();
 
@@ -52,7 +52,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     }
   }
 
-  const onMouseMove = useCallback(function onMouseMove(event: React.MouseEvent) {
+  const handleMouseMove = useCallback(function onMouseMove(event: React.MouseEvent) {
     if (!measuring) return;
 
     const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
@@ -60,7 +60,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     moveTo(position);
   }, [measuring, containerRef, moveTo]);
 
-  function onKeyUp(event: React.KeyboardEvent) {
+  function handleKeyUp(event: React.KeyboardEvent) {
     if (event.code === 'Escape') {
       setSelectedTokenID(null);
 
@@ -81,9 +81,9 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   return (
     <RulerOverlayWrapper
       ref={containerRef!}
-      onClick={onMouseDown}
-      onMouseMove={onMouseMove}
-      onKeyUp={onKeyUp}
+      onMouseUp={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onKeyUp={handleKeyUp}
       tabIndex={0}
     >
       {children}
