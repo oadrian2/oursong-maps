@@ -50,15 +50,3 @@
   flex: 1 1 auto;
   user-select: none;
 }
-
-.supply-trash {
-  display: flex;
-  border: 2px solid transparent;
-  border-radius: 50%;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  height: 100%;
-  min-width: var(--tokenSize);
-  min-height: var(--tokenSize);
-}

@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { isFigureShape, ItemTypes, TokenID } from '../api/types';
 import { generatorState, isControlledGeneratorState } from '../app/mapState';
 import { fullTokenState } from '../app/tokenState';
-import { SupplyFigure } from './SupplyFigure';
+import { SupplyFigureToken } from '../doodads/FigureToken';
 
 export function StashedToken({ id }: StashTokenProps) {
   const {
@@ -31,7 +31,7 @@ export function StashedToken({ id }: StashTokenProps) {
   if (isFigureShape(generator.shape)) {
     return (
       <div ref={drag}>
-        <SupplyFigure name={name} label={label} color={color} baseSize={generator.shape.baseSize} />
+        <SupplyFigureToken name={name} label={label} color={color} baseSize={generator.shape.baseSize} />
       </div>
     );
   }

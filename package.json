@@ -45,7 +45,8 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      "> 5%",
+      "not IE 11",
       "not dead",
       "not op_mini all",
       "supports es6-module"

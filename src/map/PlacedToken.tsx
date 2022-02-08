@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Placement, TokenID } from '../api/types';
 import { cellSizeState, hasFacingState } from '../app/campaignState';
@@ -9,7 +9,7 @@ import {
   centerToCenterNormalizedCellDistance,
   edgeToEdgeCellDistance,
   roundToStep,
-  tokenConnection
+  tokenConnection,
 } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
 import { fullTokenState, hoveredTokenIdState } from '../app/tokenState';
@@ -36,12 +36,12 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
     active,
     label,
     name,
-    shape: { color, type },
+    shape: { type, color },
   } = useRecoilValue(fullTokenState(id))!;
 
-  // console.log('PlacedToken render');
-
-  const selfPlacement = { position: position!, facing, scale };
+  // Position being null can happen when this refreshes before the container page removes the entry
+  // Likely we need to handle position separately from the rest of the properties
+  const selfPlacement = useMemo(() => ({ position: position!, facing, scale }), [position, facing, scale]);
 
   const overlay =
     !!activeId &&
@@ -53,8 +53,8 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
 
   const handleMouseEnter = useCallback(() => {
     setActiveId(id);
-    setTrackedPlacement(position && { position, facing, scale });
-  }, [id, setActiveId, position, facing, scale, setTrackedPlacement]);
+    setTrackedPlacement(selfPlacement);
+  }, [id, selfPlacement, setActiveId, setTrackedPlacement]);
 
   const handleMouseLeave = useCallback(() => {
     setActiveId(null);
@@ -96,32 +96,6 @@ export const ContentLayer = styled.div`
 `;
 
 type PlacedTokenProps = { id: TokenID; isSelected?: boolean; onClick?: React.EventHandler<React.SyntheticEvent> };
-
-// export function StorageFigureToken({ name, color, active, selected, scale, position }) {}
-
-// export function PlacedFigureToken({ name, color, active, selected, scale, position, facing, label }: PlacedFigureTokenProps) {
-//   return (
-//     <>
-//       <TokenSelectionRing selected={selected} />
-//       <FigureToken name={name} color={color} label={label} />
-//       {!active && <DeathMarker />}
-//       {typeof facing === 'number' && <TokenFacing facing={facing} />}
-//     </>
-//   );
-// }
-
-// export type PlacedFigureTokenProps = { name: string };
-
-// export function PlacedMarkerToken({ name }: PlacedMarkerTokenProps) {}
-
-// export type PlacedMarkerTokenProps = { name: string };
-
-// type Sizeable = { scale: number };
-// type Selectable = { selected: boolean };
-// type Placeable = { position: Point | null };
-// type Faceable = { facing: Angle | null };
-
-// type Marker = Sizeable & Placeable & Faceable;
 
 function distance(
   origin: Placement,

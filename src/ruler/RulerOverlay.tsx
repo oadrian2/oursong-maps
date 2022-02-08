@@ -20,10 +20,6 @@ export type RulerOverlayHandle = { clientCoordinatesToMapCoordinates: (position:
 export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({ children }: RulerOverlayProps, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // const [measuring, setMeasuring] = useState(false);
-
-  // const [selectedTokenID, setSelectedTokenID] = useRecoilState(selectedTokenIdState);
-  // const hoveredTokenID = useRecoilValue(hoveredTokenIdState);
   const setSelectedTokenID = useSetRecoilState(selectedTokenIdState);
 
   const { position: hoveredPosition } = useRecoilValue(trackedPositionState) ?? { position: null };
@@ -54,24 +50,6 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
 
       start(position, hoveredPosition, null);
     }
-
-    // if (event.button !== 2) return;
-
-    // if (measuring) return;
-
-    // setMeasuring(true);
-
-    // const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
-
-    // start(position, hoveredPosition, selectedTokenID === hoveredTokenID ? selectedTokenID : null);
-  }
-
-  function onMouseUp() {
-    if (!measuring) return;
-
-    // setMeasuring(false);
-
-    // complete();
   }
 
   const onMouseMove = useCallback(function onMouseMove(event: React.MouseEvent) {
@@ -88,8 +66,6 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
 
       if (!measuring) return;
 
-      // setMeasuring(false);
-
       stop();
     }
 
@@ -105,8 +81,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   return (
     <RulerOverlayWrapper
       ref={containerRef!}
-      onMouseUp={onMouseUp}
-      onMouseDown={onMouseDown}
+      onClick={onMouseDown}
       onMouseMove={onMouseMove}
       onKeyUp={onKeyUp}
       tabIndex={0}

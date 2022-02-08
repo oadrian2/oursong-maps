@@ -20,8 +20,8 @@ export const Measurement = ({ id }: MeasurementProps) => {
 
   const { isSingle, origin, path, lastPoint, lastLength, totalLength, scaledX, scaledY } = calcMetrics(ruler);
 
-  const offsetX = scaledX * 1.25;
-  const offsetY = scaledY * 1.25;
+  const offsetX = scaledX;
+  const offsetY = scaledY;
 
   const overlayInBounds = inBounds(
     { x: lastPoint.x + offsetX * CIRCLE_SIZE, y: lastPoint.y + offsetY * CIRCLE_SIZE },
@@ -95,7 +95,9 @@ type RulerData = {
 };
 
 function inBounds(point: { x: number; y: number }, rect: { width: number; height: number }) {
-  return point.x > 0 && point.x < rect.width && point.y > 0 && point.y < rect.height;
+  const allowance = 32;
+
+  return point.x > 0 - allowance && point.x < rect.width + allowance && point.y > 0 - allowance && point.y < rect.height + allowance;
 }
 
 export function calcMetrics({ origin, points }: Ruler): RulerData {

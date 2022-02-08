@@ -3,6 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { TokenID } from '../api/types';
 import { stashedTokenIDsState } from '../app/tokenState';
 import { StashedToken } from './StashedToken';
+import { StashLabel } from './Supply';
 import './Supply.css';
 
 export function Stash() {
@@ -13,7 +14,7 @@ export function Stash() {
       {stashedTokenIDs.map((id: TokenID) => (
         <StashedToken key={id} id={id} />
       ))}
-      {stashedTokenIDs.length === 0 && <div className="token-container-empty-label">Stash</div>}
+      {stashedTokenIDs.length === 0 && <StashLabel />}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Badge, Box, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
 import React from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { GeneratorID, isMarkerShape } from '../api/types';
@@ -7,6 +7,7 @@ import { baseDefaultState, campaignState } from '../app/campaignState';
 import { claimedFigureGeneratorListState, figureGeneratorListState, generatorState } from '../app/mapState';
 import { isGMState } from '../app/userState';
 import { BorderLayer } from '../doodads/BorderLayer';
+import { BaseSizeBadge } from '../doodads/FigureToken';
 import { FigureBase } from '../doodads/TokenBase';
 import { ContentLayer } from '../map/PlacedToken';
 import { ScalingBox } from '../map/ScalingBox';
@@ -92,19 +93,14 @@ const FigureLine = ({ id }: FigureLineProps) => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Badge
-        color="secondary"
-        badgeContent={baseSize === baseDefault ? 0 : baseSize}
-        overlap="circular"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
+      <BaseSizeBadge baseSize={baseSize}>
         <ScalingBox scale={1}>
           <FigureBase title={name}>
             <BorderLayer color={color} />
             <ContentLayer>{label}</ContentLayer>
           </FigureBase>
         </ScalingBox>
-      </Badge>
+      </BaseSizeBadge>
       <Typography variant="body1">{name}</Typography>
     </Box>
   );

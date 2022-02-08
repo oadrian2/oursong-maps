@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React from 'react';
 import { Figures } from './Figures';
 import { Markers } from './Markers';
@@ -17,7 +18,7 @@ export function Supply() {
       <hr className="supply-rule" />
       <div className="supply-fluid-container">
         <div className="token-container">
-          <React.Suspense fallback={<div className="token-container-empty-label">Stash</div>}>
+          <React.Suspense fallback={<StashLabel />}>
             <Stash />
           </React.Suspense>
         </div>
@@ -25,3 +26,18 @@ export function Supply() {
     </div>
   );
 }
+
+export const TokenContainerLabel = styled.div`
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+  color: white;
+  font-size: 2rem;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1 1 auto;
+  user-select: none;
+`;
+
+export const ModelsLabel = () => <TokenContainerLabel>Models</TokenContainerLabel>;
+
+export const StashLabel = () => <TokenContainerLabel>Stash</TokenContainerLabel>;
