@@ -9,7 +9,7 @@ import { TokenMainMenu } from './TokenMainMenu';
 import { TokenSizeMenu } from './TokenSizeMenu';
 
 export function TokenMenu({ id, showMenu }: TokenMenuProps) {
-  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor }] = useToken(id);
+  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor, enlarge, shrink }] = useToken(id);
   const capabilities = useRecoilValue(tokenCapabilityState(id));
 
   const [activeMenu, setActiveMenu] = useState(MenuType.main);
@@ -43,8 +43,8 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
           capabilities={capabilities}
         />
       )}
-      {showMenu && activeMenu === MenuType.color && <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />}
-      {showMenu && activeMenu === MenuType.size && <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} setSize={() => {}} />}
+      {showMenu && activeMenu === MenuType.color && capabilities.canColor && <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />}
+      {showMenu && activeMenu === MenuType.size && capabilities.canSize && <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} enlargeToken={enlarge} shrinkToken={shrink} />}
     </AnimatePresence>
   );
 }

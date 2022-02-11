@@ -4,6 +4,7 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import PaletteIcon from '@mui/icons-material/Palette';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import HeightIcon from  '@mui/icons-material/Height'
 import { TokenCapabilities } from '../app/tokenState';
 import HeartPulseIcon from '../icons/HeartPulse';
 import SkullIcon from '../icons/Skull';
@@ -27,7 +28,7 @@ export function TokenMainMenu({
   const activeActionPosition = 0 * Math.PI;
   const colorActionPosition = -0.25 * Math.PI;
 
-  const { canHide, canKill, canColor, canStash, canTrash } = capabilities;
+  const { canHide, canKill, canColor, canStash, canTrash, canSize } = capabilities;
 
   return (
     <>
@@ -57,6 +58,11 @@ export function TokenMainMenu({
       {canTrash && (
         <ArcFab key="trash" angle={trashActionPosition} onClick={onTrashTokenClicked}>
           <DeleteIcon />
+        </ArcFab>
+      )}
+      {canSize && (
+        <ArcFab key="size-menu" angle={-0.5 * Math.PI} onClick={onOpenSizeMenu}>
+          <HeightIcon />
         </ArcFab>
       )}
     </>

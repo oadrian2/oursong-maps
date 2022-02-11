@@ -13,8 +13,9 @@ const userListSyncEffect: AtomEffect<UserID[]> = ({ setSelf }) => {
 export const userListState = atom<UserID[]>({
   key: 'UserList',
   default: [],
-  effects_UNSTABLE: [userListSyncEffect],
+  effects: [userListSyncEffect],
 });
+
 const userSyncEffect: AtomEffect<UserID> = ({ trigger, setSelf }) => {
   if (trigger === 'get') {
     setSelf(api.userId!);
@@ -28,7 +29,7 @@ const userSyncEffect: AtomEffect<UserID> = ({ trigger, setSelf }) => {
 export const userIdState = atom<UserID>({
   key: 'UserId',
   default: api.userId!,
-  effects_UNSTABLE: [userSyncEffect],
+  effects: [userSyncEffect],
 });
 
 export const isGMState = atom<boolean>({

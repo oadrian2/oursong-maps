@@ -64,7 +64,7 @@ export const tokenIDsState = atom<TokenID[]>({
     key: 'TokenIDs/Default',
     get: () => api.getTokens(),
   }),
-  effects_UNSTABLE: [
+  effects: [
     ({ setSelf }) => {
       const subscription = api.tokenListChanges.subscribe((ids) => setSelf(ids));
 
@@ -79,7 +79,7 @@ export const tokenState = atomFamily<Token, TokenID>({
     key: 'TokenState/Default',
     get: (id: TokenID) => async () => api.getToken(id),
   }),
-  effects_UNSTABLE: (id) => [
+  effects: (id) => [
     ({ onSet, setSelf }) => {
       const subscription = api.tokenChanges.subscribe(([tokenID, token]) => tokenID === id && setSelf(token));
 
@@ -120,20 +120,31 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
       const index = get(tokenIndexState(id));
 
       const baseDefault = get(baseDefaultState);
-      const { name, shape } = get(generatorState(token.generator))!;
+      const { name, shape: generatorShape } = get(generatorState(token.generator))!;
 
-      const scale = ('baseSize' in shape ? shape.baseSize : baseDefault) / baseDefault;
+      const label = generatorShape.type === 'figure' ? `${generatorShape.label}${generatorShape.isGroup ? index + 1 : index || ''}` : '';
 
-      const label = shape.type === 'figure' ? `${shape.label}${shape.isGroup ? index + 1 : index || ''}` : '';
+      const { visible = true, deleted = false, active = true, facing, shape: tokenShape = {}, ...restToken } = token;
 
-      const { visible = true, deleted = false, active = true, facing, shape: shapeOverrides = {}, ...restToken } = token;
+      const shape =
+        generatorShape.type === 'figure'
+          ? ({ ...generatorShape, ...tokenShape } as FigureShape)
+          : generatorShape.type === 'marker'
+          ? ({ ...generatorShape, ...tokenShape } as MarkerShape)
+          : (null as never);
+      // if (generatorShape.type !== tokenShape.type) throw new Error('');
+
+      const generatorSize = 'baseSize' in generatorShape ? generatorShape.baseSize : null;
+      const tokenSize = 'baseSize' in tokenShape ? tokenShape.baseSize : null;
+
+      const scale = (tokenSize ?? generatorSize ?? baseDefault) / baseDefault;
 
       return {
         ...restToken,
         name,
         label,
         facing: hasFacing ? facing : null,
-        shape: { ...shape, ...shapeOverrides },
+        shape,
         visible,
         deleted,
         active,

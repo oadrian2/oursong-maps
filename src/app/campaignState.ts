@@ -16,6 +16,11 @@ export const baseDefaultState = selector<number>({
   get: ({ get }) => get(campaignState).metrics.baseDefault,
 });
 
+export const baseOptionsState = selector<number[]>({
+  key: 'BaseOptions',
+  get: ({ get }) => get(campaignState).metrics.baseOptions,
+})
+
 export const hasFacingState = selector<boolean>({
   key: 'HasFacingState',
   get: ({ get }) => get(campaignState).metrics.hasFacing,

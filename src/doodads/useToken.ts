@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
-import { useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilCallback, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
 import { Point, TokenColor, TokenID } from '../api/types';
+import { baseDefaultState, baseOptionsState } from '../app/campaignState';
 import { FullToken, fullTokenState, selectedTokenIdState, tokenState } from '../app/tokenState';
 
 export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
@@ -33,7 +34,41 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [token, setToken]
   );
 
-  return [token, { stash, trash, setVisible, setActive, placeAt, setColor }];
+  const enlarge = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async () => {
+        const token = await snapshot.getPromise(fullTokenState(tokenID));
+        const baseDefault = await snapshot.getPromise(baseDefaultState);
+        const baseOptions = [...(await snapshot.getPromise(baseOptionsState))];
+
+        if (token?.shape?.type !== 'figure') return;
+
+        const oldSize = token.shape?.baseSize ?? baseDefault;
+        const newSize = baseOptions.find((s) => oldSize < s) ?? oldSize;
+
+        oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, baseSize: newSize }, path: [] });
+      },
+    [tokenID]
+  );
+
+  const shrink = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async () => {
+        const token = await snapshot.getPromise(fullTokenState(tokenID))!;
+        const baseDefault = await snapshot.getPromise(baseDefaultState);
+        const baseOptions = [...(await snapshot.getPromise(baseOptionsState))];
+
+        if (token?.shape?.type !== 'figure') return;
+
+        const oldSize = token.shape?.baseSize ?? baseDefault;
+        const newSize = baseOptions.reverse().find((s) => oldSize > s) ?? oldSize;
+
+        oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, baseSize: newSize }, path: [] });
+      },
+    [tokenID]
+  );
+
+  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink }];
 }
 
 type TokenCommands = {
@@ -43,4 +78,6 @@ type TokenCommands = {
   setActive: (active: boolean) => void;
   placeAt: (position: Point) => void;
   setColor: (color: TokenColor) => void;
+  enlarge: () => void;
+  shrink: () => void;
 };

@@ -18,6 +18,8 @@ export type Angle = number;
 
 export type Placement = { position: Point; scale: Scale; facing: Facing | null };
 
+export type Stashed = { position: null, scale: Scale; facing: null };
+
 ///
 
 export type TokenID = string;
@@ -39,7 +41,7 @@ export type Token = {
   active: boolean;
   facing: number | null;
   path: Point[];
-  shape?: Omit<Partial<FigureShape | MarkerShape>, 'type'>; // override properties
+  shape?: Partial<FigureShape> | Partial<MarkerShape>; // override properties
 };
 
 ///

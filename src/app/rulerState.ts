@@ -41,7 +41,7 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
 export const rulerState = atomFamily<Ruler, UserID>({
   key: 'RulerState',
   default: DEFAULT_RULER,
-  effects_UNSTABLE: (userID) => [rulerSyncEffect(userID)],
+  effects: (userID) => [rulerSyncEffect(userID)],
 });
 
 export const selfRulerState = selector<Ruler>({

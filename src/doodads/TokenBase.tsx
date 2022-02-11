@@ -1,24 +1,19 @@
-import styled from '@emotion/styled';
-import { ReactNode } from 'react';
+import { styled } from '@mui/material/styles';
 
-export function FigureBase({ title, children }: FigureBaseProps) {
-  return <TokenShape title={title}>{children}</TokenShape>;
-}
+export const FigureBase = styled('div')(({ theme }) => ({
+  display: 'grid',
+  placeContent: 'center',
 
-type FigureBaseProps = { title: string; children: ReactNode };
+  position: 'relative',
 
-export const TokenShape = styled.div`
-  display: grid;
-  place-content: center;
+  width: '100%',
+  height: '100%',
 
-  position: relative;
+  borderRadius: '50%',
 
-  width: 100%;
-  height: 100%;
+  fontWeight: 400,
 
-  border-radius: 50%;
+  userSelect: 'none',
 
-  font-weight: 400;
-
-  user-select: none;
-`;
+  boxShadow: theme.shadows[1],
+}));
