@@ -3,19 +3,13 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
 import { isFigureShape, ItemTypes, TokenID } from '../api/types';
-import { generatorState, isControlledGeneratorState } from '../app/mapState';
+import { isControlledGeneratorState } from '../app/mapState';
 import { fullTokenState } from '../app/tokenState';
 import { SupplyFigureToken } from '../doodads/FigureToken';
 
 export function StashedToken({ id }: StashTokenProps) {
-  const {
-    generator: generatorId,
-    name,
-    label,
-    shape: { color },
-  } = useRecoilValue(fullTokenState(id))!;
+  const { generator: generatorId, name, label, shape } = useRecoilValue(fullTokenState(id))!;
 
-  const generator = useRecoilValue(generatorState(generatorId))!;
   const isClaimed = useRecoilValue(isControlledGeneratorState(generatorId));
 
   const [, drag, preview] = useDrag({
@@ -28,10 +22,10 @@ export function StashedToken({ id }: StashTokenProps) {
     preview(getEmptyImage(), { captureDraggingState: true });
   }, [preview]);
 
-  if (isFigureShape(generator.shape)) {
+  if (isFigureShape(shape)) {
     return (
       <div ref={drag}>
-        <SupplyFigureToken name={name} label={label} color={color} baseSize={generator.shape.baseSize} />
+        <SupplyFigureToken name={name} label={label} color={shape.color} baseSize={shape.baseSize} />
       </div>
     );
   }
