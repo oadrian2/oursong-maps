@@ -4,9 +4,9 @@ import { api } from '../api/ws';
 import { mapIdState } from './mapState';
 
 export const campaignState = atom<Campaign>({
-  key: 'CampaignState',
+  key: 'Campaign',
   default: selector<Campaign>({
-    key: 'CampaignState/Default',
+    key: 'Campaign/Default',
     get: async ({ get }) => api.getCampaign(get(mapIdState).game),
   }),
 });
@@ -22,7 +22,7 @@ export const baseOptionsState = selector<number[]>({
 })
 
 export const hasFacingState = selector<boolean>({
-  key: 'HasFacingState',
+  key: 'HasFacing',
   get: ({ get }) => get(campaignState).metrics.hasFacing,
 });
 

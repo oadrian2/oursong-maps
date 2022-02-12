@@ -38,7 +38,7 @@ export const mapIdState = atom<PartitionedID>({
 export const mapState = atom<Map>({
   key: 'Map',
   default: selector<Map>({
-    key: 'MapState/Default',
+    key: 'Map/Default',
     get: async ({ get }) => await api.getMap(get(mapIdState)!),
   }),
 });
@@ -145,19 +145,6 @@ export const generatorState = selectorFamily<Generator | null, GeneratorID>({
     (id) =>
     ({ get }) =>
       get(mapGeneratorsState).find((g) => g.id === id),
-});
-
-export const generatorsByColorState = selector<Record<TokenColor, GeneratorID[]>>({
-  key: 'GeneratorsByColor',
-  get: ({ get }) => {
-    const generators = get(mapGeneratorsState).filter((g) => isFigureShape(g.shape));
-
-    return generators.reduce((result, { id, shape: { color } }) => {
-      result[color] = [...(result[color] || []), id];
-
-      return result;
-    }, {} as Record<TokenColor, GeneratorID[]>);
-  },
 });
 
 const sortComparer = (generatorA: Generator, generatorB: Generator) =>

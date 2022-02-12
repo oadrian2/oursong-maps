@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useRecoilCallback, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
-import { Point, TokenColor, TokenID } from '../api/types';
+import { FullToken, Point, TokenColor, TokenID } from '../api/types';
 import { baseDefaultState, baseOptionsState } from '../app/campaignState';
-import { FullToken, fullTokenState, selectedTokenIdState, tokenState } from '../app/tokenState';
+import { fullTokenState, selectedTokenIdState, tokenState } from '../app/tokenState';
 
 export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
   const token = useRecoilValue(fullTokenState(tokenID));
@@ -44,7 +44,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         if (token?.shape?.type !== 'figure') return;
 
         const oldSize = token.shape?.baseSize ?? baseDefault;
-        const newSize = baseOptions.find((s) => oldSize < s) ?? oldSize;
+        const newSize = baseOptions.find((size) => oldSize < size) ?? oldSize;
 
         oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, baseSize: newSize }, path: [] });
       },
@@ -61,7 +61,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         if (token?.shape?.type !== 'figure') return;
 
         const oldSize = token.shape?.baseSize ?? baseDefault;
-        const newSize = baseOptions.reverse().find((s) => oldSize > s) ?? oldSize;
+        const newSize = baseOptions.reverse().find((size) => oldSize > size) ?? oldSize;
 
         oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, baseSize: newSize }, path: [] });
       },

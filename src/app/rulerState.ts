@@ -39,13 +39,13 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
 ///
 
 export const rulerState = atomFamily<Ruler, UserID>({
-  key: 'RulerState',
+  key: 'Ruler',
   default: DEFAULT_RULER,
   effects: (userID) => [rulerSyncEffect(userID)],
 });
 
 export const selfRulerState = selector<Ruler>({
-  key: 'SelfRulerState',
+  key: 'SelfRuler',
   get: ({ get }) => get(rulerState(get(userIdState))),
   set: ({ get, set }, newValue) => set(rulerState(get(userIdState)), newValue),
   cachePolicy_UNSTABLE: {
@@ -59,7 +59,7 @@ export const isMeasuringState = selector<boolean>({
 })
 
 export const visibleRulerState = selectorFamily<Ruler, UserID>({
-  key: 'VisibleRulerState',
+  key: 'VisibleRuler',
   get:
     (userID: UserID) =>
     ({ get }) => {
@@ -80,6 +80,6 @@ export const visibleRulerState = selectorFamily<Ruler, UserID>({
 });
 
 export const isSelfMovingState = selector<boolean>({
-  key: 'IsSelfMovingState',
+  key: 'IsSelfMoving',
   get: ({ get }) => !!get(selfRulerState).attached,
 });

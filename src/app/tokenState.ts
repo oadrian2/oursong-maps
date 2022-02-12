@@ -1,52 +1,9 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
-import { FigureShape, isFigureShape, isMarkerShape, MarkerShape, Placement, Scale, Token, TokenID } from '../api/types';
+import { FigureShape, FullToken, isFigureShape, isMarkerShape, MarkerShape, Placement, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
 import { baseDefaultState, hasFacingState } from './campaignState';
 import { controlledGeneratorListState, generatorState, viewInactiveState } from './mapState';
-import { centerToCenterNormalizedCellDistance, tokenConnection } from './math';
 import { isGMState } from './userState';
-
-export type FullToken = Token & {
-  name: string;
-  shape: FigureShape | MarkerShape;
-  scale: Scale;
-  label: string;
-};
-
-// type CanDie = {
-//   dead?: boolean;
-// };
-
-// type CanHide = {
-//   hidden: boolean;
-// };
-
-// type CanColor = {
-//   color: Color;
-// };
-
-// type CanPlace = {
-//   position: Point | null;
-//   facing: number | null;
-// };
-
-// type CanSize = {
-//   scale: number;
-// };
-
-// type CanSubordinateTo = {
-//   subordinateTo?: GeneratorID;
-// };
-
-// type PlacedToken = Token & CanPlace;
-
-///
-// type TokenAura = { color: Color | null; radius: number };
-// type CircleAura = { shape: 'circle'; radius: number };
-// type RectangleAura = { shape: 'rectangle'; width: number; height: number };
-// type SquareAura = { shape: 'square'; side: number };
-// type Aura = CircleAura | RectangleAura | SquareAura;
-///
 
 export const selectedTokenIdState = atom<TokenID | null>({
   key: 'SelectedTokenId',
@@ -74,9 +31,9 @@ export const tokenIDsState = atom<TokenID[]>({
 });
 
 export const tokenState = atomFamily<Token, TokenID>({
-  key: 'TokenState',
+  key: 'Token',
   default: selectorFamily<Token, TokenID>({
-    key: 'TokenState/Default',
+    key: 'Token/Default',
     get: (id: TokenID) => async () => api.getToken(id),
   }),
   effects: (id) => [
@@ -112,42 +69,31 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
       if (!id) return null;
 
       const hasFacing = get(hasFacingState);
+      const baseDefault = get(baseDefaultState);
 
       const token = get(tokenState(id));
-
-      if (!token) throw Error(`Invalid Token '${id}'`);
-
       const index = get(tokenIndexState(id));
+      const generator = get(generatorState(token.generator))!;
 
-      const baseDefault = get(baseDefaultState);
-      const { name, shape: generatorShape } = get(generatorState(token.generator))!;
+      const { name, shape: generatorShape } = generator;
+      const { facing, shape: tokenShape = {}, ...restToken } = token;
 
       const label = generatorShape.type === 'figure' ? `${generatorShape.label}${generatorShape.isGroup ? index + 1 : index || ''}` : '';
 
-      const { visible = true, deleted = false, active = true, facing, shape: tokenShape = {}, ...restToken } = token;
+      const shape = isFigureShape(generatorShape)
+        ? ({ ...generatorShape, ...tokenShape } as FigureShape)
+        : isMarkerShape(generatorShape)
+        ? ({ ...generatorShape, ...tokenShape } as MarkerShape)
+        : (null as never);
 
-      const shape =
-        generatorShape.type === 'figure'
-          ? ({ ...generatorShape, ...tokenShape } as FigureShape)
-          : generatorShape.type === 'marker'
-          ? ({ ...generatorShape, ...tokenShape } as MarkerShape)
-          : (null as never);
-      // if (generatorShape.type !== tokenShape.type) throw new Error('');
-
-      const generatorSize = 'baseSize' in generatorShape ? generatorShape.baseSize : null;
-      const tokenSize = 'baseSize' in tokenShape ? tokenShape.baseSize : null;
-
-      const scale = (tokenSize ?? generatorSize ?? baseDefault) / baseDefault;
+      const scale = 'baseSize' in shape ? shape.baseSize / baseDefault : 1.0;
 
       return {
         ...restToken,
         name,
         label,
-        facing: hasFacing ? facing : null,
         shape,
-        visible,
-        deleted,
-        active,
+        facing: hasFacing ? facing : null,
         scale,
       };
     },
@@ -208,29 +154,6 @@ export const tokenPlacementsState = selector<[TokenID, Placement][]>({
       .map((id) => [id, get(tokenState(id))] as [TokenID, Token])
       .filter(([_, token]) => token.position !== null)
       .map(([id, { position, facing }]) => [id, { position, facing, scale: 1.0 } as Placement]),
-});
-
-export const tokenMeasurementsState = selector<
-  Record<TokenID, Record<TokenID, { distance: number; canSeeTarget: boolean; canSeeOrigin: boolean }>>
->({
-  key: 'TokenMeasurements',
-  get: ({ get }) => {
-    const placements = get(tokenPlacementsState);
-
-    const mapTo = (origin: Placement, target: Placement) => {
-      const distance = centerToCenterNormalizedCellDistance(origin, target);
-      const [canSeeTarget, canSeeOrigin] = tokenConnection(origin, target);
-
-      return { distance, canSeeTarget, canSeeOrigin };
-    };
-
-    return Object.fromEntries(
-      placements.map(([originID, originPlacement]) => [
-        originID,
-        Object.fromEntries(placements.map(([targetID, targetPlacement]) => [targetID, mapTo(originPlacement, targetPlacement)])),
-      ])
-    );
-  },
 });
 
 export const activeTokenIDsState = selector<TokenID[]>({
