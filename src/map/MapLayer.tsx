@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { Box, Switch } from '@mui/material';
 import { nanoid } from 'nanoid';
 import React, { useCallback, useRef } from 'react';
@@ -75,7 +74,7 @@ export function MapLayer() {
           <MapImage onClick={handleMapImageClick} />
           <React.Suspense
             fallback={
-              <Box sx={{ boxShadow: 3, m: 1, position: 'fixed' }} style={{ top: '50%', left: '50%', background: 'white' }}>
+              <Box sx={{ boxShadow: 3, m: 1, position: 'fixed', top: '50%', left: '50%', background: 'white' }}>
                 Loading...
               </Box>
             }
@@ -84,18 +83,12 @@ export function MapLayer() {
           </React.Suspense>
         </div>
       </RulerOverlay>
-      <MapCommandConsole>
+      <Box position="fixed" right="2rem" top="5rem">
         <Box display="flex" alignItems="center">
-          <SkullIcon style={{ width: 40, height: 40 }} />
+          <SkullIcon sx={{ width: 40, height: 40 }} />
           <Switch checked={viewInactive} onChange={handleViewInactiveChange} />
         </Box>
-      </MapCommandConsole>
+      </Box>
     </>
   );
 }
-
-export const MapCommandConsole = styled.div`
-  position: fixed;
-  right: 2rem;
-  top: 5rem;
-`;

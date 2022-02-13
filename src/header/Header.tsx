@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { Box } from '@mui/material';
 import { useTitle } from 'react-use';
 import { useRecoilValue } from 'recoil';
 import { mapTitleState } from '../app/mapState';
@@ -8,11 +8,9 @@ export function Header() {
 
   useTitle(`OurSong Maps - ${title}`);
 
-  return <Title>{title}</Title>;
+  return (
+    <Box component="span" fontSize="2.5rem">
+      {title}
+    </Box>
+  );
 }
-
-export const Title = styled.span`
-  font-size: 2.5rem;
-`;
-
-Title.displayName = 'Title';

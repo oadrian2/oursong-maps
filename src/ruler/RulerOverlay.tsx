@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import React, { forwardRef, ReactNode, useCallback, useImperativeHandle, useRef } from 'react';
 import { XYCoord } from 'react-dnd';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -52,13 +52,16 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     }
   }
 
-  const handleMouseMove = useCallback(function onMouseMove(event: React.MouseEvent) {
-    if (!measuring) return;
+  const handleMouseMove = useCallback(
+    function onMouseMove(event: React.MouseEvent) {
+      if (!measuring) return;
 
-    const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
+      const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
 
-    moveTo(position);
-  }, [measuring, containerRef, moveTo]);
+      moveTo(position);
+    },
+    [measuring, containerRef, moveTo]
+  );
 
   function handleKeyUp(event: React.KeyboardEvent) {
     if (event.code === 'Escape') {
@@ -79,13 +82,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   }
 
   return (
-    <RulerOverlayWrapper
-      ref={containerRef!}
-      onMouseUp={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onKeyUp={handleKeyUp}
-      tabIndex={0}
-    >
+    <RulerOverlayWrapper ref={containerRef!} onMouseUp={handleMouseDown} onMouseMove={handleMouseMove} onKeyUp={handleKeyUp} tabIndex={0}>
       {children}
       <Rulers />
     </RulerOverlayWrapper>
@@ -96,7 +93,7 @@ RulerOverlay.displayName = 'RulerOverlay';
 
 type RulerOverlayProps = { children: ReactNode };
 
-export const RulerOverlayWrapper = styled.div`
+export const RulerOverlayWrapper = styled('div')`
   display: flex;
 
   border: 2px solid black;

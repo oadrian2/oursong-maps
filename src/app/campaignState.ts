@@ -1,5 +1,5 @@
 import { atom, selector } from 'recoil';
-import { Campaign } from '../api/types';
+import { Campaign, CampaignGroup } from '../api/types';
 import { api } from '../api/ws';
 import { mapIdState } from './mapState';
 
@@ -11,6 +11,11 @@ export const campaignState = atom<Campaign>({
   }),
 });
 
+export const groupsState = selector<CampaignGroup[]>({
+  key: 'CampaignGroups',
+  get: ({ get }) => [...get(campaignState).groups].sort((a, b) => a.name.localeCompare(b.name)),
+});
+
 export const baseDefaultState = selector<number>({
   key: 'DefaultBaseSize',
   get: ({ get }) => get(campaignState).metrics.baseDefault,
@@ -19,7 +24,7 @@ export const baseDefaultState = selector<number>({
 export const baseOptionsState = selector<number[]>({
   key: 'BaseOptions',
   get: ({ get }) => get(campaignState).metrics.baseOptions,
-})
+});
 
 export const hasFacingState = selector<boolean>({
   key: 'HasFacing',
@@ -28,10 +33,10 @@ export const hasFacingState = selector<boolean>({
 
 export const arcDegreesState = selector<number>({
   key: 'ArcDegrees',
-  get: ({ get }) => get(campaignState).metrics.arcDegrees
-})
+  get: ({ get }) => get(campaignState).metrics.arcDegrees,
+});
 
-export const cellSizeState = selector<{ amount: number, unit: string }>({
+export const cellSizeState = selector<{ amount: number; unit: string }>({
   key: 'CellSize',
   get: ({ get }) => {
     const formattedCellSize = get(campaignState).metrics.cellSize;
@@ -40,8 +45,10 @@ export const cellSizeState = selector<{ amount: number, unit: string }>({
 
     if (!result || !result.groups) throw new Error('Augh!');
 
-    const { groups: { amount, unit } } = result;
+    const {
+      groups: { amount, unit },
+    } = result;
 
     return { amount: +amount, unit };
-  }
-})
+  },
+});

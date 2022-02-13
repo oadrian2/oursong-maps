@@ -1,20 +1,15 @@
-import styled from '@emotion/styled';
 import { Box, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
-import React from 'react';
+import { styled } from '@mui/system';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { GeneratorID, isMarkerShape } from '../api/types';
-import { baseDefaultState, campaignState } from '../app/campaignState';
+import { baseDefaultState, groupsState } from '../app/campaignState';
 import { claimedFigureGeneratorListState, figureGeneratorListState, generatorState } from '../app/mapState';
 import { isGMState } from '../app/userState';
-import { BorderLayer } from '../doodads/BorderLayer';
-import { BaseSizeBadge } from '../doodads/FigureToken';
-import { FigureBase } from '../doodads/TokenBase';
-import { ContentLayer } from '../map/PlacedToken';
-import { ScalingBox } from '../map/ScalingBox';
+import { SupplyFigureToken } from '../doodads/FigureToken';
 import { Seat } from './Seat';
 
 const SeatDialog = () => {
-  const { groups } = useRecoilValue(campaignState);
+  const groups = useRecoilValue(groupsState);
   const claimed = useRecoilValue(claimedFigureGeneratorListState);
 
   return (
@@ -34,7 +29,7 @@ const SeatDialog = () => {
 
 export default SeatDialog;
 
-const SeatList = styled.div`
+const SeatList = styled('div')`
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
@@ -54,7 +49,7 @@ const GMSeat = () => {
   return (
     <Seat name="GM" onClaim={handleClaim}>
       <Box sx={{ marginInline: 'auto', width: '40%' }}>
-        <img src="/gm.png" alt="D20" width="100%" />
+        <Box component="img" src="/gm.png" alt="D20" sx={{ width: '100%' }} />
       </Box>
     </Seat>
   );
@@ -93,14 +88,7 @@ const FigureLine = ({ id }: FigureLineProps) => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <BaseSizeBadge baseSize={baseSize}>
-        <ScalingBox scale={1}>
-          <FigureBase title={name}>
-            <BorderLayer color={color} />
-            <ContentLayer>{label}</ContentLayer>
-          </FigureBase>
-        </ScalingBox>
-      </BaseSizeBadge>
+      <SupplyFigureToken label={label} name={name} color={color} baseSize={baseSize} />
       <Typography variant="body1">{name}</Typography>
     </Box>
   );

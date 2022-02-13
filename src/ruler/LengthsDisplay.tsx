@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { cellSizeState } from '../app/campaignState';
 import { roundToStep } from '../app/math';
@@ -9,23 +9,21 @@ export function LengthsDisplay({ lastLength, totalLength }: LengthsDisplayProps)
   const lastLengthToStep = roundToStep(amount * lastLength, amount / 10);
   const totalLengthToStep = roundToStep(amount * totalLength, amount / 10);
 
+  const formatOptions = { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit };
+
   return (
     <MeasurementText>
       <strong>C:</strong>
-      <span>
-        {lastLengthToStep.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit })}
-      </span>
+      <span>{lastLengthToStep.toLocaleString(undefined, formatOptions)}</span>
       <strong>T:</strong>
-      <span>
-        {totalLengthToStep.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit })}
-      </span>
+      <span>{totalLengthToStep.toLocaleString(undefined, formatOptions)}</span>
     </MeasurementText>
   );
 }
 
 export type LengthsDisplayProps = { lastLength: number; totalLength: number };
 
-export const MeasurementText = styled.div`
+export const MeasurementText = styled('div')`
   display: grid;
   grid-template: auto / auto auto;
   place-content: center space-between;
@@ -42,7 +40,7 @@ export const MeasurementText = styled.div`
 
 MeasurementText.displayName = 'MeasurementText';
 
-export const OverlayCircle = styled.div`
+export const OverlayCircle = styled('div')`
   display: grid;
 
   background-color: #eeeeee80;
@@ -61,7 +59,7 @@ export const OverlayCircle = styled.div`
 
 OverlayCircle.displayName = 'OverlayCircle';
 
-export const OverlayRectangle = styled.div`
+export const OverlayRectangle = styled('div')`
   display: grid;
 
   background-color: #eeeeee80;

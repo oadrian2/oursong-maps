@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { useMemo } from 'react';
 import { useDragLayer, XYCoord } from 'react-dnd';
 import { ItemTypes } from '../api/types';
@@ -46,12 +46,11 @@ export function CustomDragLayer() {
   );
 }
 
-const DragLayer = styled.div`
+const DragLayer = styled('div')`
   position: fixed;
   pointer-events: none;
   z-index: 100;
-  left: 0;
-  top: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
 `;

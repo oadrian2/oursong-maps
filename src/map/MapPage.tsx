@@ -1,5 +1,5 @@
-import styled from '@emotion/styled';
-import React, { useEffect } from 'react';
+import { styled } from '@mui/material';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { api } from '../api/ws';
@@ -41,14 +41,13 @@ export function MapPage({ game, id }: { game: string; id: string }) {
           <MapLayer />
         </MapContent>
       </MapLayout>
-      {/* <SessionDialog /> */}
       <SeatDialog />
       <ConnectionInfo />
     </DndProvider>
   );
 }
 
-export const MapLayout = styled.div`
+export const MapLayout = styled('div')`
   width: 100vw;
   height: 100vh;
   display: grid;
@@ -62,7 +61,7 @@ export const MapLayout = styled.div`
   color: white;
 `;
 
-export const MapHeader = styled.div`
+export const MapHeader = styled('div')`
   grid-area: header;
 
   display: flex;
@@ -71,11 +70,11 @@ export const MapHeader = styled.div`
   padding-left: 1rem;
 `;
 
-export const MapSidebar = styled.div`
+export const MapSidebar = styled('div')`
   grid-area: sidebar;
 `;
 
-export const MapContent = styled.div`
+export const MapContent = styled('div')`
   grid-area: content;
   overflow: scroll;
   background-color: white;

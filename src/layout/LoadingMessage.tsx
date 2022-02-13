@@ -1,6 +1,6 @@
-import styled from '@emotion/styled';
+import { styled } from "@mui/material";
 
-export const LoadingMessage = styled.div`
+export const LoadingMessage = styled('div')`
   display: grid;
   place-content: center;
   width: 100vw;

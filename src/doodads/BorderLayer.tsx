@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
-import { TokenColor } from "../api/types";
+import { Box } from '@mui/material';
+import { TokenColor } from '../api/types';
 
 const colorMap: { [key in TokenColor]: string } = {
   red: '#d32f2f',
@@ -10,17 +10,25 @@ const colorMap: { [key in TokenColor]: string } = {
   magenta: '#ff3bf8',
 };
 
-export const BorderLayer = styled.div`
-  position: absolute;
+export function BorderLayer({ color }: BorderLayerProps) {
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
 
-  border: 4px solid transparent;
-  border-color: ${({ color }: { color: TokenColor }) => colorMap[color]};
+        border: '4px solid transparent',
+        borderColor: colorMap[color],
 
-  background: black;
-  color: transparent;
+        background: 'black',
+        color: 'transparent',
 
-  border-radius: 50%;
+        borderRadius: '50%',
 
-  width: 100%;
-  height: 100%;
-`;
+        width: '100%',
+        height: '100%',
+      }}
+    />
+  );
+}
+
+export type BorderLayerProps = { color: TokenColor };

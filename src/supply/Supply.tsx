@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import React from 'react';
 import { Figures } from './Figures';
 import { Markers } from './Markers';
@@ -27,7 +27,7 @@ export function Supply() {
   );
 }
 
-export const TokenContainerLabel = styled.div`
+export const TokenContainerLabel = styled('div')`
   writing-mode: vertical-lr;
   text-orientation: upright;
   color: white;

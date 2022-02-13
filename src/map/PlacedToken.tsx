@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Placement, TokenID } from '../api/types';
@@ -85,7 +85,7 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
   );
 }
 
-export const ContentLayer = styled.div`
+export const ContentLayer = styled('div')`
   position: absolute;
   display: grid;
   place-content: center;
@@ -120,7 +120,7 @@ const measurementStrategy = {
   [MeasurementStrategy.centerToCenterNormalized]: centerToCenterNormalizedCellDistance,
 };
 
-export const TokenSelectionRing = styled.div(({ selected }: TokenSelectionRingProps) => ({
+export const TokenSelectionRing = styled('div')(({ selected }: TokenSelectionRingProps) => ({
   position: 'absolute',
   inset: -4,
   borderWidth: 4,

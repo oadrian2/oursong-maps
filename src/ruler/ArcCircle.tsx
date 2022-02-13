@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Point } from '../api/types';
 import { degToRad, offsetAngle } from '../app/math';
 
@@ -21,7 +21,7 @@ export const ArcCircle = ({ origin, target, arcDegrees }: ArcCircleProps) => {
 
 type ArcCircleProps = { origin: Point; target: Point; arcDegrees: number };
 
-export const OverlayShape = styled.path`
+export const OverlayShape = styled('path')`
   fill: hsla(0, 0%, 80%, 0.25);
   stroke: hsla(0, 0%, 80%, 0.5);
   stroke-width: 1px;

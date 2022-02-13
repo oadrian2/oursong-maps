@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { TokenColor } from '../api/types';
 
 const CELL_SIZE = 48.0;
@@ -30,7 +30,7 @@ export type MarkerColor = keyof typeof TokenColor;
 
 export type MarkerTokenProps = { color?: MarkerColor; effectRadius?: number; name: string };
 
-export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
+export const MarkerTokenShape = styled('div')<{ hue: number; radius: number }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -42,14 +42,14 @@ export const MarkerTokenShape = styled.div<{ hue: number; radius: number }>`
 
 MarkerTokenShape.displayName = 'MarkerTokenShape';
 
-export const MarkerTokenImage = styled.img`
+export const MarkerTokenImage = styled('img')`
   width: 32px;
   margin-top: -32px;
 `;
 
 MarkerTokenImage.displayName = 'MarkerTokenImage';
 
-export const MarkerTokenPlacemat = styled.div`
+export const MarkerTokenPlacemat = styled('div')`
   position: absolute;
 
   width: 12px;
@@ -67,7 +67,7 @@ export const MarkerTokenPlacemat = styled.div`
 
 MarkerTokenPlacemat.displayName = 'MarkerTokenPlacemat';
 
-export const MarkerTokenAura = styled.div`
+export const MarkerTokenAura = styled('div')`
   position: absolute;
 
   width: var(--radius);

@@ -16,4 +16,6 @@ export const FigureBase = styled('div')(({ theme }) => ({
   userSelect: 'none',
 
   boxShadow: theme.shadows[1],
+
+  lineHeight: 1.2,
 }));

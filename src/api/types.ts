@@ -130,6 +130,11 @@ export const ItemTypes = {
 
 export type CampaignID = string;
 
+export type CampaignGroup = {
+  name: string;
+  generators: GeneratorID[];
+}
+
 export type Campaign = {
   metrics: {
     style: 'centerToCenterNormalized';
@@ -140,8 +145,5 @@ export type Campaign = {
     arcDegrees: number;
   };
   generators: Generator[];
-  groups: {
-    name: string;
-    generators: GeneratorID[];
-  }[];
+  groups: CampaignGroup[];
 };
