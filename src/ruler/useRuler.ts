@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useRecoilCallback, useRecoilState } from 'recoil';
 import { Point, Ruler, TokenID } from '../api/types';
 import { selfRulerState } from '../app/rulerState';
-import { selectedTokenIdState, tokenState } from '../app/tokenState';
+import { tokenState } from '../app/tokenState';
 
 export function useRuler(): [Ruler, RulerCommands] {
   const [ruler, setRuler] = useRecoilState(selfRulerState);
@@ -43,9 +43,8 @@ export function useRuler(): [Ruler, RulerCommands] {
     ({ snapshot, set }) =>
       async () => {
         const ruler = await snapshot.getPromise(selfRulerState);
-        const selectedID = await snapshot.getPromise(selectedTokenIdState);
 
-        if (ruler.attached && ruler.attached === selectedID) {
+        if (ruler.attached) {
           const token = await snapshot.getPromise(tokenState(ruler.attached));
 
           const path: Point[] = [ruler.origin!, ...ruler.points];
@@ -54,8 +53,6 @@ export function useRuler(): [Ruler, RulerCommands] {
 
           const position = { x: endX, y: endY };
           const facing = Math.atan2(endY - startY, endX - startX);
-
-          console.log(position, facing, ruler.attached);
 
           set(tokenState(ruler.attached), { ...token, position, facing, path });
         }
