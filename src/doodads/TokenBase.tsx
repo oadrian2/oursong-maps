@@ -1,21 +1,23 @@
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material';
 
-export const FigureBase = styled('div')(({ theme }) => ({
-  display: 'grid',
-  placeContent: 'center',
+export const FigureBase = styled('div')(
+  ({ theme }) => `
+  display: grid;
+  place-content: center;
 
-  position: 'relative',
+  position: relative;
 
-  width: '100%',
-  height: '100%',
+  width: 100%;
+  height: 100%;
 
-  borderRadius: '50%',
+  border-radius: 50%;
 
-  fontWeight: 400,
+  font-weight: 400;
 
-  userSelect: 'none',
+  user-select: none;
 
-  boxShadow: theme.shadows[1],
+  box-shadow: ${theme.shadows[1]};
 
-  lineHeight: 1.2,
-}));
+  line-height: 1.2;
+`
+);
