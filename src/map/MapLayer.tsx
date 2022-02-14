@@ -6,6 +6,7 @@ import { useRecoilCallback, useRecoilState, useSetRecoilState } from 'recoil';
 import { GeneratorID, ItemTypes, Point, TokenID } from '../api/types';
 import { viewInactiveState } from '../app/mapState';
 import { selectedTokenIdState, tokenIDsState, tokenState } from '../app/tokenState';
+import { isGMState } from '../app/userState';
 import SkullIcon from '../icons/Skull';
 import { RulerOverlay, RulerOverlayHandle } from '../ruler/RulerOverlay';
 import { MapImage } from './MapImage';
@@ -39,8 +40,17 @@ export function MapLayer() {
         const midpointPosition = atMidpoint(position);
 
         const tokenIDs = await snapshot.getPromise(tokenIDsState);
+        const isGM = await snapshot.getPromise(isGMState);
 
-        set(tokenState(id), { position: midpointPosition, facing: null, generator, deleted: false, active: true, visible: true, path: [] });
+        set(tokenState(id), {
+          position: midpointPosition,
+          facing: null,
+          generator,
+          deleted: false,
+          active: true,
+          visible: !isGM,
+          path: [],
+        });
         set(tokenIDsState, [...tokenIDs, id]);
       }
   );
@@ -73,11 +83,7 @@ export function MapLayer() {
         <div ref={drop}>
           <MapImage onClick={handleMapImageClick} />
           <React.Suspense
-            fallback={
-              <Box sx={{ boxShadow: 3, m: 1, position: 'fixed', top: '50%', left: '50%', background: 'white' }}>
-                Loading...
-              </Box>
-            }
+            fallback={<Box sx={{ boxShadow: 3, m: 1, position: 'fixed', top: '50%', left: '50%', background: 'white' }}>Loading...</Box>}
           >
             <TokenLayer />
           </React.Suspense>
