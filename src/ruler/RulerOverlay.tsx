@@ -82,7 +82,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   }
 
   return (
-    <RulerOverlayWrapper ref={containerRef!} onMouseUp={handleMouseDown} onMouseMove={handleMouseMove} onKeyUp={handleKeyUp} tabIndex={0}>
+    <RulerOverlayWrapper ref={containerRef!} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onKeyUp={handleKeyUp} tabIndex={0}>
       {children}
       <Rulers />
     </RulerOverlayWrapper>
