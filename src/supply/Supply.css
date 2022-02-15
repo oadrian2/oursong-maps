@@ -12,6 +12,7 @@
   height: 2px;
   color: white;
   flex: none;
+  border-style: none none solid;
 }
 
 .supply-fluid-container {

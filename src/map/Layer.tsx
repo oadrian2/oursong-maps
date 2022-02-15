@@ -1,5 +1,4 @@
 import { styled } from '@mui/material';
-import { Point } from '../api/types';
 
 export const Layer = styled('div')<{ interactive?: boolean }>`
   position: absolute;
@@ -12,16 +11,15 @@ export const Layer = styled('div')<{ interactive?: boolean }>`
 
 Layer.displayName = 'Layer';
 
-export const Positioned = styled('div')<{ at?: Point }>`
+export const Stack = styled('div')`
   position: absolute;
 
   display: grid;
-  grid-template: 1 fr / 1 fr;
   place-items: center;
 
-  ${({ at }) => !!at && `transform: translate(${at.x}px, ${at.y}px)`};
+  > * { position: absolute; }
 `;
 
-Positioned.displayName = 'Positioned';
+Stack.displayName = 'Stack';
 
 export const SvgLayer = Layer.withComponent('svg');
