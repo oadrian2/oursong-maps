@@ -53,7 +53,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   }
 
   const handleMouseMove = useCallback(
-    function onMouseMove(event: React.MouseEvent) {
+    (event: React.MouseEvent) => {
       if (!measuring) return;
 
       const position = clientCoordinatesToMapCoordinates(containerRef.current!, { x: event.pageX, y: event.pageY });
@@ -65,21 +65,16 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
 
   const handleKeyUp = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSelectedTokenID(null);
-
-        if (!measuring) return;
-
+      if (event.key === 'Escape' && measuring) {
         stop();
+
+        return;
       }
 
-      if (event.key === 'w') {
-        pushWaypoint();
-      }
+      if (event.key === 'Escape') setSelectedTokenID(null);
 
-      if (event.key === 'q') {
-        popWaypoint();
-      }
+      if (event.key === 'w' && measuring) pushWaypoint();
+      if (event.key === 'q' && measuring) popWaypoint();
     },
     [setSelectedTokenID, stop, pushWaypoint, popWaypoint, measuring]
   );
@@ -91,11 +86,7 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
   });
 
   return (
-    <RulerOverlayWrapper
-      ref={containerRef!}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-    >
+    <RulerOverlayWrapper ref={containerRef!} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}>
       {children}
       <Rulers />
     </RulerOverlayWrapper>
