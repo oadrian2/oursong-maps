@@ -42,7 +42,7 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
   useEffect(() => {
     if (!position) return;
 
-    const segments = targetPath && targetPath.length !== 0 ? targetPath : [position, position];
+    const segments = targetPath?.length !== 0 ? targetPath : [position, position];
 
     const xCoords = segments.map(({ x }: Point) => x);
     const yCoords = segments.map(({ y }: Point) => y);

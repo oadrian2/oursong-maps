@@ -55,8 +55,8 @@ export const selfRulerState = selector<Ruler>({
 
 export const isMeasuringState = selector<boolean>({
   key: 'IsMeasuring',
-  get: ({ get }) => !!get(selfRulerState).origin
-})
+  get: ({ get }) => !!get(selfRulerState).origin,
+});
 
 export const visibleRulerState = selectorFamily<Ruler, UserID>({
   key: 'VisibleRuler',

@@ -22,7 +22,7 @@ export function useRuler(): [Ruler, RulerCommands] {
 
       if (lastPoint.x === to.x && lastPoint.y === to.y) return;
 
-      setRuler({ ...ruler, points: [...ruler.points.slice(0, -1), to] });
+      setRuler({ ...ruler, points: [...ruler.points.slice(0, -1) as [Point, ...Point[]], to] });
     },
     [ruler, setRuler]
   );
@@ -36,7 +36,7 @@ export function useRuler(): [Ruler, RulerCommands] {
   const popWaypoint = useCallback(() => {
     if (ruler.origin === null || ruler.points.length === 1) return;
 
-    setRuler({ ...ruler, points: [...ruler.points.slice(0, -1)] });
+    setRuler({ ...ruler, points: [...ruler.points.slice(0, -1) as [Point, ...Point[]]] });
   }, [ruler, setRuler]);
 
   const complete = useRecoilCallback(
@@ -47,9 +47,9 @@ export function useRuler(): [Ruler, RulerCommands] {
         if (ruler.attached) {
           const token = await snapshot.getPromise(tokenState(ruler.attached));
 
-          const path: Point[] = [ruler.origin!, ...ruler.points];
-          const { x: startX, y: startY } = path[path.length - 2];
-          const { x: endX, y: endY } = path[path.length - 1];
+          const path = [ruler.origin, ...ruler.points];
+          const { x: startX, y: startY } = path.at(-2)!;
+          const { x: endX, y: endY } = path.at(-1)!;
 
           const position = { x: endX, y: endY };
           const facing = Math.atan2(endY - startY, endX - startX);

@@ -69,12 +69,14 @@ function inBounds(point: { x: number; y: number }, rect: { left: number; top: nu
   return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom;
 }
 
-function calcMetrics({ origin, points }: Ruler): RulerData {
+function calcMetrics(ruler: Ruler): RulerData {
+  const { origin, points } = ruler;
+
   if (!origin) throw Error(`Parameter 'origin' is required.`);
 
   const path = `M ${origin.x},${origin.y} ${points.map(({ x, y }) => `${x},${y}`).join(' ')}`;
 
-  const { segments, lastPoint, lastLength, totalLength, scaledX, scaledY } = points.reduce(
+  const { segments, lastPoint, lastLength, totalLength, scaledX, scaledY } = ruler.points.reduce(
     ({ segments, lastPoint: start, totalLength }: PathData, end: Point) => {
       const width = end.x - start.x;
       const height = end.y - start.y;

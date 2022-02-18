@@ -103,12 +103,19 @@ export type ShapeAura = {
 
 ///
 
-export type Ruler = {
-  origin: Point | null;
-  points: Point[];
-  attached: TokenID | null;
-  when: Date;
-};
+export type Ruler =
+  | {
+      origin: null;
+      points: [];
+      attached: null;
+      when: Date;
+    }
+  | {
+      origin: Point;
+      points: [Point, ...Point[]];
+      attached: TokenID | null;
+      when: Date;
+    };
 
 ///
 
@@ -133,7 +140,7 @@ export type CampaignID = string;
 export type CampaignGroup = {
   name: string;
   generators: GeneratorID[];
-}
+};
 
 export type Campaign = {
   metrics: {
