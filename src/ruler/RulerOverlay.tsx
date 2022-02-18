@@ -1,5 +1,5 @@
 import { styled } from '@mui/material';
-import React, { forwardRef, ReactNode, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, ReactNode, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 import { XYCoord } from 'react-dnd';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { trackedPositionState } from '../app/mapState';
@@ -63,26 +63,39 @@ export const RulerOverlay = forwardRef<RulerOverlayHandle, RulerOverlayProps>(({
     [measuring, containerRef, moveTo]
   );
 
-  function handleKeyUp(event: React.KeyboardEvent) {
-    if (event.code === 'Escape') {
-      setSelectedTokenID(null);
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedTokenID(null);
 
-      if (!measuring) return;
+        if (!measuring) return;
 
-      stop();
-    }
+        stop();
+      }
 
-    if (event.code === 'KeyW') {
-      pushWaypoint();
-    }
+      if (event.key === 'w') {
+        pushWaypoint();
+      }
 
-    if (event.code === 'KeyQ') {
-      popWaypoint();
-    }
-  }
+      if (event.key === 'q') {
+        popWaypoint();
+      }
+    },
+    [setSelectedTokenID, stop, pushWaypoint, popWaypoint, measuring]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keyup', handleKeyUp);
+
+    return () => document.removeEventListener('keyup', handleKeyUp);
+  });
 
   return (
-    <RulerOverlayWrapper ref={containerRef!} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onKeyUp={handleKeyUp} tabIndex={0}>
+    <RulerOverlayWrapper
+      ref={containerRef!}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+    >
       {children}
       <Rulers />
     </RulerOverlayWrapper>
