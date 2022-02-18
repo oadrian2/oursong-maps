@@ -120,17 +120,15 @@ const measurementStrategy = {
   [MeasurementStrategy.centerToCenterNormalized]: centerToCenterNormalizedCellDistance,
 };
 
-export const TokenSelectionRing = styled('div')(({ selected }: TokenSelectionRingProps) => ({
-  position: 'absolute',
-  inset: -4,
-  borderWidth: 4,
-  borderStyle: 'solid',
-  borderColor: 'lightgreen',
-  borderRadius: '50%',
-  transition: 'opacity 0.2s ease-in-out',
-  opacity: selected ? 1.0 : 0.0,
-  pointerEvents: 'none',
-}));
+export const TokenSelectionRing = styled('div')<TokenSelectionRingProps>`
+  position: absolute;
+  inset: -4px;
+  border: 4px solid lightgreen;
+  border-radius: 50%;
+  transition: opacity 0.3s ease-in-out;
+  opacity: ${({ selected }) => selected ? 1.0 : 0.0};
+  pointer-events: none;
+`;
 
 TokenSelectionRing.displayName = 'TokenSelectionRing';
 

@@ -93,8 +93,7 @@ RulerOverlay.displayName = 'RulerOverlay';
 
 type RulerOverlayProps = { children: ReactNode };
 
-const RulerOverlayWrapper = styled('div')(
-  ({ theme }) => `
+const RulerOverlayWrapper = styled('div')`
   display: flex;
 
   border: 2px solid black;
@@ -107,8 +106,7 @@ const RulerOverlayWrapper = styled('div')(
 
   user-select: none;
 
-  box-shadow: ${theme.shadows[3]};
-`
-);
+  box-shadow: ${({ theme }) => theme.shadows[3]};
+`;
 
 RulerOverlayWrapper.displayName = 'RulerOverlayWrapper';

@@ -1,7 +1,6 @@
 import { styled } from '@mui/material';
 
-export const FigureBase = styled('div')(
-  ({ theme }) => `
+export const FigureBase = styled('div')`
   display: grid;
   place-content: center;
 
@@ -16,8 +15,7 @@ export const FigureBase = styled('div')(
 
   user-select: none;
 
-  box-shadow: ${theme.shadows[1]};
+  box-shadow: ${({ theme }) => theme.shadows[1]};
 
   line-height: 1.2;
-`
-);
+`;
