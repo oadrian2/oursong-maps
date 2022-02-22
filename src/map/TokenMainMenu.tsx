@@ -4,7 +4,7 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import PaletteIcon from '@mui/icons-material/Palette';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import HeightIcon from  '@mui/icons-material/Height'
+import HeightIcon from '@mui/icons-material/Height';
 import { TokenCapabilities } from '../app/tokenState';
 import HeartPulseIcon from '../icons/HeartPulse';
 import SkullIcon from '../icons/Skull';
@@ -13,56 +13,60 @@ import { ArcFab } from './ArcFab';
 export function TokenMainMenu({
   isActive,
   isVisible,
+  onMoveClicked,
   onSetActiveClicked,
   onSetVisibleClicked,
   onStashTokenClicked,
   onTrashTokenClicked,
   onOpenColorMenu,
   onOpenSizeMenu,
-  onMoveClicked,
   capabilities,
 }: TokenMainMenuProps) {
+  const activeActionPosition = 0 * Math.PI;
   const visibleActionPosition = +0.25 * Math.PI;
+  const moveActionPosition = +0.5 * Math.PI;
   const stashActionPosition = +0.75 * Math.PI;
   const trashActionPosition = -0.75 * Math.PI;
-  const activeActionPosition = 0 * Math.PI;
+  const sizeActionPosition = -0.5 * Math.PI;
   const colorActionPosition = -0.25 * Math.PI;
 
-  const { canHide, canKill, canColor, canStash, canTrash, canSize } = capabilities;
+  const { canMove, canHide, canKill, canColor, canStash, canTrash, canSize } = capabilities;
 
   return (
     <>
-      <ArcFab key="move" angle={0.5 * Math.PI} onClick={() => onMoveClicked()}>
-        <DirectionsRunIcon />
-      </ArcFab>
-      {canHide && (
-        <ArcFab key="visible" angle={visibleActionPosition} onClick={() => onSetVisibleClicked(!isVisible)}>
-          {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-        </ArcFab>
-      )}
       {canKill && (
-        <ArcFab key="active" angle={activeActionPosition} onClick={() => onSetActiveClicked(!isActive)}>
+        <ArcFab key="active" angle={activeActionPosition} aria-label="toggle alive" onClick={() => onSetActiveClicked(!isActive)}>
           {isActive ? <HeartPulseIcon /> : <SkullIcon />}
         </ArcFab>
       )}
-      {canColor && (
-        <ArcFab key="color-menu" angle={colorActionPosition} onClick={onOpenColorMenu}>
-          <PaletteIcon />
+      {canHide && (
+        <ArcFab key="visible" angle={visibleActionPosition} aria-label="toggle visibility" onClick={() => onSetVisibleClicked(!isVisible)}>
+          {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+        </ArcFab>
+      )}
+      {canMove && (
+        <ArcFab key="move" angle={moveActionPosition} aria-label="move" onClick={() => onMoveClicked()}>
+          <DirectionsRunIcon />
         </ArcFab>
       )}
       {canStash && (
-        <ArcFab key="stash" angle={stashActionPosition} onClick={onStashTokenClicked}>
+        <ArcFab key="stash" angle={stashActionPosition} aria-label="stash" onClick={onStashTokenClicked}>
           <ArchiveIcon />
         </ArcFab>
       )}
       {canTrash && (
-        <ArcFab key="trash" angle={trashActionPosition} onClick={onTrashTokenClicked}>
+        <ArcFab key="trash" angle={trashActionPosition} aria-label="trash" onClick={onTrashTokenClicked}>
           <DeleteIcon />
         </ArcFab>
       )}
       {canSize && (
-        <ArcFab key="size-menu" angle={-0.5 * Math.PI} onClick={onOpenSizeMenu}>
+        <ArcFab key="size-menu" angle={sizeActionPosition} aria-label="change size" onClick={onOpenSizeMenu}>
           <HeightIcon />
+        </ArcFab>
+      )}
+      {canColor && (
+        <ArcFab key="color-menu" angle={colorActionPosition} aria-label="change color" onClick={onOpenColorMenu}>
+          <PaletteIcon />
         </ArcFab>
       )}
     </>

@@ -20,27 +20,27 @@ export function TokenColorMenu({ setColor: onSetColor, closeMenu: onCloseMenu }:
 
   return (
     <>
-      <ArcFab angle={setRedActionPosition} onClick={() => onSetColor(TokenColor.red)}>
+      <ArcFab angle={setRedActionPosition} aria-label="color red" onClick={() => onSetColor(TokenColor.red)}>
         <LetterRIcon />
       </ArcFab>
-      <ArcFab angle={setGreenActionPosition} onClick={() => onSetColor(TokenColor.green)}>
+      <ArcFab angle={setGreenActionPosition} aria-label="color green" onClick={() => onSetColor(TokenColor.green)}>
         <LetterGIcon />
       </ArcFab>
-      <ArcFab angle={setBlueActionPosition} onClick={() => onSetColor(TokenColor.blue)}>
+      <ArcFab angle={setBlueActionPosition} aria-label="color blue" onClick={() => onSetColor(TokenColor.blue)}>
         <LetterBIcon />
       </ArcFab>
 
-      <ArcFab angle={setYellowActionPosition} onClick={() => onSetColor(TokenColor.yellow)}>
+      <ArcFab angle={setYellowActionPosition} aria-label="color yellow" onClick={() => onSetColor(TokenColor.yellow)}>
         <LetterYIcon />
       </ArcFab>
-      <ArcFab angle={setCyanActionPosition} onClick={() => onSetColor(TokenColor.cyan)}>
+      <ArcFab angle={setCyanActionPosition} aria-label="color cyan" onClick={() => onSetColor(TokenColor.cyan)}>
         <LetterCIcon />
       </ArcFab>
-      <ArcFab angle={setMagentaActionPosition} onClick={() => onSetColor(TokenColor.magenta)}>
+      <ArcFab angle={setMagentaActionPosition} aria-label="color magenta" onClick={() => onSetColor(TokenColor.magenta)}>
         <LetterMIcon />
       </ArcFab>
 
-      <ArcFab angle={cancelActionPosition} onClick={onCloseMenu}>
+      <ArcFab angle={cancelActionPosition} aria-label="close menu" onClick={onCloseMenu}>
         <ClearIcon />
       </ArcFab>
     </>

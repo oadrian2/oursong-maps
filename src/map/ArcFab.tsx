@@ -7,7 +7,7 @@ import { roundToStep } from '../app/math';
 
 const TOKEN_SIZE = 48;
 
-export function ArcFab({ children, angle, onClick = () => {} }: ArcFabProps) {
+export function ArcFab({ children, angle, 'aria-label': label, onClick = () => {} }: ArcFabProps) {
   const startDistance = TOKEN_SIZE * 0.25;
   const endDistance = TOKEN_SIZE * 1.5;
   const step = 0.001;
@@ -51,7 +51,7 @@ export function ArcFab({ children, angle, onClick = () => {} }: ArcFabProps) {
         z-index: 100;
       `}
     >
-      <Fab color="primary" size="small" onClick={onClick} component="button" onMouseDown={stopPropogation} onMouseUp={stopPropogation}>
+      <Fab color="primary" size="small" onClick={onClick} component="button" aria-label={label} onMouseDown={stopPropogation} onMouseUp={stopPropogation}>
         {children}
       </Fab>
     </motion.div>
@@ -61,5 +61,6 @@ export function ArcFab({ children, angle, onClick = () => {} }: ArcFabProps) {
 export type ArcFabProps = {
   children: NonNullable<ReactNode>;
   angle: number;
+  'aria-label'?: string;
   onClick: React.EventHandler<React.SyntheticEvent>;
 };

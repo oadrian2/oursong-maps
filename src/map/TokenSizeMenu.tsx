@@ -11,14 +11,14 @@ export function TokenSizeMenu({ closeMenu, enlargeToken, shrinkToken }: TokenSiz
 
   return (
     <>
-      <ArcFab angle={enlargeActionPosition} onClick={enlargeToken}>
+      <ArcFab angle={enlargeActionPosition} aria-label="enlarge" onClick={enlargeToken}>
         <AddIcon />
       </ArcFab>
-      <ArcFab angle={shrinkActionPosition} onClick={shrinkToken}>
+      <ArcFab angle={shrinkActionPosition} aria-label="shrink" onClick={shrinkToken}>
         <RemoveIcon />
       </ArcFab>
 
-      <ArcFab angle={cancelActionPosition} onClick={closeMenu}>
+      <ArcFab angle={cancelActionPosition} aria-label="close menu" onClick={closeMenu}>
         <ClearIcon />
       </ArcFab>
     </>
