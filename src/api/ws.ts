@@ -1,7 +1,7 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { BehaviorSubject, Observable, shareReplay, Subject } from 'rxjs';
 import { MapID } from '../app/mapState';
-import { Campaign, CampaignID, Generator, Map, PartitionedID, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
+import { Campaign, CampaignID, Generator, Map, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
 
 type Handler = (...args: any[]) => void;
 
