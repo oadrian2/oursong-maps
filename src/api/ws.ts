@@ -13,6 +13,7 @@ export class MapApi {
   #connectionHandlers: Handler[] = [];
   #userListHandlers: Handler[] = [];
   #connectedIds = new Set<string>();
+  #tokenCache: StorageToken[] | null = null;
 
   readonly #userID = new Subject<UserID>();
   readonly #userList = new BehaviorSubject<UserID[]>([]);
@@ -59,8 +60,10 @@ export class MapApi {
       this.#pingChanges.next([ping.id, ping]);
     });
 
-    this.connection.on('worldState', (worldState: { tokens: (Token & PartitionedID)[] }) => {
+    this.connection.on('worldState', (worldState: { tokens: StorageToken[] }) => {
       const { tokens } = worldState;
+
+      this.#tokenCache = tokens;
 
       this.#tokenListChanges.next(tokens.map(({ id }) => id));
     });
@@ -129,6 +132,12 @@ export class MapApi {
   async getToken(tokenID: TokenID): Promise<Token> {
     if (this.mapId === null) throw new MapNotJoinedError();
 
+    const cachedToken = this.#tokenCache?.find((t) => t.id === tokenID);
+
+    if (cachedToken) {
+      return mapStorageTokenToToken(cachedToken);
+    }
+
     const response = await fetch(`${process.env.REACT_APP_HUB_URL}/token/${this.mapId.game}/${tokenID}`);
 
     if (response.status !== 200) throw Error('Augh!');
@@ -146,6 +155,8 @@ export class MapApi {
     if (response.status !== 200) throw Error('Augh!');
 
     const tokens = await response.json();
+
+    this.#tokenCache = tokens;
 
     return tokens.map(({ id }: { id: TokenID }) => id);
   }
