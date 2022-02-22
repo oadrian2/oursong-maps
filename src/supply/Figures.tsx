@@ -1,6 +1,7 @@
 import { useRecoilValue } from 'recoil';
 import { claimedFigureGeneratorListState } from '../app/mapState';
 import { Generator } from './Generator';
+import { ModelsLabel } from './Supply';
 
 export function Figures() {
   const claimedGenereratorIds = useRecoilValue(claimedFigureGeneratorListState);
@@ -12,6 +13,6 @@ export function Figures() {
       ))}
     </>
   ) : (
-    <div className="token-container-empty-label">Models</div>
+    <ModelsLabel />
   );
 }
