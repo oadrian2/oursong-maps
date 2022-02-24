@@ -28,16 +28,7 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
 
   const [trackedPlacement, setTrackedPlacement] = useRecoilState(trackedPositionState);
 
-  const {
-    position,
-    facing,
-    scale,
-    visible,
-    active,
-    label,
-    name,
-    shape: { type, color },
-  } = useRecoilValue(fullTokenState(id))!;
+  const { position, facing, scale, visible, active, label, name, shape } = useRecoilValue(fullTokenState(id))!;
 
   // Position being null can happen when this refreshes before the container page removes the entry
   // Likely we need to handle position separately from the rest of the properties
@@ -68,11 +59,11 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
       style={{ opacity: visible ? 1 : 0.5, transition: 'opacity 0.3s' }}
       onClick={onClick}
     >
-      {type === 'marker' && <MarkerToken name={name} color={color} effectRadius={2} />}
-      {type === 'figure' && (
+      {shape.type === 'marker' && <MarkerToken name={name} color={shape.color} effectRadius={shape.auraSize} />}
+      {shape.type === 'figure' && (
         <ScalingBox scale={scale}>
           <FigureBase title={name}>
-            <BorderLayer color={color} />
+            <BorderLayer color={shape.color} />
             <ContentLayer>{label}</ContentLayer>
             {!active && <DeathMarker />}
             {typeof overlay === 'string' && <Overlay>{overlay}</Overlay>}
@@ -126,7 +117,7 @@ export const TokenSelectionRing = styled('div')<TokenSelectionRingProps>`
   border: 4px solid lightgreen;
   border-radius: 50%;
   transition: opacity 0.3s ease-in-out;
-  opacity: ${({ selected }) => selected ? 1.0 : 0.0};
+  opacity: ${({ selected }) => (selected ? 1.0 : 0.0)};
   pointer-events: none;
 `;
 

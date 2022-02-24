@@ -107,6 +107,7 @@ export type TokenCapabilities = {
   canSize: boolean;
   canKill: boolean;
   canHide: boolean;
+  canChangeAura: boolean;
 };
 
 export const tokenCapabilityState = selectorFamily<TokenCapabilities, TokenID>({
@@ -128,6 +129,7 @@ export const tokenCapabilityState = selectorFamily<TokenCapabilities, TokenID>({
           canSize: true,
           canKill: true,
           canHide: true,
+          canChangeAura: false,
         };
       }
 
@@ -140,6 +142,7 @@ export const tokenCapabilityState = selectorFamily<TokenCapabilities, TokenID>({
           canSize: false,
           canKill: false,
           canHide: isGM,
+          canChangeAura: true,
         };
       }
 

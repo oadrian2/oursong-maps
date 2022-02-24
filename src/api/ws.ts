@@ -258,7 +258,11 @@ function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>
     active,
     facing,
     path,
-    shape: { ...(parsedColor && { color: parsedColor }), ...(shape?.baseSize && { baseSize: shape?.baseSize }) },
+    shape: {
+      ...(parsedColor && { color: parsedColor }),
+      ...(shape?.baseSize && { baseSize: shape.baseSize }),
+      ...(shape?.auraSize && { auraSize: shape.auraSize }),
+    },
   };
 }
 
@@ -310,6 +314,7 @@ type StorageToken = {
   shape?: {
     color?: StorageColor;
     baseSize?: number;
+    auraSize?: number;
   };
 };
 

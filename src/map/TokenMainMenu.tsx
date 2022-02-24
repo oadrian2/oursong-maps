@@ -20,6 +20,7 @@ export function TokenMainMenu({
   onTrashTokenClicked,
   onOpenColorMenu,
   onOpenSizeMenu,
+  onOpenAuraMenu,
   capabilities,
 }: TokenMainMenuProps) {
   const activeActionPosition = 0 * Math.PI;
@@ -30,7 +31,7 @@ export function TokenMainMenu({
   const sizeActionPosition = -0.5 * Math.PI;
   const colorActionPosition = -0.25 * Math.PI;
 
-  const { canMove, canHide, canKill, canColor, canStash, canTrash, canSize } = capabilities;
+  const { canMove, canHide, canKill, canColor, canStash, canTrash, canSize, canChangeAura } = capabilities;
 
   return (
     <>
@@ -64,6 +65,11 @@ export function TokenMainMenu({
           <HeightIcon />
         </ArcFab>
       )}
+      {canChangeAura && (
+        <ArcFab key="size-menu" angle={sizeActionPosition} aria-label="change aura" onClick={onOpenAuraMenu}>
+          <HeightIcon />
+        </ArcFab>
+      )}
       {canColor && (
         <ArcFab key="color-menu" angle={colorActionPosition} aria-label="change color" onClick={onOpenColorMenu}>
           <PaletteIcon />
@@ -83,5 +89,6 @@ type TokenMainMenuProps = {
   onOpenColorMenu: () => void;
   onOpenSizeMenu: () => void;
   onMoveClicked: () => void;
+  onOpenAuraMenu: () => void;
   capabilities: TokenCapabilities;
 };

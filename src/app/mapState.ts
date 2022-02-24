@@ -167,6 +167,7 @@ const markerGenerators: Generator[] = [
     shape: {
       type: 'marker',
       color: TokenColor.red,
+      auraSize: 2,
     },
   },
   {
@@ -175,6 +176,7 @@ const markerGenerators: Generator[] = [
     shape: {
       type: 'marker',
       color: TokenColor.blue,
+      auraSize: 2,
     },
   },
   {
@@ -183,6 +185,7 @@ const markerGenerators: Generator[] = [
     shape: {
       type: 'marker',
       color: TokenColor.green,
+      auraSize: 2,
     },
   },
 ];

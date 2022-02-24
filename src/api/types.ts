@@ -83,6 +83,7 @@ export type FigureShape = {
 export type MarkerShape = {
   type: 'marker';
   color: TokenColor;
+  auraSize?: number;
 };
 
 export type Generator = {

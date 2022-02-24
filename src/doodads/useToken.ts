@@ -68,7 +68,41 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [tokenID]
   );
 
-  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink }];
+  const enlargeAura = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async () => {
+        const token = await snapshot.getPromise(fullTokenState(tokenID));
+        const auraSizeDefault = 2;
+        const auraSizeOptions = [1, 2, 3, 4, 5, 6];
+
+        if (token?.shape?.type !== 'marker') return;
+
+        const oldSize = token.shape?.auraSize ?? auraSizeDefault;
+        const newSize = auraSizeOptions.find((size) => oldSize < size) ?? oldSize;
+
+        oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, auraSize: newSize }, path: [] });
+      },
+    [tokenID]
+  );
+
+  const shrinkAura = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async () => {
+        const token = await snapshot.getPromise(fullTokenState(tokenID))!;
+        const auraSizeDefault = 2;
+        const auraSizeOptions = [1, 2, 3, 4, 5, 6];
+
+        if (token?.shape?.type !== 'marker') return;
+
+        const oldSize = token.shape?.auraSize ?? auraSizeDefault;
+        const newSize = auraSizeOptions.reverse().find((size) => oldSize > size) ?? oldSize;
+
+        oldSize !== newSize && set(tokenState(tokenID), { ...token, shape: { ...token.shape, auraSize: newSize }, path: [] });
+      },
+    [tokenID]
+  );
+
+  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink, enlargeAura, shrinkAura }];
 }
 
 type TokenCommands = {
@@ -80,4 +114,6 @@ type TokenCommands = {
   setColor: (color: TokenColor) => void;
   enlarge: () => void;
   shrink: () => void;
+  enlargeAura: () => void;
+  shrinkAura: () => void;
 };
