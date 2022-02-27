@@ -86,7 +86,7 @@ export const fullTokenState = selectorFamily<FullToken | null, TokenID | null>({
         ? ({ ...generatorShape, ...tokenShape } as MarkerShape)
         : (null as never);
 
-      const scale = 'baseSize' in shape ? shape.baseSize / baseDefault : 1.0;
+      const scale = 'baseSize' in shape ? shape.baseSize / baseDefault : 0.0;
 
       return {
         ...restToken,

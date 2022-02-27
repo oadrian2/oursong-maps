@@ -17,7 +17,7 @@ export function MarkerToken({ color = 'green', effectRadius = 0, name }: MarkerT
 
   return (
     <MarkerTokenShape title={name} hue={hue} radius={radius}>
-      {!!radius && <MarkerTokenAura />}
+      {!!radius && <MarkerCircleAura />}
       <MarkerTokenPlacemat />
       <MarkerTokenImage src={`/marker-${color}-512.png`} draggable="false" alt={name} />
     </MarkerTokenShape>
@@ -67,7 +67,7 @@ export const MarkerTokenPlacemat = styled('div')`
 
 MarkerTokenPlacemat.displayName = 'MarkerTokenPlacemat';
 
-export const MarkerTokenAura = styled('div')`
+export const MarkerCircleAura = styled('div')`
   position: absolute;
 
   width: var(--radius);
@@ -85,4 +85,25 @@ export const MarkerTokenAura = styled('div')`
   pointer-events: none;
 `;
 
-MarkerTokenAura.displayName = 'MarkerTokenAura';
+MarkerCircleAura.displayName = 'MarkerCircleAura';
+
+export const MarkerLineAura = styled('div')`
+  position: absolute;
+
+  width: var(--radius);
+  height: 3rem;
+
+  border: 2px solid hsl(var(--color), 100%, 60%);
+
+  background-color: hsl(var(--color), 100%, 30%);
+
+  opacity: 0.3;
+
+  z-index: -1;
+
+  pointer-events: none;
+
+  transform: translateX(50%);
+`;
+
+MarkerLineAura.displayName = 'MarkerLineAura';
