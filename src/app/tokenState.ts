@@ -1,3 +1,4 @@
+import { shape } from '@mui/system';
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { FigureShape, FullToken, isFigureShape, isMarkerShape, MarkerShape, Placement, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
@@ -161,14 +162,18 @@ export const tokenPlacementsState = selector<[TokenID, Placement][]>({
 
 export const activeTokenIDsState = selector<TokenID[]>({
   key: 'ActiveTokenIDs',
-  get: ({ get }) =>
-    get(tokenIDsState).filter((id) => {
-      const { position, deleted = false, active = true } = get(tokenState(id));
-      const isVisible = get(isTokenVisibleState(id));
-      const viewInactive = get(viewInactiveState);
+  get: ({ get }) => {
+    const viewInactive = get(viewInactiveState);
 
-      return !!position && !deleted && isVisible && (active || viewInactive);
-    }),
+    return [
+      ...get(tokenIDsState)
+        .map(
+          (id) => [id, get(tokenState(id)), get(isTokenVisibleState(id)), get(tokenEffectiveSize(id))] as [TokenID, Token, boolean, number]
+        )
+        .filter(([_, { position, deleted, active }, isVisible]) => !!position && !deleted && isVisible && (active || viewInactive)),
+    ].sort(([, , , a], [, , , b]) => b - a)
+    .map(([id]) => id);
+  },
 });
 
 export const stashedTokenIDsState = selector<TokenID[]>({
@@ -186,9 +191,27 @@ export const isTokenVisibleState = selectorFamily<boolean, TokenID>({
   get:
     (tokenID: TokenID) =>
     ({ get }) => {
-      const { visible = true, generator } = get(tokenState(tokenID));
+      const { visible, generator } = get(tokenState(tokenID));
       const controlledGeneratorList = get(controlledGeneratorListState);
 
       return !!visible || controlledGeneratorList.includes(generator);
+    },
+});
+
+export const tokenEffectiveSize = selectorFamily<number, TokenID>({
+  key: 'TokenEffectiveSize',
+  get:
+    (tokenID: TokenID) =>
+    ({ get }) => {
+      const token = get(fullTokenState(tokenID));
+
+      switch (token!.shape.type) {
+        case 'figure':
+          return token?.shape.baseSize ?? 30.0;
+        case 'marker':
+          return token?.shape.auraSize ?? 0.0;
+        default:
+          return null as never;
+      }
     },
 });

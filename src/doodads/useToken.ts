@@ -41,7 +41,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         const baseDefault = await snapshot.getPromise(baseDefaultState);
         const baseOptions = [...(await snapshot.getPromise(baseOptionsState))];
 
-        if (token?.shape?.type !== 'figure') return;
+        if (token?.shape.type !== 'figure') return;
 
         const oldSize = token.shape?.baseSize ?? baseDefault;
         const newSize = baseOptions.find((size) => oldSize < size) ?? oldSize;
@@ -58,7 +58,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         const baseDefault = await snapshot.getPromise(baseDefaultState);
         const baseOptions = [...(await snapshot.getPromise(baseOptionsState))];
 
-        if (token?.shape?.type !== 'figure') return;
+        if (token?.shape.type !== 'figure') return;
 
         const oldSize = token.shape?.baseSize ?? baseDefault;
         const newSize = baseOptions.reverse().find((size) => oldSize > size) ?? oldSize;
@@ -75,7 +75,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         const auraSizeDefault = 2;
         const auraSizeOptions = [1, 2, 3, 4, 5, 6];
 
-        if (token?.shape?.type !== 'marker') return;
+        if (token?.shape.type !== 'marker') return;
 
         const oldSize = token.shape?.auraSize ?? auraSizeDefault;
         const newSize = auraSizeOptions.find((size) => oldSize < size) ?? oldSize;
@@ -92,7 +92,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
         const auraSizeDefault = 2;
         const auraSizeOptions = [1, 2, 3, 4, 5, 6];
 
-        if (token?.shape?.type !== 'marker') return;
+        if (token?.shape.type !== 'marker') return;
 
         const oldSize = token.shape?.auraSize ?? auraSizeDefault;
         const newSize = auraSizeOptions.reverse().find((size) => oldSize > size) ?? oldSize;
