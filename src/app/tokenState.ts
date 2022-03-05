@@ -1,4 +1,3 @@
-import { shape } from '@mui/system';
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { FigureShape, FullToken, isFigureShape, isMarkerShape, MarkerShape, Placement, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
