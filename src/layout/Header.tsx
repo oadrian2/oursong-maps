@@ -9,7 +9,7 @@ export function Header() {
   useTitle(`OurSong Maps - ${title}`);
 
   return (
-    <Box component="span" fontSize="2.5rem">
+    <Box component="h1" fontSize="2.5rem" fontWeight="normal">
       {title}
     </Box>
   );
