@@ -42,6 +42,8 @@ export type Token = {
   facing: number | null;
   path: Point[];
   shape?: Partial<FigureShape> | Partial<MarkerShape>; // override properties
+  notes: string;
+  tags: string[];
 };
 
 export type FullToken = Token & {
@@ -154,4 +156,5 @@ export type Campaign = {
   };
   generators: Generator[];
   groups: CampaignGroup[];
+  tags: string[];
 };

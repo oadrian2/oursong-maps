@@ -34,6 +34,10 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [token, setToken]
   );
 
+  const setNotes = useCallback((notes: string) => setToken({ ...token, notes, path: [] }), [token, setToken]);
+
+  const setTags = useCallback((tags: string[]) => setToken({ ...token, tags, path: [] }), [token, setToken]);
+
   const enlarge = useRecoilCallback(
     ({ snapshot, set }) =>
       async () => {
@@ -102,7 +106,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [tokenID]
   );
 
-  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink, enlargeAura, shrinkAura }];
+  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink, enlargeAura, shrinkAura, setNotes, setTags }];
 }
 
 type TokenCommands = {
@@ -116,4 +120,6 @@ type TokenCommands = {
   shrink: () => void;
   enlargeAura: () => void;
   shrinkAura: () => void;
+  setNotes: (notes: string) => void;
+  setTags: (tags: string[]) => void;
 };

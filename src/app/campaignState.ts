@@ -36,6 +36,11 @@ export const arcDegreesState = selector<number>({
   get: ({ get }) => get(campaignState).metrics.arcDegrees,
 });
 
+export const tagsDefaultState = selector<string[]>({
+  key: 'TagsDefault',
+  get: ({ get }) => get(campaignState).tags,
+})
+
 export const cellSizeState = selector<{ amount: number; unit: string }>({
   key: 'CellSize',
   get: ({ get }) => {

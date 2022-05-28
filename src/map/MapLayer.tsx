@@ -50,6 +50,8 @@ export function MapLayer() {
           active: true,
           visible: !isGM,
           path: [],
+          notes: '',
+          tags: [],
         });
         set(tokenIDsState, [...tokenIDs, id]);
       }

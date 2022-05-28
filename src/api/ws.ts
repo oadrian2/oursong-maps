@@ -231,7 +231,7 @@ class MapNotJoinedError extends Error {
 }
 
 function mapTokenToStorageToken(token: Token): Omit<StorageToken, 'id' | 'game' | 'map'> {
-  const { generator, position, deleted, visible, active, facing, path, shape } = token;
+  const { generator, position, deleted, visible, active, facing, path, shape, notes, tags } = token;
 
   return {
     generator,
@@ -242,11 +242,24 @@ function mapTokenToStorageToken(token: Token): Omit<StorageToken, 'id' | 'game' 
     facing,
     path,
     shape,
+    notes,
+    tags,
   };
 }
 
 function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>): Token {
-  const { generator, position = null, deleted = false, visible = true, active = true, facing = null, path = [], shape } = token;
+  const {
+    generator,
+    position = null,
+    deleted = false,
+    visible = true,
+    active = true,
+    facing = null,
+    path = [],
+    shape,
+    notes = '',
+    tags = [],
+  } = token;
 
   const parsedColor = fromColorToColor(shape?.color);
 
@@ -263,6 +276,8 @@ function mapStorageTokenToToken(token: Omit<StorageToken, 'id' | 'game' | 'map'>
       ...(shape?.baseSize && { baseSize: shape.baseSize }),
       ...(shape?.auraSize && { auraSize: shape.auraSize }),
     },
+    notes,
+    tags,
   };
 }
 
@@ -316,6 +331,8 @@ type StorageToken = {
     baseSize?: number;
     auraSize?: number;
   };
+  notes?: string;
+  tags?: string[];
 };
 
 type StorageFigureGenerator = {
