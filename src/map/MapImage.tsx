@@ -14,7 +14,7 @@ export function MapImage({ onClick = () => {} }: MapImageProps) {
 
   const { src, width } = useRecoilValue(mapImageState);
 
-  return <img draggable="false" style={{ width }} src={src} alt="the map" onClick={handleClick} />;
+  return <img draggable="false" width={width} src={src} alt="the map" onClick={handleClick} />;
 }
 
 export interface MapImageProps {

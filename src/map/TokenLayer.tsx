@@ -1,14 +1,13 @@
-import { Card, CardContent, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { Point } from '../api/types';
-import { tagsDefaultState } from '../app/campaignState';
-import { isControlledGeneratorState, mapImageState } from '../app/mapState';
+import { Point, Token } from '../api/types';
+import { isControlledGeneratorState } from '../app/mapState';
 import { isSelfMovingState } from '../app/rulerState';
 import { activeTokenIDsState, selectedTokenIdState, tokenState } from '../app/tokenState';
 import { useToken } from '../doodads/useToken';
 import { PlacedToken } from './PlacedToken';
+import { TokenFlyout } from './TokenFlyout';
 import { TokenMenu } from './TokenMenu';
 
 export function TokenLayer() {
@@ -61,6 +60,12 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
     setSelectedTokenId(id);
   }, [setSelectedTokenId, id, isClaimed]);
 
+  const [token, { patchToken }] = useToken(id);
+
+  const handleFlyoutClose = useCallback((patch: Partial<Token>) => {
+    patchToken(patch);
+  }, [patchToken]);
+
   return (
     <motion.div
       animate={controls}
@@ -72,88 +77,9 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
     >
       <PlacedToken id={id} onClick={handleTokenClick} isSelected={isSelected} />
       <TokenMenu id={id} showMenu={isSelected && !isMoving} />
-      <TokenFlyout id={id} show={isSelected && !isMoving} />
+      <TokenFlyout show={isSelected && !isMoving} fullToken={token} onClose={handleFlyoutClose} />
     </motion.div>
   );
 }
 
 type AnimatedPlacedTokenProps = { id: string };
-
-function TokenFlyout({ id, show }: TokenFlyoutProps) {
-  const statuses = useRecoilValue(tagsDefaultState);
-
-  const [{ name, notes, tags, position }, { setNotes, setTags }] = useToken(id)!;
-
-  const { width } = useRecoilValue(mapImageState);
-
-  const [localNotes, setLocalNotes] = useState(notes);
-  const [localTags, setLocalTags] = useState(tags);
-
-  useEffect(() => {
-    if (localNotes === notes && localTags.every((t, i) => t === tags[i])) return;
-
-    if (!show) {
-      setNotes(localNotes);
-      setTags(localTags);
-    }
-  }, [show, localNotes, notes, setNotes, localTags, tags, setTags]);
-
-  if (!show) return null;
-
-  const handleStatus = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const s = new Set(localTags);
-
-    if (event.target.checked) {
-      s.add(event.target.value);
-    } else {
-      s.delete(event.target.value);
-    }
-
-    setLocalTags([...s.values()]);
-  };
-
-  const pastMidway = position!.x * 2 > width;
-
-  return (
-    <Paper
-      elevation={2}
-      sx={{
-        display: 'grid',
-        position: 'absolute',
-        top: '50%',
-        left: pastMidway ? 'auto' : '16ch',
-        right: pastMidway ? '16ch' : 'auto',
-        background: 'white',
-        minWidth: '50ch',
-        minHeight: '8rem',
-        transform: 'translateY(-50%)',
-      }}
-    >
-      <Card>
-        <CardContent>
-          <Typography variant="h5" sx={{ marginBottom: 2 }}>
-            {name}
-          </Typography>
-          <FormGroup sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(50%, 1fr))', gap: '10px 0' }}>
-            {statuses.map((status) => (
-              <FormControlLabel key={status} control={<Switch size="small" value={status} onChange={handleStatus} checked={localTags.includes(status)} />} label={<Typography variant="body2">{status}</Typography>} />
-            ))}
-            <TextField
-              id="outlined-basic"
-              label="Notes"
-              variant="outlined"
-              multiline
-              rows={4}
-              sx={{ gridColumn: '1/-1' }}
-              value={localNotes}
-              onChange={(event) => setLocalNotes(event.target.value)}
-            />
-          </FormGroup>
-        </CardContent>
-      </Card>
-    </Paper>
-  );
-}
-
-type TokenFlyoutProps = { id: string; show: boolean };
-

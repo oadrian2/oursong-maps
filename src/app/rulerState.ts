@@ -27,9 +27,7 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
         filter(([[_, { when: whenFirst }], [__, { when: whenSecond }]]) => whenSecond > whenFirst),
         map(([_, [__, ruler]]) => ruler)
       )
-      .subscribe(function (value) {
-        setSelf(value);
-      });
+      .subscribe(setSelf);
 
     onSet(throttle((ruler: Ruler) => api.updateRuler({ ...ruler, when: new Date() }), 200));
 

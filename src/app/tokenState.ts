@@ -1,4 +1,5 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
+import { distinctUntilChanged } from 'rxjs';
 import { FigureShape, FullToken, isFigureShape, isMarkerShape, MarkerShape, Placement, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
 import { baseDefaultState, hasFacingState } from './campaignState';
@@ -23,7 +24,9 @@ export const tokenIDsState = atom<TokenID[]>({
   }),
   effects: [
     ({ setSelf }) => {
-      const subscription = api.tokenListChanges.subscribe((ids) => setSelf(ids));
+      const subscription = api.tokenListChanges
+        .pipe(distinctUntilChanged((p: TokenID[], c: TokenID[]) => p.length === c.length && p.every((pi) => c.includes(pi))))
+        .subscribe((ids) => setSelf(ids));
 
       return () => subscription.unsubscribe();
     },
@@ -170,8 +173,9 @@ export const activeTokenIDsState = selector<TokenID[]>({
           (id) => [id, get(tokenState(id)), get(isTokenVisibleState(id)), get(tokenEffectiveSize(id))] as [TokenID, Token, boolean, number]
         )
         .filter(([_, { position, deleted, active }, isVisible]) => !!position && !deleted && isVisible && (active || viewInactive)),
-    ].sort(([, , , a], [, , , b]) => b - a)
-    .map(([id]) => id);
+    ]
+      .sort(([, , , a], [, , , b]) => b - a)
+      .map(([id]) => id);
   },
 });
 
