@@ -1,11 +1,13 @@
 import { Card, CardContent, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { FullToken, Token } from '../api/types';
 import { tagsDefaultState } from '../app/campaignState';
 import { mapImageState } from '../app/mapState';
 
 export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
+  const showRef = useRef(show);
+
   const statuses = useRecoilValue(tagsDefaultState);
 
   const { width } = useRecoilValue(mapImageState);
@@ -14,10 +16,17 @@ export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
   const [localTags, setLocalTags] = useState(fullToken.tags);
 
   useEffect(() => {
-    if (!show) {
+    if (showRef.current === true && !show) {
+      showRef.current = false;
       onClose({ notes: localNotes, tags: localTags });
     }
-  }, [show, localNotes, localTags, onClose]);
+
+    if (showRef.current === false && show) {
+      showRef.current = true;
+      setLocalNotes(fullToken.notes);
+      setLocalTags(fullToken.tags);
+    }
+  }, [show, localNotes, JSON.stringify(localTags), onClose]);
 
   if (!show) return null;
 

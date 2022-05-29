@@ -1,11 +1,10 @@
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import React, { useCallback, useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilCallback, useRecoilState, useRecoilValue } from 'recoil';
 import { Point, Token } from '../api/types';
 import { isControlledGeneratorState } from '../app/mapState';
 import { isSelfMovingState } from '../app/rulerState';
-import { activeTokenIDsState, selectedTokenIdState, tokenState } from '../app/tokenState';
-import { useToken } from '../doodads/useToken';
+import { activeTokenIDsState, fullTokenState, selectedTokenIdState, tokenState } from '../app/tokenState';
 import { PlacedToken } from './PlacedToken';
 import { TokenFlyout } from './TokenFlyout';
 import { TokenMenu } from './TokenMenu';
@@ -60,11 +59,19 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
     setSelectedTokenId(id);
   }, [setSelectedTokenId, id, isClaimed]);
 
-  const [token, { patchToken }] = useToken(id);
+  const token = useRecoilValue(fullTokenState(id))!;
+
+  const patchToken = useRecoilCallback(({ snapshot, set }) => async (patch: Partial<Token>) => {
+    const token = await snapshot.getPromise(tokenState(id));
+
+    set(tokenState(id), { ...token, ...patch, path: [] });
+  }, [id]);
 
   const handleFlyoutClose = useCallback((patch: Partial<Token>) => {
+    if (patch.notes === token.notes && patch.tags?.length === token.tags?.length && patch.tags?.every(pi => token.tags?.includes(pi))) return;
+
     patchToken(patch);
-  }, [patchToken]);
+  }, [token, patchToken]);
 
   return (
     <motion.div
@@ -83,3 +90,5 @@ function AnimatedPlacedToken({ id }: AnimatedPlacedTokenProps) {
 }
 
 type AnimatedPlacedTokenProps = { id: string };
+
+
