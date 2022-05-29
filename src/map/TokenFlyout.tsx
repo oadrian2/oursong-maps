@@ -1,32 +1,37 @@
 import { Card, CardContent, FormControlLabel, FormGroup, Paper, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { FullToken, Token } from '../api/types';
+import { TokenID } from '../api/types';
 import { tagsDefaultState } from '../app/campaignState';
 import { mapImageState } from '../app/mapState';
+import { useToken } from '../doodads/useToken';
 
-export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
+export function TokenFlyout({ id, show }: TokenFlyoutProps) {
   const showRef = useRef(show);
 
   const statuses = useRecoilValue(tagsDefaultState);
 
   const { width } = useRecoilValue(mapImageState);
 
-  const [localNotes, setLocalNotes] = useState(fullToken.notes);
-  const [localTags, setLocalTags] = useState(fullToken.tags);
+  const [token, { patchToken }] = useToken(id);
+
+  const [localNotes, setLocalNotes] = useState(token.notes);
+  const [localTags, setLocalTags] = useState(token.tags);
 
   useEffect(() => {
     if (showRef.current === true && !show) {
       showRef.current = false;
-      onClose({ notes: localNotes, tags: localTags });
+
+      patchToken({ notes: localNotes, tags: localTags });
     }
 
     if (showRef.current === false && show) {
       showRef.current = true;
-      setLocalNotes(fullToken.notes);
-      setLocalTags(fullToken.tags);
+
+      setLocalNotes(token.notes);
+      setLocalTags(token.tags);
     }
-  }, [show, localNotes, JSON.stringify(localTags), onClose]);
+  }, [show, localNotes, localTags, token, patchToken]);
 
   if (!show) return null;
 
@@ -42,7 +47,7 @@ export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
     setLocalTags([...s.values()]);
   };
 
-  const pastMidway = fullToken.position!.x * 2 > width;
+  const pastMidway = token.position!.x * 2 > width;
 
   return (
     <Paper
@@ -62,7 +67,7 @@ export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
       <Card>
         <CardContent>
           <Typography variant="h5" sx={{ marginBottom: 2 }}>
-            {fullToken.name}
+            {token.name}
           </Typography>
           <FormGroup sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(50%, 1fr))', gap: '10px 0' }}>
             {statuses.map((status) => (
@@ -90,7 +95,6 @@ export function TokenFlyout({ show, fullToken, onClose }: TokenFlyoutProps) {
 }
 
 type TokenFlyoutProps = {
+  id: TokenID;
   show: boolean;
-  fullToken: FullToken;
-  onClose: (token: Partial<Token>) => void;
 };
