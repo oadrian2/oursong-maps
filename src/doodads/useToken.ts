@@ -34,23 +34,43 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [token, setToken]
   );
 
-  const setNotes = useRecoilCallback(({ snapshot, set }) => async (notes: string) => {
-    const token = await snapshot.getPromise(tokenState(tokenID));
+  const setNotes = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (notes: string) => {
+        const token = await snapshot.getPromise(tokenState(tokenID));
 
-    set(tokenState(tokenID), { ...token, notes, path: [] });
-  }, [tokenID]);
+        set(tokenState(tokenID), { ...token, notes, path: [] });
+      },
+    [tokenID]
+  );
 
-  const setTags = useRecoilCallback(({ snapshot, set }) => async (tags: string[]) => {
-    const token = await snapshot.getPromise(tokenState(tokenID));
+  const setTags = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (tags: string[]) => {
+        const token = await snapshot.getPromise(tokenState(tokenID));
 
-    set(tokenState(tokenID), { ...token, tags, path: [] });
-  }, [tokenID]);
+        set(tokenState(tokenID), { ...token, tags, path: [] });
+      },
+    [tokenID]
+  );
 
-  const patchToken = useRecoilCallback(({ snapshot, set }) => async (patch: Partial<Token>) => {
-    const token = await snapshot.getPromise(tokenState(tokenID));
+  const patchToken = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (patch: Partial<Token>) => {
+        const token = await snapshot.getPromise(tokenState(tokenID));
 
-    set(tokenState(tokenID), { ...token, ...patch, path: [] });
-  }, [tokenID]);
+        for (let key in patch) {
+          if ((patch as any)[key] !== (token as any)[key]) {
+            break;
+          }
+
+          return;
+        }
+
+        set(tokenState(tokenID), { ...token, ...patch, path: [] });
+      },
+    [tokenID]
+  );
 
   const enlarge = useRecoilCallback(
     ({ snapshot, set }) =>
@@ -120,7 +140,10 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
     [tokenID]
   );
 
-  return [token, { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink, enlargeAura, shrinkAura, setNotes, setTags, patchToken }];
+  return [
+    token,
+    { stash, trash, setVisible, setActive, placeAt, setColor, enlarge, shrink, enlargeAura, shrinkAura, setNotes, setTags, patchToken },
+  ];
 }
 
 type TokenCommands = {
