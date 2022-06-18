@@ -11,6 +11,14 @@ export const campaignState = atom<Campaign>({
   }),
 });
 
+export const campaignsState = atom<Campaign[]>({
+  key: 'Campaigns',
+  default: selector<Campaign[]>({
+    key: 'Campaigns/Default',
+    get: async () => [...await api.getCampaigns()].sort(({ title: titleA }, { title: titleB }) => titleA.localeCompare(titleB)),
+  }),
+});
+
 export const groupsState = selector<CampaignGroup[]>({
   key: 'CampaignGroups',
   get: ({ get }) => [...get(campaignState).groups].sort((a, b) => a.name.localeCompare(b.name)),
@@ -39,7 +47,7 @@ export const arcDegreesState = selector<number>({
 export const tagsDefaultState = selector<string[]>({
   key: 'TagsDefault',
   get: ({ get }) => get(campaignState).tags,
-})
+});
 
 export const cellSizeState = selector<{ amount: number; unit: string }>({
   key: 'CellSize',

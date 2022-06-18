@@ -146,6 +146,8 @@ export type CampaignGroup = {
 };
 
 export type Campaign = {
+  id: string;
+  title: string;
   metrics: {
     style: 'centerToCenterNormalized';
     hasFacing: boolean;
@@ -158,3 +160,8 @@ export type Campaign = {
   groups: CampaignGroup[];
   tags: string[];
 };
+
+export type CampaignRef = {
+  id: string;
+  title: string;
+}
