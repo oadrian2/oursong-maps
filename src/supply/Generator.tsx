@@ -3,12 +3,14 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useRecoilValue } from 'recoil';
 import { isFigureShape, isMarkerShape, ItemTypes } from '../api/types';
+import { baseDefaultState } from '../app/campaignState';
 import { generatorState } from '../app/mapState';
 import { SupplyFigureToken } from '../doodads/FigureToken';
 import { MarkerToken } from '../doodads/MarkerToken';
 
 export function Generator({ id }: GeneratorProps) {
   const generator = useRecoilValue(generatorState(id))!;
+  const baseDefault = useRecoilValue(baseDefaultState);
 
   const [, drag, preview] = useDrag({
     type: ItemTypes.GENERATOR,
@@ -22,7 +24,14 @@ export function Generator({ id }: GeneratorProps) {
 
   return (
     <div ref={drag}>
-      {isFigureShape(generator.shape) && <SupplyFigureToken name={generator.name} {...generator.shape} label={`${generator.shape.label}${generator.shape.isGroup ? '#' : ''}`} />}
+      {isFigureShape(generator.shape) && (
+        <SupplyFigureToken
+          name={generator.name}
+          {...generator.shape}
+          label={`${generator.shape.label}${generator.shape.isGroup ? '#' : ''}`}
+          defaultBaseSize={baseDefault}
+        />
+      )}
       {isMarkerShape(generator.shape) && <MarkerToken name={generator.name} {...generator.shape} effectRadius={0} />}
     </div>
   );

@@ -149,7 +149,7 @@ export type Campaign = {
   id: string;
   title: string;
   metrics: {
-    style: 'centerToCenterNormalized';
+    style: 'centerToCenterNormalized' | 'zone';
     hasFacing: boolean;
     baseDefault: number;
     baseOptions: number[];
@@ -159,6 +159,7 @@ export type Campaign = {
   generators: Generator[];
   groups: CampaignGroup[];
   tags: string[];
+  maps?: Map[]
 };
 
 export type CampaignRef = {

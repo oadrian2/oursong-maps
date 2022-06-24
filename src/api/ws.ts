@@ -184,6 +184,16 @@ export class MapApi {
     return storageCampaign;
   }
 
+  async getMapsByCampaign(campaignId: CampaignID): Promise<Map[]> {
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${campaignId}/maps`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const storageMaps = await response.json();
+
+    return storageMaps.map(mapStorageMapToMap);
+  }
+
   async getCampaigns(): Promise<Campaign[]> {
     const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns`);
 

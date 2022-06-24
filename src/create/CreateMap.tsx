@@ -1,13 +1,16 @@
 import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { SyntheticEvent, useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useParams } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { campaignsState } from '../app/campaignState';
-import { useDropzone } from 'react-dropzone';
 
 export function CreateMap() {
-  const [campaign, setCampaign] = useState('');
+  const { game } = useParams(); 
+
+  const [campaign, setCampaign] = useState(game);
   const [images, setImages] = useState([] as any[]);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 })
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0, webp: '' });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     console.log(acceptedFiles);
@@ -22,10 +25,15 @@ export function CreateMap() {
   };
 
   const handleImageLoad = (event: SyntheticEvent) => {
-    const { width, height } = event.target as HTMLImageElement;
+    const target = event.target as HTMLImageElement;
 
-    setImageDimensions({ width, height });
-  }
+    const { width, height } = target;
+    const webp = getWebP(target);
+
+    console.log(webp);
+
+    setImageDimensions({ width, height, webp });
+  };
 
   const campaigns = useRecoilValue(campaignsState);
 
@@ -45,14 +53,21 @@ export function CreateMap() {
         <input title="Drop Images Here" {...getInputProps()} />
         {isDragActive ? <p>Drop the files here ...</p> : <p>Drag 'n' drop some files here, or click to select files</p>}
       </Box>
-      <Box>
-        {images.map((image) => (
-          <Box key={image.name}>
-            {imageDimensions.width} x {imageDimensions.height}; {image.type}; {image.name}<br />
-            <img src={image.preview} alt="preview" onLoad={handleImageLoad} />
-          </Box>
-        ))}
-      </Box>
+      {images.map((image) => (
+        <Box key={image.name}>
+          {imageDimensions.width} x {imageDimensions.height}; {image.type}; {image.name}
+          <br />
+          <img src={image.preview} style={{ maxWidth: '100%' }} alt="preview" onLoad={handleImageLoad} />
+        </Box>
+      ))}
     </Box>
   );
+}
+
+function getWebP(image: HTMLImageElement) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx?.drawImage(image, 0, 0);
+
+  return canvas.toDataURL('image/webp', 1);
 }

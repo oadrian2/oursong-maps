@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-
 import { useSetRecoilState } from 'recoil';
 import './App.css';
 import { mapIdState } from './app/mapState';
+import { Details } from './campaign/Details';
 import { CreateMap } from './create/CreateMap';
 import { LoadingMessage } from './layout/LoadingMessage';
 import { MapPage } from './map/MapPage';
@@ -17,9 +18,10 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<div>The GM will send you a link.</div>} />
+              <Route path="maps/:game/create" element={<CreateMap />} />
               <Route path="maps/:game/:id" element={<LoadingMapPage />} />
               <Route path="create" element={<IDs />} />
-              <Route path="create-map" element={<CreateMap />} />
+              <Route path="campaign/:game" element={<Details />} />
             </Routes>
           </Router>
         </ThemeProvider>

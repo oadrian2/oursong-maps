@@ -10,13 +10,11 @@ import { BorderLayer } from './BorderLayer';
 import { Overlay } from './Overlay';
 import { FigureBase } from './TokenBase';
 
-export function BaseSizeBadge({ baseSize, children }: BaseSizeBadgeProps) {
-  const baseDefault = useRecoilValue(baseDefaultState);
-
+export function BaseSizeBadge({ baseSize, defaultBaseSize, children }: BaseSizeBadgeProps) {
   return (
     <Badge
       color="secondary"
-      badgeContent={baseSize === baseDefault ? 0 : baseSize}
+      badgeContent={baseSize === defaultBaseSize ? 0 : baseSize}
       overlap="circular"
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
@@ -27,12 +25,13 @@ export function BaseSizeBadge({ baseSize, children }: BaseSizeBadgeProps) {
 
 export type BaseSizeBadgeProps = {
   baseSize: number;
+  defaultBaseSize: number;
   children: ReactNode;
 };
 
-export function SupplyFigureToken({ label, name, color, baseSize }: SupplyFigureTokenProps) {
+export function SupplyFigureToken({ label, name, color, baseSize, defaultBaseSize }: SupplyFigureTokenProps) {
   return (
-    <BaseSizeBadge baseSize={baseSize}>
+    <BaseSizeBadge baseSize={baseSize} defaultBaseSize={defaultBaseSize}>
       <Box sx={{ width: '48px', height: '48px' }}>
         <FigureBase title={name}>
           <BorderLayer color={color} />
@@ -48,6 +47,7 @@ export type SupplyFigureTokenProps = {
   name: string;
   color: TokenColor;
   baseSize: number;
+  defaultBaseSize: number;
 };
 
 export function PlacedFigureToken({ label, name, color, baseSize, facing, overlay, active }: PlacedFigureTokenProps) {
