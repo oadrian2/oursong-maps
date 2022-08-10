@@ -27,7 +27,7 @@ export function StashedToken({ id }: StashTokenProps) {
   if (isFigureShape(shape)) {
     return (
       <div ref={drag}>
-        <SupplyFigureToken name={name} label={label} color={shape.color} baseSize={shape.baseSize} defaultBaseSize={baseDefault} />
+        <SupplyFigureToken name={name} label={label} color={shape.color} baseSize={shape.baseSize} baseSizeInvisible={shape.baseSize === baseDefault} />
       </div>
     );
   }

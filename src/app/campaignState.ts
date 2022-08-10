@@ -1,24 +1,31 @@
 import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { Campaign, CampaignGroup } from '../api/types';
 import { api } from '../api/ws';
-import { mapIdState } from './mapState';
+import { routedGameKeyState } from '../stores/routedState';
 
-export const campaignState = atom<Campaign>({
-  key: 'Campaign',
+export const routedCampaignState = atom<Campaign>({
+  key: 'RoutedCampaign',
   default: selector<Campaign>({
-    key: 'Campaign/Default',
-    get: async ({ get }) => api.getCampaign(get(mapIdState).game),
+    key: 'RoutedCampaign/Default',
+    get: async ({ get }) => get(campaignState(get(routedGameKeyState))),
   }),
 });
 
-export const specificCampaignState = atomFamily<Campaign, string>({
-  key: 'SpecificCampaign',
+export const routedCampaignMetricsState = selector<Campaign['metrics']>({
+  key: 'RoutedCampaignMetrics',
+  get: ({ get }) => get(routedCampaignState).metrics,
+});
+
+export const campaignState = atomFamily<Campaign, string>({
+  key: 'Campaign',
   default: selectorFamily<Campaign, string>({
-    key: 'SpecificCampaign/Default',
-    get: (game: string) => async () => ({ 
-      ...(await api.getCampaign(game)),
-      maps: (await api.getMapsByCampaign(game))
-    }),
+    key: 'Campaign/Default',
+    get: (game: string) => async () => {
+      return {
+        ...(await api.getCampaign(game)),
+        maps: await api.getMapsByCampaign(game),
+      };
+    },
   }),
 });
 
@@ -32,40 +39,40 @@ export const campaignsState = atom<Campaign[]>({
 
 export const groupsState = selector<CampaignGroup[]>({
   key: 'CampaignGroups',
-  get: ({ get }) => [...get(campaignState).groups].sort((a, b) => a.name.localeCompare(b.name)),
+  get: ({ get }) => [...get(routedCampaignState).groups].sort((a, b) => a.name.localeCompare(b.name)),
 });
 
 export const baseDefaultState = selector<number>({
   key: 'DefaultBaseSize',
-  get: ({ get }) => get(campaignState).metrics.baseDefault,
+  get: ({ get }) => get(routedCampaignState).metrics.baseDefault,
 });
 
 export const baseOptionsState = selector<number[]>({
   key: 'BaseOptions',
-  get: ({ get }) => get(campaignState).metrics.baseOptions,
+  get: ({ get }) => get(routedCampaignState).metrics.baseOptions,
 });
 
 export const hasFacingState = selector<boolean>({
   key: 'HasFacing',
-  get: ({ get }) => get(campaignState).metrics.hasFacing,
+  get: ({ get }) => get(routedCampaignState).metrics.hasFacing,
 });
 
 export const arcDegreesState = selector<number>({
   key: 'ArcDegrees',
-  get: ({ get }) => get(campaignState).metrics.arcDegrees,
+  get: ({ get }) => get(routedCampaignState).metrics.arcDegrees,
 });
 
 export const tagsDefaultState = selector<string[]>({
   key: 'TagsDefault',
-  get: ({ get }) => get(campaignState).tags,
+  get: ({ get }) => get(routedCampaignState).tags,
 });
 
 export const cellSizeState = selector<{ amount: number; unit: string }>({
   key: 'CellSize',
   get: ({ get }) => {
-    const formattedCellSize = get(campaignState).metrics.cellSize;
+    const formattedCellSize = get(routedCampaignState).metrics.cellSize;
 
-    const result = calculateCellSize(formattedCellSize)
+    const result = calculateCellSize(formattedCellSize);
 
     if (!result) throw new Error('Augh!');
 

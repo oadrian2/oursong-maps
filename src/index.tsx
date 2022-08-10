@@ -1,16 +1,17 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { RecoilRoot } from 'recoil';
 import App from './App';
 import './fonts/Roboto-Regular.ttf';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container!);
+
+root.render(
   <RecoilRoot>
     <App />
-  </RecoilRoot>,
-  document.getElementById('root')
+  </RecoilRoot>
 );
 
 // If you want to start measuring performance in your app, pass a function

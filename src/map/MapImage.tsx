@@ -1,10 +1,10 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import { mapImageState } from '../app/mapState';
 
 export function MapImage({ onClick = () => {} }: MapImageProps) {
   const handleClick = useCallback(
-    (event) => {
+    (event: React.MouseEvent) => {
       if (event.button === 2) return;
 
       onClick(event);

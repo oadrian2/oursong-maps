@@ -88,7 +88,7 @@ const FigureLine = ({ id }: FigureLineProps) => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <SupplyFigureToken label={label} name={name} color={color} baseSize={baseSize} defaultBaseSize={baseDefault} />
+      <SupplyFigureToken label={label} name={name} color={color} baseSize={baseSize} />
       <Typography variant="body1">{name}</Typography>
     </Box>
   );

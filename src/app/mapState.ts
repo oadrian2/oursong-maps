@@ -1,17 +1,8 @@
 import { atom, selector, selectorFamily } from 'recoil';
-import {
-  FigureShape,
-  Generator,
-  GeneratorID,
-  isFigureShape,
-  isMarkerShape,
-  MarkerShape,
-  PartitionedID,
-  Placement,
-  TokenColor,
-} from '../api/types';
+import { Generator, GeneratorID, isFigureShape, isMarkerShape, PartitionedID, Placement, TokenColor } from '../api/types';
 import { api } from '../api/ws';
-import { campaignState } from './campaignState';
+import { defaultGeneratorComparer } from '../stores/comparers';
+import { routedCampaignState } from './campaignState';
 
 ///
 
@@ -60,10 +51,12 @@ export const createUniqueComparitor =
 export const mapGeneratorsState = selector<any[]>({
   key: 'MapGenerators',
   get: ({ get }) => {
-    const { generators: campaignGenerators } = get(campaignState);
+    const { generators: campaignGenerators } = get(routedCampaignState);
     const { generators } = get(mapState);
 
-    return [...generators, ...campaignGenerators, ...markerGenerators].filter(createUniqueComparitor((x) => x.id)).sort(sortComparer);
+    return [...generators, ...campaignGenerators, ...markerGenerators]
+      .filter(createUniqueComparitor((x) => x.id))
+      .sort(defaultGeneratorComparer);
   },
 });
 
@@ -146,18 +139,6 @@ export const generatorState = selectorFamily<Generator | null, GeneratorID>({
     ({ get }) =>
       get(mapGeneratorsState).find((g) => g.id === id),
 });
-
-const sortComparer = (generatorA: Generator, generatorB: Generator) =>
-  generatorA.shape.type.localeCompare(generatorB.shape.type) ||
-  +(isFigureShape(generatorA.shape) && isFigureShape(generatorB.shape) && figureComparer(generatorA.shape, generatorB.shape)) ||
-  +(isMarkerShape(generatorA.shape) && isMarkerShape(generatorB.shape) && markerComparer(generatorA.shape, generatorB.shape));
-
-const figureComparer = (
-  { label: labelA, color: colorA, isGroup: isGroupA = false }: FigureShape,
-  { label: labelB, color: colorB, isGroup: isGroupB = false }: FigureShape
-) => colorA.localeCompare(colorB) || +isGroupA - +isGroupB || labelA.localeCompare(labelB);
-
-const markerComparer = ({ color: colorA }: MarkerShape, { color: colorB }: MarkerShape) => colorA.localeCompare(colorB);
 
 // TODO: find a better solution
 const markerGenerators: Generator[] = [

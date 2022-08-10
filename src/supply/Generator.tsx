@@ -27,9 +27,10 @@ export function Generator({ id }: GeneratorProps) {
       {isFigureShape(generator.shape) && (
         <SupplyFigureToken
           name={generator.name}
-          {...generator.shape}
           label={`${generator.shape.label}${generator.shape.isGroup ? '#' : ''}`}
-          defaultBaseSize={baseDefault}
+          color={generator.shape.color}
+          baseSize={generator.shape.baseSize}
+          baseSizeInvisible={generator.shape.baseSize === baseDefault}
         />
       )}
       {isMarkerShape(generator.shape) && <MarkerToken name={generator.name} {...generator.shape} effectRadius={0} />}

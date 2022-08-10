@@ -1,5 +1,4 @@
 import { Badge, Box } from '@mui/material';
-import { ReactNode } from 'react';
 import { useRecoilValue } from 'recoil';
 import { TokenColor } from '../api/types';
 import { baseDefaultState } from '../app/campaignState';
@@ -10,35 +9,23 @@ import { BorderLayer } from './BorderLayer';
 import { Overlay } from './Overlay';
 import { FigureBase } from './TokenBase';
 
-export function BaseSizeBadge({ baseSize, defaultBaseSize, children }: BaseSizeBadgeProps) {
+export function SupplyFigureToken({ label, name, color, baseSize, baseSizeInvisible = false }: SupplyFigureTokenProps) {
   return (
     <Badge
       color="secondary"
-      badgeContent={baseSize === defaultBaseSize ? 0 : baseSize}
+      badgeContent={baseSize}
+      invisible={baseSizeInvisible}
+      max={999}
       overlap="circular"
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
-      {children}
-    </Badge>
-  );
-}
-
-export type BaseSizeBadgeProps = {
-  baseSize: number;
-  defaultBaseSize: number;
-  children: ReactNode;
-};
-
-export function SupplyFigureToken({ label, name, color, baseSize, defaultBaseSize }: SupplyFigureTokenProps) {
-  return (
-    <BaseSizeBadge baseSize={baseSize} defaultBaseSize={defaultBaseSize}>
       <Box sx={{ width: '48px', height: '48px' }}>
         <FigureBase title={name}>
           <BorderLayer color={color} />
           <ContentLayer>{label}</ContentLayer>
         </FigureBase>
       </Box>
-    </BaseSizeBadge>
+    </Badge>
   );
 }
 
@@ -47,7 +34,7 @@ export type SupplyFigureTokenProps = {
   name: string;
   color: TokenColor;
   baseSize: number;
-  defaultBaseSize: number;
+  baseSizeInvisible?: boolean;
 };
 
 export function PlacedFigureToken({ label, name, color, baseSize, facing, overlay, active }: PlacedFigureTokenProps) {

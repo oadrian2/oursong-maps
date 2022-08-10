@@ -60,8 +60,10 @@ export class MapApi {
       this.#pingChanges.next([ping.id, ping]);
     });
 
-    this.connection.on('worldState', (worldState: { tokens: StorageToken[] }) => {
-      const { tokens } = worldState;
+    this.connection.on('worldState', (worldState: { id: string; game: string; tokens: StorageToken[] }) => {
+      const { id, game, tokens } = worldState;
+
+      if (!this.#mapMatches({ id, game }, this.mapId!)) return;
 
       this.#tokenCache = tokens;
 
