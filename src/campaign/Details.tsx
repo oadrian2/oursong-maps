@@ -44,6 +44,10 @@ export function Details() {
         Star Wars
       </Link>
       <br />
+      <Link component={RouterLink} to="/campaign/ttb">
+        Malifaux
+      </Link>
+      <br />
     </Box>
   );
 }
