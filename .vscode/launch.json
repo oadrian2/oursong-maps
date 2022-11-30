@@ -2,19 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-msedge",
+      "command": "yarn start",
+      "name": "Run yarn start",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "type": "msedge",
       "request": "launch",
       "name": "Launch  Edge against localhost",
       "url": "http://localhost:3000/maps/sw/J9bSPNXMj1p1N56p35AaH",
       "webRoot": "${workspaceFolder}/src",
       "runtimeArgs": ["--disable-web-security"]
-    },
-    {
-      "type": "edge",
-      "request": "attach",
-      "name": "Attach to Microsoft Edge",
-      "port": 3000,
-      "webRoot": "${workspaceFolder}"
     }
   ]
 }
