@@ -53,21 +53,15 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
       },
     [tokenID]
   );
-
+  
   const patchToken = useRecoilCallback(
     ({ snapshot, set }) =>
       async (patch: Partial<Token>) => {
         const token = await snapshot.getPromise(tokenState(tokenID));
 
-        for (let key in patch) {
-          if ((patch as any)[key] !== (token as any)[key]) {
-            break;
-          }
-
-          return;
+        if (Object.keys(patch).some((key) => (patch as Record<string, unknown>)[key] !== (token as Record<string, unknown>)[key])) {
+          set(tokenState(tokenID), { ...token, ...patch, path: [] });
         }
-
-        set(tokenState(tokenID), { ...token, ...patch, path: [] });
       },
     [tokenID]
   );
