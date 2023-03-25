@@ -6,13 +6,13 @@ import { ModelsLabel } from './Supply';
 export function Figures() {
   const claimedGenereratorIds = useRecoilValue(claimedFigureGeneratorListState);
 
-  return claimedGenereratorIds.length ? (
+  if (!claimedGenereratorIds.length) return <ModelsLabel />;
+
+  return (
     <>
       {claimedGenereratorIds.map((id) => (
         <Generator key={id} id={id} />
       ))}
     </>
-  ) : (
-    <ModelsLabel />
   );
 }

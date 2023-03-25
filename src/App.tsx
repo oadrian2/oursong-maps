@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import './App.css';
 import { mapIdState } from './app/mapState';
-import { Details } from './campaign/Details';
+import { Details as CampaignDetails } from './campaign/Details';
 import { CreateMap } from './create/CreateMap';
 import { LoadingMessage } from './layout/LoadingMessage';
 import { MapPage } from './map/MapPage';
@@ -40,7 +40,7 @@ function App() {
                 path="campaign/:game"
                 element={
                   <RecoilURLRouteSync>
-                    <Details />
+                    <CampaignDetails />
                   </RecoilURLRouteSync>
                 }
               />

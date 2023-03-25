@@ -78,7 +78,6 @@ export function TokenFlyout({ id, show }: TokenFlyoutProps) {
               />
             ))}
             <TextField
-              id="outlined-basic"
               label="Notes"
               variant="outlined"
               multiline

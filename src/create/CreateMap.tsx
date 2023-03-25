@@ -113,7 +113,7 @@ export function DropImage({ onFileSelected }: { onFileSelected: (file: File) => 
   return (
     <Box {...getRootProps()} sx={{ border: 1, margin: 'auto', padding: 1 }}>
       <input title="Drop Images Here" {...getInputProps()} />
-      {isDragActive ? <p>Drop the files here ...</p> : <p>Drag 'n' drop some files here, or click to select files</p>}
+      {isDragActive ? <p>Drop your map here ...</p> : <p>Drop your map here, or click to select it.</p>}
     </Box>
   );
 }
@@ -132,15 +132,10 @@ function getMappedExention(mimeType: string): string | undefined {
 }
 
 const ScrollingBox = styled('div')`
-  width: 70vw;
-  height: 70vh;
+  width: 80vw;
+  height: 80vh;
 
   overflow: scroll;
 
   scrollbar-width: thin;
-
-  /* ::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-  } */
 `;

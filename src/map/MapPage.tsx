@@ -1,16 +1,23 @@
-import { styled } from '@mui/material';
+import { AppBar, styled, Toolbar, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useTitle } from 'react-use';
+import { useRecoilValue } from 'recoil';
 import { api } from '../api/ws';
 import { CustomDragLayer } from '../app/CustomDragLayer';
-import { Header } from '../layout/Header';
+import { mapTitleState } from '../app/mapState';
+import { Login } from '../layout/Login';
 import { ConnectionInfo } from '../session/ConnectionInfo';
 import SeatDialog from '../session/SeatDialog';
 import { Supply } from '../supply/Supply';
 import { MapLayer } from './MapLayer';
 
 export function MapPage({ game, id }: { game: string; id: string }) {
+  const title = useRecoilValue(mapTitleState);
+
+  useTitle(`OurSong Maps - ${title}`);
+
   useEffect(() => {
     const connect = async () => {
       await api.connect();
@@ -28,22 +35,29 @@ export function MapPage({ game, id }: { game: string; id: string }) {
   }, [game, id]);
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <CustomDragLayer />
+    <>
       <MapLayout>
-        <MapHeader>
-          <Header />
-        </MapHeader>
-        <MapSidebar>
-          <Supply />
-        </MapSidebar>
-        <MapContent>
-          <MapLayer />
-        </MapContent>
+        <AppBar position="static" sx={{ gridArea: 'header' }}>
+          <Toolbar sx={{ background: 'black' }}>
+            <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+              {title}
+            </Typography>
+            <Login />
+          </Toolbar>
+        </AppBar>
+        <DndProvider backend={HTML5Backend}>
+          <CustomDragLayer />
+          <MapSidebar>
+            <Supply />
+          </MapSidebar>
+          <MapContent>
+            <MapLayer />
+          </MapContent>
+        </DndProvider>
       </MapLayout>
       <SeatDialog />
       <ConnectionInfo />
-    </DndProvider>
+    </>
   );
 }
 
@@ -59,15 +73,6 @@ export const MapLayout = styled('div')`
     'sidebar content';
   background-color: black;
   color: white;
-`;
-
-export const MapHeader = styled('div')`
-  grid-area: header;
-
-  display: flex;
-  align-items: center;
-
-  padding-left: 1rem;
 `;
 
 export const MapSidebar = styled('div')`

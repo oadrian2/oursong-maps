@@ -163,6 +163,16 @@ export class MapApi {
     return tokens.map(({ id }: { id: TokenID }) => id);
   }
 
+  async getMapTokens(game: string, map: string) {
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/map/${game}/${map}/tokens`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const tokens = await response.json();
+
+    return tokens.map(({ id }: { id: TokenID }) => id);
+  }
+
   async getMap(mapId: MapID): Promise<Map> {
     // TODO: Fix the eary request
     // if (this.mapId === null) throw new MapJoinError();
@@ -176,18 +186,8 @@ export class MapApi {
     return mapStorageMapToMap(storageMap);
   }
 
-  async getCampaign(campaignId: CampaignID): Promise<Campaign> {
-    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${campaignId}`);
-
-    if (response.status !== 200) throw Error('Augh!');
-
-    const storageCampaign = await response.json();
-
-    return storageCampaign;
-  }
-
-  async getMapsByCampaign(campaignId: CampaignID): Promise<Map[]> {
-    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${campaignId}/maps`);
+  async getMapsByCampaign(gameID: CampaignID): Promise<Map[]> {
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${gameID}/maps`);
 
     if (response.status !== 200) throw Error('Augh!');
 
@@ -204,6 +204,16 @@ export class MapApi {
     const storageCampaigns = await response.json();
 
     return storageCampaigns;
+  }
+
+  async getCampaign(gameID: CampaignID): Promise<Campaign> {
+    const response = await fetch(`${process.env.REACT_APP_HUB_URL}/campaigns/${gameID}`);
+
+    if (response.status !== 200) throw Error('Augh!');
+
+    const storageCampaign = await response.json();
+
+    return storageCampaign;
   }
 
   onConnected(handler: Handler) {

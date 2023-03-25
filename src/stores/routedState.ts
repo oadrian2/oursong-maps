@@ -8,7 +8,7 @@ export const routedGameKeyState = atom<string>({
   effects: [syncEffect({ refine: string(), itemKey: 'game', storeKey: 'context' })],
 });
 
-export const routeMapKeyState = atom<string>({
+export const routedMapKeyState = atom<string>({
   key: 'RoutedMap',
   default: errorSelector(`Value for 'map' missing in route.`),
   effects: [syncEffect({ refine: string(), itemKey: 'map', storeKey: 'context' })],

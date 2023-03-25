@@ -2,6 +2,7 @@ import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { distinctUntilChanged } from 'rxjs';
 import { FigureShape, FullToken, isFigureShape, isMarkerShape, MarkerShape, Placement, Token, TokenID } from '../api/types';
 import { api } from '../api/ws';
+import { routedGameKeyState, routedMapKeyState } from '../stores/routedState';
 import { baseDefaultState, hasFacingState } from './campaignState';
 import { controlledGeneratorListState, generatorState, viewInactiveState } from './mapState';
 import { isGMState } from './userState';
@@ -14,6 +15,14 @@ export const selectedTokenIdState = atom<TokenID | null>({
 export const hoveredTokenIdState = atom<TokenID | null>({
   key: 'HoveredTokenId',
   default: null,
+});
+
+export const routedMapTokens = atom<TokenID[]>({
+  key: 'RoutedTokenIDs',
+  default: selector<TokenID[]>({
+    key: 'RoutedTokenIDs/Default',
+    get: ({ get }) => api.getMapTokens(get(routedGameKeyState), get(routedMapKeyState)),
+  }),
 });
 
 export const tokenIDsState = atom<TokenID[]>({
