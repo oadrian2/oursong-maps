@@ -105,7 +105,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
       async () => {
         const token = await snapshot.getPromise(fullTokenState(tokenID));
         const auraSizeDefault = 2;
-        const auraSizeOptions = [1, 2, 3, 4, 5, 6];
+        const auraSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
         if (token?.shape.type !== 'marker') return;
 
@@ -122,7 +122,7 @@ export function useToken(tokenID: TokenID): [FullToken, TokenCommands] {
       async () => {
         const token = await snapshot.getPromise(fullTokenState(tokenID))!;
         const auraSizeDefault = 2;
-        const auraSizeOptions = [1, 2, 3, 4, 5, 6];
+        const auraSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
         if (token?.shape.type !== 'marker') return;
 

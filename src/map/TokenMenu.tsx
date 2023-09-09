@@ -1,7 +1,7 @@
 import { AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { fullTokenState, selectedTokenIdState, tokenCapabilityState } from '../app/tokenState';
+import { fullTokenState, tokenCapabilityState } from '../app/tokenState';
 import { useToken } from '../doodads/useToken';
 import { useRuler } from '../ruler/useRuler';
 import { TokenAuraMenu } from './TokenAuraMenu';
@@ -11,6 +11,7 @@ import { TokenSizeMenu } from './TokenSizeMenu';
 
 export function TokenMenu({ id, showMenu }: TokenMenuProps) {
   const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor, enlarge, shrink, enlargeAura, shrinkAura }] = useToken(id);
+  
   const capabilities = useRecoilValue(tokenCapabilityState(id));
 
   const [activeMenu, setActiveMenu] = useState(MenuType.main);
@@ -21,11 +22,10 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
 
   const [, { start }] = useRuler();
 
-  const selectedTokenId = useRecoilValue(selectedTokenIdState);
-  const { position } = useRecoilValue(fullTokenState(selectedTokenId!)) || { position: null };
+  const { position } = useRecoilValue(fullTokenState(id)) || { position: null };
 
   function handleMove() {
-    start({ x: position!.x, y: position!.y - 48 * 1.5 }, position!, selectedTokenId);
+    start({ x: position!.x, y: position!.y - 48 * 1.5 }, position!, id);
   }
 
   return (

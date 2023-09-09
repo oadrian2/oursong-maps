@@ -37,8 +37,7 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
   const overlay =
     !!activeId &&
     trackedPlacement &&
-    position?.x !== trackedPlacement.position.x &&
-    position?.y !== trackedPlacement.position.y &&
+    !(position?.x === trackedPlacement.position.x && position?.y === trackedPlacement.position.y) &&
     distance(trackedPlacement, selfPlacement, measurementStrategy[MeasurementStrategy.centerToCenterNormalized], cellSize) +
       orientation(trackedPlacement, selfPlacement, hasFacing);
 

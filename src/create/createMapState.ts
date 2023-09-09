@@ -14,8 +14,8 @@ export const mapImageTitleState = atom<string>({
 
 export const mapImageMetadataState = selector<{ width: number; height: number }>({
   key: 'CreateMapDimensions',
-  get: ({ get }) => {
-    return new Promise<{ width: number; height: number }>((resolve) => {
+  get: ({ get }) =>
+    new Promise<{ width: number; height: number }>((resolve) => {
       const mapImageFile = get(mapImageFileState);
 
       const image = document.createElement('img');
@@ -29,8 +29,7 @@ export const mapImageMetadataState = selector<{ width: number; height: number }>
 
         resolve({ width, height });
       };
-    });
-  },
+    }),
 });
 
 export const optimizedMapBlobState = selector<Blob>({
@@ -50,7 +49,9 @@ export const optimizedMapBlobState = selector<Blob>({
 
     const mimeTypes = ['image/png', 'image/jpeg', 'image/webp'];
     const comparisonBlobs = await Promise.all(
-      mimeTypes.map((value) => new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (!!blob ? resolve(blob) : reject(blob)), value)))
+      mimeTypes.map(
+        (value) => new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (!!blob ? resolve(blob) : reject(blob)), value))
+      )
     );
 
     return comparisonBlobs.filter((blob) => !!blob).reduce((prev, curr) => (curr.size < prev.size ? curr : prev), originalImage)!;

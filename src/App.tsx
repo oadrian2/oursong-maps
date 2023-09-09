@@ -12,6 +12,7 @@ import { LoadingMessage } from './layout/LoadingMessage';
 import { MapPage } from './map/MapPage';
 import { themeColorState } from './stores/preferences';
 import { RecoilURLRouteSync } from './stores/RecoilURLRouteSync';
+import TestBed from './TestBed/TestBed';
 
 function App() {
   const themeColor = useRecoilValue(themeColorState);
@@ -22,7 +23,7 @@ function App() {
     <Suspense fallback={<div>Wakka Wakka</div>}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
-        <CssBaseline />
+          <CssBaseline />
           <Router>
             <Routes>
               <Route path="/" element={<div>The GM will send you a link.</div>} />
@@ -44,6 +45,8 @@ function App() {
                   </RecoilURLRouteSync>
                 }
               />
+              <Route path="ws-test" element={<DoTheThing />} />
+              <Route path="testbed" element={<TestBed />} />
             </Routes>
           </Router>
         </ThemeProvider>
@@ -54,13 +57,13 @@ function App() {
 
 const lightTheme = createTheme({
   palette: {
-    mode: 'light'
-  }
+    mode: 'light',
+  },
 });
 
 const darkTheme = createTheme({
   palette: {
-    mode: 'dark'
+    mode: 'dark',
   },
 });
 
@@ -84,6 +87,48 @@ function LoadingMapPage() {
       <MapPage game={game} id={id} />
     </React.Suspense>
   );
+}
+
+function DoTheThing() {
+  useEffect(() => {
+    connect();
+
+    return () => disconnect();
+  }, []);
+
+  const handleClick = () => {
+    sendMessage('message from app');
+  };
+
+  return (
+    <button type="button" onClick={handleClick}>
+      Do the Thing
+    </button>
+  );
+}
+
+let webSocket: WebSocket | null = null;
+
+function connect() {
+  fetch('/api/login')
+    .then((x) => x.text())
+    .then((url) => {
+      disconnect();
+
+      webSocket = new WebSocket(url);
+
+      webSocket.onopen = console.log;
+      webSocket.onclose = console.log;
+      webSocket.onmessage = console.log;
+    });
+}
+
+function disconnect() {
+  webSocket?.close();
+}
+
+function sendMessage(value: string) {
+  webSocket?.send(value);
 }
 
 export default App;
