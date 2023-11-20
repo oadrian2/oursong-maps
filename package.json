@@ -36,7 +36,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start-swa": "swa start http://localhost:3000 --api-location http://localhost:7071"
   },
   "eslintConfig": {
     "extends": [
@@ -61,7 +62,9 @@
   "devDependencies": {
     "@types/lodash.throttle": "^4.1.6",
     "@types/node": "^18.0.0",
-    "@types/react-dom": "^18.0.5"
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.0.5",
+    "concurrently": "^8.2.2"
   },
   "proxy": "http://localhost:7071"
 }

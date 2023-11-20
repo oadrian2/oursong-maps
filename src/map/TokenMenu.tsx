@@ -10,15 +10,14 @@ import { TokenMainMenu } from './TokenMainMenu';
 import { TokenSizeMenu } from './TokenSizeMenu';
 
 export function TokenMenu({ id, showMenu }: TokenMenuProps) {
-  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor, enlarge, shrink, enlargeAura, shrinkAura }] = useToken(id);
-  
+  const [{ active = true, visible = true }, { setVisible, setActive, stash, trash, setColor, enlarge, shrink, enlargeAura, shrinkAura }] =
+    useToken(id);
+
   const capabilities = useRecoilValue(tokenCapabilityState(id));
 
   const [activeMenu, setActiveMenu] = useState(MenuType.main);
 
-  useEffect(() => {
-    setActiveMenu(MenuType.main);
-  }, [setActiveMenu, showMenu]);
+  useEffect(() => setActiveMenu(MenuType.main), [setActiveMenu, showMenu]);
 
   const [, { start }] = useRuler();
 
@@ -45,9 +44,15 @@ export function TokenMenu({ id, showMenu }: TokenMenuProps) {
           capabilities={capabilities}
         />
       )}
-      {showMenu && activeMenu === MenuType.color && capabilities.canColor && <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />}
-      {showMenu && activeMenu === MenuType.size && capabilities.canSize && <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} enlargeToken={enlarge} shrinkToken={shrink} />}
-      {showMenu && activeMenu === MenuType.aura && capabilities.canChangeAura && <TokenAuraMenu closeMenu={() => setActiveMenu(MenuType.main)} enlargeAura={enlargeAura} shrinkAura={shrinkAura} />}
+      {showMenu && activeMenu === MenuType.color && capabilities.canColor && (
+        <TokenColorMenu closeMenu={() => setActiveMenu(MenuType.main)} setColor={setColor} />
+      )}
+      {showMenu && activeMenu === MenuType.size && capabilities.canSize && (
+        <TokenSizeMenu closeMenu={() => setActiveMenu(MenuType.main)} enlargeToken={enlarge} shrinkToken={shrink} />
+      )}
+      {showMenu && activeMenu === MenuType.aura && capabilities.canChangeAura && (
+        <TokenAuraMenu closeMenu={() => setActiveMenu(MenuType.main)} enlargeAura={enlargeAura} shrinkAura={shrinkAura} />
+      )}
     </AnimatePresence>
   );
 }

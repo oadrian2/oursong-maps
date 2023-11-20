@@ -33,7 +33,8 @@ export function TokenFlyout({ id, show }: TokenFlyoutProps) {
     }
   }, [show, localNotes, localTags, token, patchToken]);
 
-  if (!show) return null;
+  // If not shown or stashed, then hide.
+  if (!show || !token.position) return null;
 
   const handleStatus = (event: React.ChangeEvent<HTMLInputElement>) => {
     const s = new Set(localTags);
@@ -47,7 +48,7 @@ export function TokenFlyout({ id, show }: TokenFlyoutProps) {
     setLocalTags([...s.values()]);
   };
 
-  const pastMidway = token.position!.x * 2 > width;
+  const pastMidway = token.position.x * 2 > width;
 
   return (
     <Paper

@@ -1,13 +1,15 @@
-import { Badge, Box } from '@mui/material';
+import { Badge } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { TokenColor } from '../api/types';
 import { baseDefaultState } from '../app/campaignState';
-import { DeathMarker } from '../map/DeathMarker';
 import { ContentLayer } from '../map/PlacedToken';
 import { TokenFacing } from '../map/TokenFacing';
 import { BorderLayer } from './BorderLayer';
+import { DeathMarker } from './DeathMarker';
 import { Overlay } from './Overlay';
+import { ScaledBox } from './ScaledBox';
 import { FigureBase } from './TokenBase';
+import { UnscaledBox } from './UnscaledBox';
 
 export function SupplyFigureToken({ label, name, color, baseSize, baseSizeInvisible = false }: SupplyFigureTokenProps) {
   return (
@@ -19,12 +21,12 @@ export function SupplyFigureToken({ label, name, color, baseSize, baseSizeInvisi
       overlap="circular"
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
-      <Box sx={{ width: '48px', height: '48px' }}>
+      <UnscaledBox>
         <FigureBase title={name}>
           <BorderLayer color={color} />
           <ContentLayer>{label}</ContentLayer>
         </FigureBase>
-      </Box>
+      </UnscaledBox>
     </Badge>
   );
 }
@@ -41,17 +43,15 @@ export function PlacedFigureToken({ label, name, color, baseSize, facing, overla
   const baseDefault = useRecoilValue(baseDefaultState);
 
   return (
-    <Box sx={{ width: '48px', height: '48px' }}>
-      <Box sx={{ width: '100%', height: '100%', transform: `scale(${baseSize / baseDefault})` }}>
-        <FigureBase title={name}>
-          <BorderLayer color={color} />
-          <ContentLayer>{label}</ContentLayer>
-          {typeof facing === 'number' && <TokenFacing facing={facing} />}
-          {!active && <DeathMarker />}
-          {typeof overlay === 'string' && <Overlay>{overlay}</Overlay>}
-        </FigureBase>
-      </Box>
-    </Box>
+    <ScaledBox scale={baseSize / baseDefault}>
+      <FigureBase title={name}>
+        <BorderLayer color={color} />
+        <ContentLayer>{label}</ContentLayer>
+        {typeof facing === 'number' && <TokenFacing facing={facing} />}
+        {!active && <DeathMarker />}
+        {typeof overlay === 'string' && <Overlay>{overlay}</Overlay>}
+      </FigureBase>
+    </ScaledBox>
   );
 }
 

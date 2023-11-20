@@ -1,13 +1,13 @@
 import { styled } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { cellSizeState } from '../app/campaignState';
-import { roundToStep } from '../app/math';
+import { roundToMultiple } from '../app/math';
 
 export function LengthsDisplay({ lastLength, totalLength }: LengthsDisplayProps) {
   const { amount, unit } = useRecoilValue(cellSizeState);
 
-  const lastLengthToStep = roundToStep(amount * lastLength, amount / 10);
-  const totalLengthToStep = roundToStep(amount * totalLength, amount / 10);
+  const lastLengthToStep = roundToMultiple(amount * lastLength, amount / 10);
+  const totalLengthToStep = roundToMultiple(amount * totalLength, amount / 10);
 
   const formatOptions = { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit };
 

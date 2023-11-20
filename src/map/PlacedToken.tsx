@@ -5,24 +5,19 @@ import { Placement, TokenID } from '../api/types';
 import { cellSizeState, hasFacingState } from '../app/campaignState';
 import { trackedPositionState } from '../app/mapState';
 import {
+  arePointsSame,
   centerToCenterCellDistance,
   centerToCenterNormalizedCellDistance,
   edgeToEdgeCellDistance,
-  roundToStep,
+  roundToMultiple,
   tokenConnection,
 } from '../app/math';
 import { MeasurementStrategy } from '../app/state';
-import { fullTokenState, hoveredTokenIdState } from '../app/tokenState';
-import { BorderLayer } from '../doodads/BorderLayer';
-import { MarkerToken } from '../doodads/MarkerToken';
-import { Overlay } from '../doodads/Overlay';
-import { FigureBase } from '../doodads/TokenBase';
-import { DeathMarker } from './DeathMarker';
-import { ScalingBox } from './ScalingBox';
+import { fullTokenState } from '../app/tokenState';
+import { BorderLayer, DeathMarker, FigureBase, MarkerToken, Overlay, ScaledBox } from '../doodads';
 import { TokenFacing } from './TokenFacing';
 
 export function PlacedToken({ id, isSelected = false, onClick = () => {} }: PlacedTokenProps) {
-  const [activeId, setActiveId] = useRecoilState(hoveredTokenIdState);
   const { amount: cellSize } = useRecoilValue(cellSizeState);
   const hasFacing = useRecoilValue(hasFacingState);
 
@@ -34,22 +29,15 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
   // Likely we need to handle position separately from the rest of the properties
   const selfPlacement = useMemo(() => ({ position: position!, facing, scale }), [position, facing, scale]);
 
+  const showOverlay = !!trackedPlacement && !arePointsSame(trackedPlacement.position, selfPlacement.position);
+
   const overlay =
-    !!activeId &&
-    trackedPlacement &&
-    !(position?.x === trackedPlacement.position.x && position?.y === trackedPlacement.position.y) &&
-    distance(trackedPlacement, selfPlacement, measurementStrategy[MeasurementStrategy.centerToCenterNormalized], cellSize) +
-      orientation(trackedPlacement, selfPlacement, hasFacing);
+    showOverlay &&
+    distance(trackedPlacement, selfPlacement, measurementStrategy, cellSize) +
+      (hasFacing ? orientation(trackedPlacement, selfPlacement) : '');
 
-  const handleMouseEnter = useCallback(() => {
-    setActiveId(id);
-    setTrackedPlacement(selfPlacement);
-  }, [id, selfPlacement, setActiveId, setTrackedPlacement]);
-
-  const handleMouseLeave = useCallback(() => {
-    setActiveId(null);
-    setTrackedPlacement(null);
-  }, [setActiveId, setTrackedPlacement]);
+  const handleMouseEnter = useCallback(() => setTrackedPlacement(selfPlacement), [selfPlacement, setTrackedPlacement]);
+  const handleMouseLeave = useCallback(() => setTrackedPlacement(null), [setTrackedPlacement]);
 
   return (
     <div
@@ -60,7 +48,7 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
     >
       {shape.type === 'marker' && <MarkerToken name={name} color={shape.color} effectRadius={shape.auraSize} />}
       {shape.type === 'figure' && (
-        <ScalingBox scale={scale}>
+        <ScaledBox scale={scale}>
           <FigureBase title={name}>
             <BorderLayer color={shape.color} />
             <ContentLayer>{label}</ContentLayer>
@@ -69,7 +57,7 @@ export function PlacedToken({ id, isSelected = false, onClick = () => {} }: Plac
             {typeof facing === 'number' && <TokenFacing facing={facing} />}
             <TokenSelectionRing selected={isSelected} />
           </FigureBase>
-        </ScalingBox>
+        </ScaledBox>
       )}
     </div>
   );
@@ -90,26 +78,35 @@ type PlacedTokenProps = { id: TokenID; isSelected?: boolean; onClick?: React.Eve
 function distance(
   origin: Placement,
   target: Placement,
-  strategy: (origin: Placement, target: Placement) => number,
+  mesasure: (origin: Placement, target: Placement) => number,
   multiplier: number
 ): number {
-  return roundToStep(multiplier * strategy(origin, target)!, multiplier / 10);
+  return roundToMultiple(multiplier * mesasure(origin, target)!, multiplier / 10);
 }
 
-function orientation(origin: Placement, target: Placement, hasFacing: boolean): string {
-  if (!hasFacing) return '';
-
+function orientation(origin: Placement, target: Placement): string {
   const [isOriginFacingTarget, isTargetFacingOrigin] = tokenConnection(origin, target);
 
-  return !isOriginFacingTarget ? 'X' : isTargetFacingOrigin ? 'F' : 'B';
+  return !isOriginFacingTarget ? '' : isTargetFacingOrigin ? 'F' : 'B';
 }
 
-const measurementStrategy = {
+/**
+ * A map of supported measurement strategies.
+ */
+const measurementStrategies = {
   [MeasurementStrategy.centerToCenter]: centerToCenterCellDistance,
   [MeasurementStrategy.edgeToEdge]: edgeToEdgeCellDistance,
   [MeasurementStrategy.centerToCenterNormalized]: centerToCenterNormalizedCellDistance,
 };
 
+/**
+ * The current measurement strategy. Currently defaulted to center-to-center normalized as it's the only one that's been used.
+ */
+const measurementStrategy = measurementStrategies[MeasurementStrategy.centerToCenterNormalized];
+
+/**
+ * Selection ring for placed tokens.
+ */
 export const TokenSelectionRing = styled('div')<TokenSelectionRingProps>`
   position: absolute;
   inset: -4px;

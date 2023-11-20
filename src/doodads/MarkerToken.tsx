@@ -58,7 +58,7 @@ export const MarkerTokenPlacemat = styled('div')`
   border: 2px solid transparent;
   border-radius: 50%;
 
-  background-color: hsl(var(--color), 40%, 30%);
+  background-color: lch(30% 40% var(--color));
 
   z-index: -1;
 
@@ -73,10 +73,10 @@ export const MarkerCircleAura = styled('div')`
   width: var(--radius);
   height: var(--radius);
 
-  border: 2px solid hsl(var(--color), 100%, 60%);
+  border: 2px solid lch(60% 100% var(--color));
   border-radius: 50%;
 
-  background-color: hsl(var(--color), 100%, 30%);
+  background-color: lch(30% 100% var(--color));
 
   opacity: 0.3;
 
@@ -86,24 +86,3 @@ export const MarkerCircleAura = styled('div')`
 `;
 
 MarkerCircleAura.displayName = 'MarkerCircleAura';
-
-export const MarkerLineAura = styled('div')`
-  position: absolute;
-
-  width: var(--radius);
-  height: 3rem;
-
-  border: 2px solid hsl(var(--color), 100%, 60%);
-
-  background-color: hsl(var(--color), 100%, 30%);
-
-  opacity: 0.3;
-
-  z-index: -1;
-
-  pointer-events: none;
-
-  transform: translateX(50%);
-`;
-
-MarkerLineAura.displayName = 'MarkerLineAura';

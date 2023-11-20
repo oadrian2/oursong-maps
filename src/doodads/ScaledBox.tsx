@@ -1,7 +1,11 @@
 import { Box } from '@mui/material';
 import { ReactNode } from 'react';
 
-export function ScalingBox({ scale, children }: ScalingBoxProps) {
+/**
+ * Box for displaying children at a multiple of the base token size.
+ * @param Params - 
+ */
+export function ScaledBox({ scale, children }: ScaledBoxProps) {
   return (
     <Box width="48px" height="48px">
       <Box width="100%" height="100%" style={{ transform: `scale(${scale})` }}>
@@ -11,7 +15,10 @@ export function ScalingBox({ scale, children }: ScalingBoxProps) {
   );
 }
 
-export type ScalingBoxProps = {
+export type ScaledBoxProps = {
+  /**
+   * Scale to apply to children.
+   */
   scale: number;
   children: ReactNode;
 };

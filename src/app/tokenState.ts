@@ -12,11 +12,6 @@ export const selectedTokenIdState = atom<TokenID | null>({
   default: null,
 });
 
-export const hoveredTokenIdState = atom<TokenID | null>({
-  key: 'HoveredTokenId',
-  default: null,
-});
-
 export const routedMapTokens = atom<TokenID[]>({
   key: 'RoutedTokenIDs',
   default: selector<TokenID[]>({
@@ -175,15 +170,19 @@ export const activeTokenIDsState = selector<TokenID[]>({
   key: 'ActiveTokenIDs',
   get: ({ get }) => {
     const viewInactive = get(viewInactiveState);
+    const selectedTokenId = get(selectedTokenIdState);
 
     return [
       ...get(tokenIDsState)
         .map(
           (id) => [id, get(tokenState(id)), get(isTokenVisibleState(id)), get(tokenEffectiveSize(id))] as [TokenID, Token, boolean, number]
         )
-        .filter(([_, { position, deleted, active }, isVisible]) => !!position && !deleted && isVisible && (active || viewInactive)),
+        .filter(
+          ([id, { position, deleted, active }, isVisible]) =>
+            !!position && !deleted && isVisible && (active || id === selectedTokenId || viewInactive)
+        ),
     ]
-      .sort(([, , , a], [, , , b]) => b - a)
+      .sort(([, , , a], [, , , b]) => b - a) // we sort them by size so that large tokens are below smaller ones
       .map(([id]) => id);
   },
 });
