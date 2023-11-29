@@ -1,0 +1,13 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "oursong-maps": {
+      "appLocation": ".",
+      "outputLocation": "build",
+      "appBuildCommand": "yarn run buid",
+      "run": "yarn start",
+      "appDevserverUrl": "http://localhost:3000",
+      "apiDevserverUrl": "http://localhost:7071"
+    }
+  }
+}
