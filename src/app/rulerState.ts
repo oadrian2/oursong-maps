@@ -21,11 +21,11 @@ const rulerSyncEffect: (param: string) => AtomEffect<Ruler> =
     const subscription = combineLatest([api.rulerChanges, getPromise(userIdState)])
       .pipe(
         filter(([[incomingUserID], selfID]) => userID !== selfID && userID === incomingUserID),
-        map(([ruler, _]) => ruler),
+        map(([ruler]) => ruler),
         startWith([userID, DEFAULT_RULER] as [UserID, Ruler]),
         pairwise(),
-        filter(([[_, { when: whenFirst }], [__, { when: whenSecond }]]) => whenSecond > whenFirst),
-        map(([_, [__, ruler]]) => ruler)
+        filter(([[, { when: whenFirst }], [, { when: whenSecond }]]) => whenSecond > whenFirst),
+        map(([, [, ruler]]) => ruler)
       )
       .subscribe(setSelf);
 

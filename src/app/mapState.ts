@@ -48,7 +48,7 @@ export const createUniqueComparitor =
   (value: T, index: number, self: T[]) =>
     self.findIndex((item) => selector(item) === selector(value)) === index;
 
-export const mapGeneratorsState = selector<any[]>({
+export const mapGeneratorsState = selector<Generator[]>({
   key: 'MapGenerators',
   get: ({ get }) => {
     const { generators: campaignGenerators } = get(routedCampaignState);
@@ -137,7 +137,7 @@ export const generatorState = selectorFamily<Generator | null, GeneratorID>({
   get:
     (id) =>
     ({ get }) =>
-      get(mapGeneratorsState).find((g) => g.id === id),
+      get(mapGeneratorsState).find((g) => g.id === id) ?? null,
 });
 
 // TODO: find a better solution

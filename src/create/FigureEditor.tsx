@@ -1,16 +1,31 @@
 import { Box, Checkbox, FormControlLabel, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { FigureShape, TokenColor, isFigureShape } from '../api/types';
 
-export function FigureEditor({ baseOptions, figure, onFigureChange }: { baseOptions: number[]; figure: any; onFigureChange: any }) {
+export type Figure = { id: string; name: string; shape: FigureShape };
+
+function calcLabel(name: string) {
+  return name.includes(' ')
+    ? name
+        .split(' ')
+        .map((p) => p.charAt(0))
+        .join('')
+        .trim()
+    : name.substring(0, 2);
+}
+
+export function FigureEditor({ baseOptions, figure, onFigureChange }: FigureEditorProps) {
+  if (!isFigureShape(figure.shape)) throw new Error('`figure` must contain a figure shape.');
+
   const {
     name,
     shape: { label, color, isGroup, baseSize },
   } = figure;
 
-  const handleColorChange = (event: any, value: any) => {
+  const handleColorChange = (_event: React.MouseEvent<HTMLElement>, value: TokenColor) => {
     onFigureChange({ ...figure, shape: { ...figure.shape, color: value } });
   };
 
-  const handleNameChange = (event: any) => {
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newName = event.target.value;
 
     const newLabel = label === calcLabel(name) ? calcLabel(newName) : label;
@@ -18,16 +33,16 @@ export function FigureEditor({ baseOptions, figure, onFigureChange }: { baseOpti
     onFigureChange({ ...figure, name: event.target.value, shape: { ...figure.shape, label: newLabel } });
   };
 
-  const handleLabelChange = (event: any) => {
+  const handleLabelChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onFigureChange({ ...figure, shape: { ...figure.shape, label: event.target.value } });
   };
 
-  const handleBaseChange = (event: any, value: any) => {
+  const handleBaseChange = (_event: React.MouseEvent<HTMLElement>, value: number) => {
     onFigureChange({ ...figure, shape: { ...figure.shape, baseSize: value } });
   };
 
-  const handleIsGroupChange = (event: any) => {
-    onFigureChange({ ...figure, shape: { ...figure.shape, isGroup: event.target.checked } });
+  const handleIsGroupChange = (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    onFigureChange({ ...figure, shape: { ...figure.shape, isGroup: checked } });
   };
 
   return (
@@ -61,12 +76,8 @@ export function FigureEditor({ baseOptions, figure, onFigureChange }: { baseOpti
   );
 }
 
-export function calcLabel(name: string) {
-  return name.includes(' ')
-    ? name
-        .split(' ')
-        .map((p) => p.charAt(0))
-        .join('')
-        .trim()
-    : name.substring(0, 2);
-}
+export type FigureEditorProps = {
+  baseOptions: number[];
+  figure: Figure;
+  onFigureChange: (figure: Figure) => void;
+};

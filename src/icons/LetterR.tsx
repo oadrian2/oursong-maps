@@ -1,6 +1,6 @@
-import { SvgIcon } from '@mui/material';
+import { SvgIcon, SvgIconProps } from '@mui/material';
 
-export default function LetterR(props: any) {
+export default function LetterR(props: SvgIconProps) {
   return (
     <SvgIcon {...props} viewBox="0 0 64 64">
       <path d="M36.604 23.043c-.623-.342-1.559-.512-2.805-.512h-6.693v7.795h6.525c1.295 0 2.268-.156 2.916-.473c1.146-.551 1.721-1.639 1.721-3.268c0-1.757-.555-2.939-1.664-3.542" />

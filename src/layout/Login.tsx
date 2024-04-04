@@ -7,7 +7,7 @@ export function Login() {
   const me = useRecoilValue(meState);
   const location = useLocation();
 
-  return !!me ? (
+  return me ? (
     <Button color="inherit" href={`/.auth/logout/google?post_logout_redirect_uri=${location.pathname}`}>
       Logout
     </Button>

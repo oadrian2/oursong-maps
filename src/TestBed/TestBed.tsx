@@ -10,8 +10,8 @@ export default function TestBed() {
   const [horizontal, setHorizontal] = useState(0);
   const [vertical, setVertical] = useState(0);
 
-  const width = 5555; // from image config
-  const height = 5555; // from image config
+  // const width = 5555; // from image config
+  // const height = 5555; // from image config
 
   const scale = scales[scaleIndex];
   const handleMouseOver: MouseEventHandler<HTMLDivElement> = (event) => {
@@ -112,7 +112,7 @@ function ScrollingContainer({ vertical = 0, horizontal = 0, onScroll, children }
     }
   }, [vertical, horizontal]);
 
-  const handleScroll = (event: any) => {
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     console.log(event);
     onScroll && onScroll((event.target as Element).scrollLeft, (event.target as Element).scrollTop);
   };

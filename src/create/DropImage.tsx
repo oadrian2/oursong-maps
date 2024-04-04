@@ -1,8 +1,7 @@
 import { Box } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 
-
-export function DropImage({ onFileSelected }: { onFileSelected: (file: File) => void; }) {
+export function DropImage({ onFileSelected }: { onFileSelected: (file: File) => void }) {
   const onDrop = (acceptedFiles: File[]) => {
     onFileSelected(acceptedFiles[0]);
   };

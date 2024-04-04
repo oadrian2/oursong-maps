@@ -4,7 +4,7 @@ import { Box, Button, Card, CardActions, CardContent, CardMedia, IconButton, Lin
 import { useResolvedPath } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { Map, TokenColor } from '../api/types';
+import { Map, TokenColor, Generator, isFigureShape } from '../api/types';
 import { campaignState } from '../app/campaignState';
 import { SupplyFigureToken } from '../doodads/FigureToken';
 import { defaultGeneratorComparer } from '../stores/comparers';
@@ -72,15 +72,19 @@ export function MapCard({ map: m }: MapCardParams) {
           {m.title}
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-          {sortedGenerators.map((g: any) => (
-            <SupplyFigureToken
-              key={g.id}
-              name={g.name}
-              label={g.shape.label + (g.shape.isGroup ? '#' : '')}
-              baseSize={g.shape.baseSize}
-              color={g.shape.color}
-            />
-          ))}
+          {sortedGenerators.map((g: Generator) =>
+            isFigureShape(g.shape) ? (
+              <SupplyFigureToken
+                key={g.id}
+                name={g.name}
+                label={g.shape.label + (g.shape.isGroup ? '#' : '')}
+                baseSize={g.shape.baseSize}
+                color={g.shape.color}
+              />
+            ) : (
+              false
+            )
+          )}
         </Box>
       </CardContent>
       <CardActions>

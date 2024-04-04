@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "swa: start",
+      "command": "swa start",
+      "isBackground": true,
+      "problemMatcher": "$swa-watch"
+    },
+    {
+      "type": "shell",
+      "label": "yarn build (swa)",
+      "command": "yarn run build",
+      "dependsOn": "yarn clean (swa)",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "type": "shell",
+      "label": "yarn install (swa)",
+      "command": "yarn install"
+    },
+    {
+      "type": "shell",
+      "label": "yarn clean (swa)",
+      "command": "yarn run clean",
+      "dependsOn": "yarn install (swa)"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import { Fab } from '@mui/material';
-import { motion } from 'framer-motion';
+import { Variants, motion } from 'framer-motion';
 import React, { ReactNode } from 'react';
 import { roundToMultiple } from '../app/math';
 
@@ -19,7 +19,7 @@ export function ArcFab({ children, angle, 'aria-label': label, onClick = () => {
   const endY = roundToMultiple(Math.sin(angle) * endDistance, step);
   const delay = 0.1;
 
-  const variants: any = {
+  const variants: Variants = {
     hidden: {
       opacity: 0,
       transform: `translate(${+startX}px, ${-startY}px)`,

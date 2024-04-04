@@ -1,17 +1,23 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { BehaviorSubject, Observable, shareReplay, Subject } from 'rxjs';
+import { BehaviorSubject, filter, Observable, shareReplay, Subject } from 'rxjs';
 import { MapID } from '../app/mapState';
 import { Campaign, CampaignID, Generator, Map, Point, Ruler, Token, TokenColor, TokenID, UserID } from './types';
+import { GroupDataMessage, OnGroupDataMessageArgs, OnServerDataMessageArgs, WebPubSubClient } from '@azure/web-pubsub-client';
 
-type Handler = (...args: any[]) => void;
+type Handler<T> = (argument: T) => void;
+
+function isRulerMessage(message: GroupDataMessage) {
+  return typeof message.data === 'object' && 'type' in message.data && message.data.type === 'ruler';
+}
 
 export class MapApi {
   readonly connection: HubConnection;
+  readonly pubSubClient: WebPubSubClient;
 
   private mapId: MapID | null = null;
 
-  #connectionHandlers: Handler[] = [];
-  #userListHandlers: Handler[] = [];
+  #connectionHandlers: Handler<UserID>[] = [];
+  #userListHandlers: Handler<UserID[]>[] = [];
   #connectedIds = new Set<string>();
   #tokenCache: StorageToken[] | null = null;
 
@@ -21,6 +27,9 @@ export class MapApi {
   readonly #rulerChanges = new Subject<[UserID, Ruler]>();
   readonly #tokenChanges = new Subject<[TokenID, Token]>();
   readonly #pingChanges = new Subject<[UserID, Point]>();
+
+  readonly #groupMessages = new Subject<GroupDataMessage>();
+  readonly #psRulerChanges = this.#groupMessages.pipe(filter(isRulerMessage));
 
   /**
    *
@@ -33,6 +42,14 @@ export class MapApi {
       .configureLogging(LogLevel.Debug)
       .build();
 
+    this.pubSubClient = new WebPubSubClient({
+      getClientAccessUrl: async () => (await (await fetch(`/api/login`)).json()).url,
+    });
+
+    this.pubSubClient.on('connected', () => console.log('connected'));
+    this.pubSubClient.on('disconnected', () => console.log('disconnected'));
+    this.pubSubClient.on('server-message', (e) => console.log(JSON.stringify(e.message)));
+
     this.connection.on('rulerUpdated', (mapId, { id }) => {
       if (!this.#mapMatches(mapId, this.mapId!)) return;
 
@@ -41,11 +58,25 @@ export class MapApi {
       }
     });
 
-    this.connection.on('rulerUpdated', (mapId, ruler) => {
-      if (!this.#mapMatches(mapId, this.mapId!)) return;
+    this.pubSubClient.on('group-message', (e: OnGroupDataMessageArgs) => {
+      const ruler = e.message.data as Ruler & { id: string; type: string };
 
-      this.#rulerChanges.next([ruler.id, ruler]);
+      if (ruler.type === 'ruler') {
+        this.#rulerChanges.next([ruler.id, ruler]);
+      } else {
+        console.log(JSON.stringify(e.message.data));
+      }
     });
+
+    this.pubSubClient.on('server-message', (e: OnServerDataMessageArgs) => {
+      console.log(JSON.stringify(e));
+    })
+
+    // this.connection.on('rulerUpdated', (mapId, ruler) => {
+    //   if (!this.#mapMatches(mapId, this.mapId!)) return;
+
+    //   this.#rulerChanges.next([ruler.id, ruler]);
+    // });
 
     this.connection.on('tokenUpdated', (mapId, token) => {
       if (!this.#mapMatches(mapId, this.mapId!)) return;
@@ -94,13 +125,17 @@ export class MapApi {
 
     this.#onUserConnected(this.connection.connectionId!);
 
-    this.#connectionHandlers.forEach((h) => h(this.connection.connectionId));
+    this.#connectionHandlers.forEach((h) => h(this.connection.connectionId!));
+
+    await this.pubSubClient.start();
   }
 
   async joinMap(game: string, id: string) {
     this.mapId = { game, id };
 
     await this.connection.invoke('joinMap', game, id);
+
+    await this.pubSubClient.joinGroup(id);
   }
 
   async leaveMap() {
@@ -115,6 +150,8 @@ export class MapApi {
     if (this.mapId === null) throw new MapNotJoinedError();
 
     this.connection.invoke('updateRuler', this.mapId, { id: this.userId, ...ruler }, new Date());
+
+    this.pubSubClient.sendToGroup(this.mapId.id, { type: 'ruler', id: this.userId, ...ruler }, 'json');
   }
 
   updatePing(ping: Point) {
@@ -129,6 +166,8 @@ export class MapApi {
     const storageToken: StorageToken = { id: tokenID, map: this.mapId.id, game: this.mapId.game, ...mapTokenToStorageToken(token) };
 
     await this.connection.invoke('updateToken', this.mapId, { ...storageToken });
+
+    await this.pubSubClient.sendEvent('wpsUpdateToken', storageToken, 'json');
   }
 
   async getToken(tokenID: TokenID): Promise<Token> {
@@ -216,23 +255,23 @@ export class MapApi {
     return storageCampaign;
   }
 
-  onConnected(handler: Handler) {
+  onConnected(handler: Handler<UserID>) {
     this.#connectionHandlers.push(handler);
   }
 
-  offConnected(handler: Handler) {
-    const removeIdx = this.#userListHandlers.indexOf(handler);
+  offConnected(handler: Handler<UserID>) {
+    const removeIdx = this.#connectionHandlers.indexOf(handler);
 
     if (removeIdx !== -1) {
-      this.#userListHandlers.splice(removeIdx, 1);
+      this.#connectionHandlers.splice(removeIdx, 1);
     }
   }
 
-  onUserListUpdated(handler: Handler) {
+  onUserListUpdated(handler: Handler<UserID[]>) {
     this.#userListHandlers.push(handler);
   }
 
-  offUserListUpdated(handler: Handler) {
+  offUserListUpdated(handler: Handler<UserID[]>) {
     const removeIdx = this.#userListHandlers.indexOf(handler);
 
     if (removeIdx !== -1) {

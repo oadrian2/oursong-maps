@@ -1,8 +1,9 @@
 {
-  "name": "map-app",
+  "name": "oursong-maps",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@azure/web-pubsub-client": "^1.0.0-beta.3",
     "@emotion/react": "^11.6.0",
     "@emotion/styled": "^11.6.0",
     "@microsoft/signalr": "^8.0.0",
@@ -24,15 +25,13 @@
     "recoil": "^0.7.5",
     "recoil-sync": "^0.2.0",
     "rxjs": "^7.5.3",
-    "typescript": "^5.2.2",
     "web-vitals": "^3.3.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start-swa": "swa start http://localhost:3000 --api-location http://localhost:7071"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -59,7 +58,12 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.0.5",
-    "concurrently": "^8.2.2"
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^5.2.2"
   },
   "proxy": "http://localhost:7071"
 }

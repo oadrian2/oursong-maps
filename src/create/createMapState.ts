@@ -50,7 +50,7 @@ export const optimizedMapBlobState = selector<Blob>({
     const mimeTypes = ['image/png', 'image/jpeg', 'image/webp'];
     const comparisonBlobs = await Promise.all(
       mimeTypes.map(
-        (value) => new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (!!blob ? resolve(blob) : reject(blob)), value))
+        (value) => new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(blob)), value))
       )
     );
 

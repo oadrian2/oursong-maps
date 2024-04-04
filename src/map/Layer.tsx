@@ -6,7 +6,7 @@ export const Layer = styled('div')<{ interactive?: boolean }>`
   height: 100%;
   width: 100%;
 
-  pointer-events: ${({ interactive }) => (!!interactive ? 'auto' : 'none')};
+  pointer-events: ${({ interactive }) => (interactive ? 'auto' : 'none')};
 `;
 
 Layer.displayName = 'Layer';

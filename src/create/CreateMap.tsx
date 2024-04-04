@@ -4,11 +4,11 @@ import { nanoid } from 'nanoid';
 import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { FigureShape, Map, TokenColor } from '../api/types';
+import { Map, TokenColor } from '../api/types';
 import { campaignState } from '../app/campaignState';
 import { SupplyFigureToken } from '../doodads/FigureToken';
 import { DropImage } from './DropImage';
-import { FigureEditor } from './FigureEditor';
+import { Figure, FigureEditor } from './FigureEditor';
 import { ScaleChooser } from './ScaleChooser';
 import { mapImageFileState, mapImageMetadataState, mapImageTitleState, optimizedMapBlobState } from './createMapState';
 import { useDataURL } from './useDataURL';
@@ -25,8 +25,6 @@ export function CreateMap() {
     </Box>
   );
 }
-
-type Figure = { id: string; name: string; shape: FigureShape };
 
 export function MapEditor() {
   const { game } = useParams();
@@ -103,7 +101,7 @@ export function MapEditor() {
         </Stack>
         <Box sx={{ display: 'flex', flexFlow: 'wrap', gap: 2, marginTop: 4 }}>
           {figures.map((figure) => (
-            <button key={figure.id} onClick={() => setSelectedFigure(figure)}>
+            <button type="button" key={figure.id} onClick={() => setSelectedFigure(figure)} aria-label={`Select ${figure.shape.label}`}>
               <SupplyFigureToken
                 name={figure.name}
                 label={(figure.shape.label || '??') + (figure.shape.isGroup ? '#' : '')}
@@ -112,7 +110,7 @@ export function MapEditor() {
               />
             </button>
           ))}
-          <button onClick={handleAddFigure}>
+          <button type="button" onClick={handleAddFigure} aria-label="Add Token">
             <SupplyFigureToken name="Add Token" label="+" color={TokenColor.red} baseSize={30} />
           </button>
         </Box>

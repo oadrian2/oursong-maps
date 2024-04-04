@@ -63,7 +63,7 @@ export const tokenIndexState = selectorFamily<number, TokenID>({
 
       return get(tokenIDsState)
         .map((id: TokenID) => [id, get(tokenState(id))] as [TokenID, Token])
-        .filter(([_, { generator }]) => selfGenerator === generator)
+        .filter(([, { generator }]) => selfGenerator === generator)
         .findIndex(([id]) => id === selfID);
     },
 });
@@ -162,7 +162,7 @@ export const tokenPlacementsState = selector<[TokenID, Placement][]>({
   get: ({ get }) =>
     get(tokenIDsState)
       .map((id) => [id, get(tokenState(id))] as [TokenID, Token])
-      .filter(([_, token]) => token.position !== null)
+      .filter(([, token]) => token.position !== null)
       .map(([id, { position, facing }]) => [id, { position, facing, scale: 1.0 } as Placement]),
 });
 
