@@ -119,6 +119,7 @@ export function MapEditor() {
             <FigureEditor baseOptions={campaign.metrics.baseOptions} figure={selectedFigure} onFigureChange={handleFigureChange} />
           </Box>
         )}
+        {id && scale && game && <a href={`https://maps.oursong.info/maps/${game}/${id}`} target="_blank">Open</a>}
       </Box>
       <Box sx={{ flex: '1', display: 'grid' }}>
         {id}; {width} x {height}; {image.type}; {compactFormatter.format(image.size)}; {scale}
